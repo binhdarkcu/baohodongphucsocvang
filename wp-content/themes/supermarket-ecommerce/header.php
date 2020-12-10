@@ -51,7 +51,12 @@
       background: <?php echo $sub_header_top_color ?> !important;
       color: #fff;
     }
-
+	.header-search .dgwt-wcas-search-wrapp .dgwt-wcas-search-form .dgwt-wcas-search-submit, .header-search .dgwt-wcas-search-wrapp .dgwt-wcas-search-form button[type=submit] {
+		background: url(<?php echo TEMPLATE_PATH;?>/assets/images/search.png) no-repeat center <?= $header_top_color;?>!important;
+	}
+	.toggleSupport{
+		color: <?= $header_top_color;?> !important;
+	}
     .price-gap {
         width: 8px;
         position: relative;
@@ -70,6 +75,7 @@
 <?php
 $getQuery = get_queried_object();
 $slugName = $getQuery -> name;
+
 ?>
 <body <?php body_class(); ?> style="background-color: <?php if (!empty($bg_color)) echo $bg_color ?>">
 

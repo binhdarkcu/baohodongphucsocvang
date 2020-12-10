@@ -1,0 +1,378 @@
+/*
+    Document   : ButterBelly Theme Language RTL
+    Created on : 30 Dec 2014, 3:33:12 PM
+    Author     : Inkthemes
+    Description: ButterBelly Theme Language RTL
+
+*/
+
+body{
+    unicode-bidi:embed;
+}
+h1, h2, h3, h4, h5, h6 {
+    text-align: right;
+}
+p {
+    text-align: right;
+}
+ol {
+    direction: rtl;
+}
+ol li {
+    list-style: decimal;
+}
+ul {
+    direction: rtl;
+}
+ul li {
+    margin-left: 0;
+}
+/*Bootstrap RTL css*/
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {
+    float: right;
+}
+
+@media (min-width: 768px) {
+    .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+        float: right;
+    }
+}
+@media (min-width: 992px) {
+    .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {
+        float: right;
+    }
+}
+@media (min-width: 1200px) {
+    .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12 {
+        float: right;
+    }
+}
+.dropdown-menu {
+    float: right;
+}
+.btn-group > .btn,
+.btn-group-vertical > .btn {
+    float: right;
+}
+.btn-toolbar .btn,
+.btn-toolbar .btn-group,
+.btn-toolbar .input-group {
+    float: right;
+}
+.btn-group > .btn-group {
+    float: right;
+}
+.input-group .form-control {
+    float: right;
+}
+.nav-tabs > li {
+    float: right;
+}
+.nav-pills > li {
+    float: right;
+}
+/*Menu */
+.menu-wrapper {
+    float:right;
+    width:100%;
+}
+#menu .ddsmoothmenu {
+    float:right;
+}
+#menu .ddsmoothmenu li {
+    float:right;
+    text-align:right;
+}
+
+.flex-caption a.slider-readmore {
+    right: initial;
+    left: 10px;
+}
+.flex-caption a.slider-readmore span.glyphicon {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+.flex-caption a.slider-readmore .sl_rd_more {
+    padding-left: 5px;
+}
+
+/*For Header logo*/
+.header .logo {
+    float:none;
+}
+.site-title {
+    text-align: center;
+}
+.site-description {
+    text-align: center;
+}
+.feature-content-inner,
+.feature-content .feature-content-inner .feature-content-text p,
+.feature-content .feature-content-inner  h3,
+.feature_mid_content .featurebox h2,
+.feature_mid_content .featurebox p.short_desc,
+.page_heading_container .page_heading_content h1 {
+    text-align: center;
+}
+
+.feature-content .feature-content-inner .feature-content-text p{}
+/*Feature content */
+.feature_mid_content .grid_16.alpha{
+    float:right;
+    margin-right:0;
+}
+
+.feature_mid_content .grid_8.omega{
+    float:left;
+    margin-left:0;
+}
+
+.feature_mid_content .feature_home_widget {
+    margin-left: 0;
+    margin-right: 0;
+}
+.feature_blog_content ul li.post_home {
+    margin: 0 0 30px 20px;
+}
+
+.flex-caption a.slider-readmore {
+    margin-top: 5px;
+}
+
+/*Blog Page */
+.page-content .grid_17.alpha{
+    float:right;
+    margin-right:0;  
+}
+.page-content .grid_7.omega{
+    float:left;
+    margin-left:0;
+}
+.page-content .content-bar {
+    margin: 0;
+    padding: 0;
+    margin-right: 0px;
+    margin-left: 28px;
+}
+
+a img.alignnone {
+    margin: 5px 0px 20px 0;
+}
+
+/* Contact Page */
+.contact-page {
+    margin-right: 0;
+    margin-left: 50px;
+}
+#contactForm label {
+    float: right;
+}
+#contactForm {
+    padding-bottom: 100px;
+    margin-bottom: 35px;
+}
+#contactForm input[type="text"], #contactForm input[type="email"] {
+    text-align: right;
+}
+#contactForm textarea {
+    text-align: right;
+}
+#contactForm input[type="submit"]{
+    float:right;
+}
+#contactForm input#vercode {
+    width: 71% !important;
+}
+
+/*sidebar */
+.widget_heading,
+.widget_area label,
+.widget_area select,
+.widget_area #calendar_wrap{
+    text-align: right;
+    clear: both;
+}
+.widget_area select,
+#calendar_wrap #wp-calendar{
+    float:right;
+}
+.sidebar ul li {
+    background-position: right 20px;
+    padding-right: 20px;
+}
+.sidebar ul li:hover {
+    background-position: right 20px;
+    padding-right: 20px;
+}
+.sidebar ul ul.sub-menu {
+    margin-left: 0;
+    margin-right: -10px;
+}
+.footer .widget_area .widget_heading {
+    background-position: right bottom;
+}
+.page-container .searchform input[type="text"], .sidebar.home .searchform input[type="text"] {
+    /*text-align:right;*/   
+}
+
+/*Comment Form*/
+#respond input[type='text'], #commentform textarea {
+    text-align: right;
+    float: left;
+}
+ol.commentlist li.comment .reply {
+    position: absolute;
+    left: 10px;
+    right: inherit;
+    top: 20px;
+}
+ol.commentlist li{
+    list-style: none;
+}
+cite.fn {
+    right: 130px;
+    left:initial;
+}
+.comment-meta.commentmetadata {
+    right: 120px;
+    left:initial;
+}
+ol.commentlist li.comment .comment-meta a {
+    float: right;
+    margin-right: 12px;
+}
+ol.commentlist li.comment .comment-author .avatar {
+    position: absolute;
+    top: -26px;
+    right: 25px;
+}
+.comment-author.vcard {
+    margin-right: 160px;
+}
+
+#commentform input#submit {
+    float: right;
+}
+.comment-awaiting-moderation {
+    margin-left: 0px;
+    margin-right:160px;
+}
+
+#respond label {
+    float: right;
+}
+.comment-awaiting-moderation {
+    margin-left: 0px;
+    margin-right:160px;
+}
+
+#respond label {
+    float: right;
+}
+
+/*Paging*/
+ul.paging {
+    float: right;
+}
+
+
+/*Gallery*/
+.content-bar .gallery ul.thumbnail.col-3 li {
+    margin-right: 0;
+    margin-left:3%;
+}
+.content-bar .gallery ul.thumbnail.col-4 li {
+    margin-right: 0;
+    margin-left: 2%;
+}
+.content-bar .gallery ul.thumbnail.col-5 li {
+    margin-right: 0 !important;
+    margin-left:5.5%;
+}
+.content-bar .gallery ul.thumbnail.col-5 li span {
+    position: absolute;
+    top: 29%;
+    left: 8%;
+}
+
+.content-bar .gallery ul.thumbnail.col-6 li {
+    margin-right: 0;
+    margin-left:4%;
+    margin-bottom: 50px;
+}
+.content-bar .gallery ul.thumbnail.col-7 li {
+    margin-right: 0;
+    margin-left: 2%;
+}
+.content-bar .gallery ul.thumbnail.col-8 li {
+    width: 75px;
+    margin-right: 0;
+    margin-left:2%
+}
+.content-bar .gallery ul.thumbnail.col-9 li {
+    margin-right: 0;
+    margin-left:3%;
+}
+
+/*Footer */
+.footer_top_container .call_us {
+    text-align: left;
+}
+.footer_top_container ul.social_logos {
+    float: right;
+}
+.footer .footer_widget .searchform input[type="text"] {
+    text-align:right;
+}
+.footer .footer_widget .searchform {
+    float: right;
+}
+.footer .footer_widget ul li {
+    background-position: right;
+    padding-right: 12px;
+}
+.footer .footer_widget p {
+    text-align: right;
+    direction: rtl;
+}
+.bottom_footer_container .copyrightinfo p {
+    text-align: right;
+}
+.bottom_footer_content .footer_nav {
+    text-align: left;
+}
+
+/* Media Screen */
+@media only screen and (min-width:992px) and (max-width:1199px){
+    .flex-caption-wrapper {
+        margin-top: -11.62%;
+    }
+    .sidebar ul ul.sub-menu {
+        margin-right: -18px;
+        margin-left: 0;
+    }
+}
+@media only screen and (max-width: 991px){
+    #wp-calendar {
+        float: right !important;
+    }
+    .footer .footer_widget .searchform {
+        margin-right: 30px !important;
+    }
+    #wp-calendar{
+        max-width: 320px;
+    }
+    .bottom_footer_container .copyrightinfo p,
+    .bottom_footer_content .footer_nav {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
+@media only screen and (max-width:480px){
+
+    ol.commentlist li.comment .reply{
+        bottom: 0;
+        top: initial;
+    }
+}

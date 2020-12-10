@@ -84,12 +84,12 @@ div#contact-floated {
     -ms-transition: all .5s;
     -o-transition: all .5s;
     transition: all .5s;
-    -webkit-transform: translateX(-150px);
-    -khtml-transform: translateX(-150px);
-    -moz-transform: translateX(-150px);
-    -ms-transform: translateX(-150px);
-    -o-transform: translateX(-150px);
-    transform: translateX(-150px);
+    -webkit-transform: translateX(0px);
+    -khtml-transform: translateX(0px);
+    -moz-transform: translateX(0px);
+    -ms-transform: translateX(0px);
+    -o-transform: translateX(0px);
+    transform: translateX(0px);
 }
 
 div#contact-floated:hover {
