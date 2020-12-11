@@ -5,6 +5,11 @@ if (!defined('BUTTERBELLY_DIR')) {
 if (!defined('BUTTERBELLY_DIR_URI')) {
     define('BUTTERBELLY_DIR_URI', get_template_directory_uri() . '/');
 }
+
+define('TEMPLATE_PATH',get_bloginfo('template_url'));
+define('HOME_URL',get_home_url());
+define('BlOG_NAME',get_bloginfo('blog_name'));
+define('SLOGAN', get_bloginfo('description'));
 /**
  * Including all the necessary library files
  */
@@ -17,6 +22,82 @@ require_once (BUTTERBELLY_DIR . 'includes/inkoption-framework/load.php');
  */
 require_once (BUTTERBELLY_DIR . 'includes/shop_loop.php');
 
+function supermarket_ecommerce_fonts_url(){
+	$font_url = '';
+	$font_family = array();
+	$font_family[] = 'Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i';
+	$font_family[] = 'Open Sans:300,300i,400,400i,600,600i,700,700i,800,800i';
+
+	$query_args = array(
+		'family'	=> rawurlencode(implode('|',$font_family)),
+	);
+	$font_url = add_query_arg($query_args,'//fonts.googleapis.com/css');
+	return $font_url;
+}
+
+function supermarket_ecommerce_scripts() {
+	// Add custom fonts, used in the main stylesheet.
+	wp_enqueue_style( 'supermarket-ecommerce-fonts', supermarket_ecommerce_fonts_url(), array(), null );
+
+	// CUSTOM CSS
+	wp_enqueue_style( 'custom-style', get_template_directory_uri().'/assets/css/custom-style.css' );
+	//wp_enqueue_style( 'custom-login', get_template_directory_uri().'/assets/css/custom-login.css' );
+
+
+
+	//Bootstarp
+
+	// Theme stylesheet.
+	wp_enqueue_style( 'supermarket-ecommerce-basic-style', get_stylesheet_uri() );
+
+	// Load the Internet Explorer 9 specific stylesheet, to fix display issues in the Customizer.
+	if ( is_customize_preview() ) {
+		wp_enqueue_style( 'supermarket-ecommerce-ie9', get_theme_file_uri( '/assets/css/ie9.css' ), array( 'supermarket-ecommerce-style' ), '1.0' );
+		wp_style_add_data( 'supermarket-ecommerce-ie9', 'conditional', 'IE 9' );
+	}
+	// Load the Internet Explorer 8 specific stylesheet.
+	wp_enqueue_style( 'supermarket-ecommerce-ie8', get_theme_file_uri( '/assets/css/ie8.css' ), array( 'supermarket-ecommerce-style' ), '1.0' );
+	wp_style_add_data( 'supermarket-ecommerce-ie8', 'conditional', 'lt IE 9' );
+
+	//font-awesome
+	//wp_enqueue_style( 'font-awesome', get_template_directory_uri().'/assets/css/fontawesome-all.css' );
+	// Load the html5 shiv.
+	//wp_enqueue_script( 'html5', get_theme_file_uri( '/assets/js/html5.js' ), array(), '3.7.3' );
+	wp_script_add_data( 'html5', 'conditional', 'lt IE 9' );
+
+	//wp_enqueue_script( 'supermarket-ecommerce-skip-link-focus-fix', get_theme_file_uri( '/assets/js/skip-link-focus-fix.js' ), array(), '1.0', true );
+
+	$supermarket_ecommerce_l10n=array();
+
+	if ( has_nav_menu( 'top' ) ) {
+		wp_enqueue_script( 'supermarket-ecommerce-navigation-jquery', get_theme_file_uri( '/assets/js/navigation.js' ), array( 'jquery' ), '1.0', true );
+		$supermarket_ecommerce_l10n['expand']         = __( 'Expand child menu', 'supermarket-ecommerce' );
+		$supermarket_ecommerce_l10n['collapse']       = __( 'Collapse child menu', 'supermarket-ecommerce' );
+	}
+
+	wp_enqueue_script( 'supermarket-ecommerce-navigation-jquery', get_theme_file_uri( '/assets/js/navigation.js' ), array( 'jquery' ), '2.1.2', true );
+	wp_enqueue_script( 'supermarket-ecommerce-skip-link-focus-fix', get_theme_file_uri( '/assets/js/skip-link-focus-fix.js' ), array(), '1.0', true );
+	wp_enqueue_script( 'bootstrap', get_template_directory_uri() . '/assets/js/bootstrap.js', array('jquery') );
+	wp_enqueue_script( 'jquery-superfish', get_template_directory_uri() . '/assets/js/jquery.superfish.js', array('jquery') ,'',true);
+	//wp_enqueue_script( 'jquery-compress', get_template_directory_uri() . '/assets/js/jquery.compress.js', array('jquery') ,'',true);
+
+	/**
+	 * Login
+	 */
+	wp_enqueue_script( 'custom-login', get_template_directory_uri() . '/assets/js/custom.login.js', array('jquery') ,'',true);
+
+	wp_localize_script( 'supermarket-ecommerce-skip-link-focus-fix', 'supermarket_ecommerceScreenReaderText', $supermarket_ecommerce_l10n );
+
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
+
+
+	wp_enqueue_style( 'autoptimize', get_template_directory_uri().'/assets/css/autoptimize.css' );
+
+	wp_enqueue_style( 'slick', get_template_directory_uri().'/assets/css/slick.css' );
+}
+add_action( 'wp_enqueue_scripts', 'supermarket_ecommerce_scripts' );
 /**
  *  CSS files
  */
@@ -204,7 +285,7 @@ function butterbelly_setup() {
      */
     add_theme_support('automatic-feed-links');
     /**
-     * Intialize language files 
+     * Intialize language files
      */
     load_theme_textdomain('butterbelly', get_template_directory() . '/languages');
     register_nav_menu('custom_menu', __('Main Menu', 'butterbelly'));
@@ -289,7 +370,7 @@ function butterbelly_body_background() {
 add_action('wp_head', 'butterbelly_body_background');
 
 /**
- * Breadcrumbs 
+ * Breadcrumbs
  * @global type $post
  * @global type $wp_query
  * @global type $author
@@ -383,7 +464,7 @@ function butterbelly_breadcrumbs() {
  * This function thumbnail id and
  * returns thumbnail image
  * @param type $iw
- * @param type $ih 
+ * @param type $ih
  */
 function butterbelly_get_thumbnail($iw, $ih, $id = "") {
     $permalink = get_permalink($id);
@@ -398,7 +479,7 @@ function butterbelly_get_thumbnail($iw, $ih, $id = "") {
 
 /**
  * This function gets image width and height and
- * Prints attached images from the post        
+ * Prints attached images from the post
  */
 function butterbelly_get_image($width, $height) {
     $return = false;
@@ -582,7 +663,7 @@ function butterbelly_childtheme_favicon() {
 add_action('wp_head', 'butterbelly_childtheme_favicon');
 
 /**
- *  Show analytics code in footer 
+ *  Show analytics code in footer
  */
 function butterbelly_childtheme_analytics() {
     $output = butterbelly_get_option('inkthemes_analytics');
@@ -593,7 +674,7 @@ function butterbelly_childtheme_analytics() {
 add_action('wp_head', 'butterbelly_childtheme_analytics');
 
 /**
- *  Custom CSS Styles 
+ *  Custom CSS Styles
  */
 function butterbelly_of_head_css() {
     $output = '';
@@ -613,7 +694,7 @@ function butterbelly_of_head_css() {
 add_action('wp_head', 'butterbelly_of_head_css');
 
 /**
- * Get category 
+ * Get category
  * @param type $cat_name
  * @return type activate support for thumbnails
  */

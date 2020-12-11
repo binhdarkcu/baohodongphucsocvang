@@ -9,19 +9,8 @@
  *
  */
 get_header();
-?>  
-<div class="page_heading_container">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="page_heading_content">
-                    <?php butterbelly_breadcrumbs(); ?>
-                </div>
-            </div>
-            <div class="clear"></div>
-        </div>
-    </div>
-</div>
+?>
+
 <div class="page-container">
     <div class="container">
         <div class="row">
@@ -33,7 +22,7 @@ get_header();
                         if (have_posts()) :
                             woocommerce_content();
                         endif;
-                        ?>	
+                        ?>
                     </div>
                 </div>
                 <div class="col-md-4">

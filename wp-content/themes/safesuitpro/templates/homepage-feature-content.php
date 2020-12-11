@@ -1,7 +1,7 @@
 <div class="home_container">
     <div class="container">
         <div class="row">
-            <div class="home-content">                
+            <div class="home-content">
                 <div class="feature-content">
                     <div class="col-md-4">
                         <div class="feature-content-inner">
@@ -98,7 +98,7 @@
                                     <img src="<?php echo butterbelly_get_option('inkthemes_fimg3'); ?>" alt="<?php _e('Third Feature Image', 'butterbelly'); ?>" />
                                 <?php } else { ?>
                                     <img src="<?php echo BUTTERBELLY_DIR_URI . 'assets/images/img.jpg'; ?>" /><?php } ?></span>
-                            <div class="feature-content-text">          
+                            <div class="feature-content-text">
                                 <div class="circle">
                                     <?php if (butterbelly_get_option('inkthemes_circle_img3') != '') { ?>
                                         <a href="<?php
@@ -121,7 +121,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="clear"></div>   
+                    <div class="clear"></div>
                     <div class="col-md-12">
                         <hr class="hp_content_bottom_border"/>
                     </div>

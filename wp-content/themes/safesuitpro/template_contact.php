@@ -23,7 +23,7 @@ if ($captcha_option === $captcha_option_on) {
             $verifyResponse = @file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret . '&response=' . $_POST['g-recaptcha-response']);
             $responseData = json_decode($verifyResponse, true);
             if ($responseData['success']) {
-                
+
             } else {
                 $captchaError = __('Robot verification failed, please try again.', 'butterbelly');
             }
@@ -35,7 +35,7 @@ if ($captcha_option === $captcha_option_on) {
         $captchaError = "";
     endif;
 } else {
-    
+
 } //captcha on-off and end captcha
 
 if (isset($_POST['submitted'])) {
@@ -169,7 +169,7 @@ if (isset($_POST['submitted'])) {
                                         if ($captcha_option === $captcha_option_on) {
                                             ?>
                                             <div class="form-group">
-                                                <div class="recaptcha-wrap"> 
+                                                <div class="recaptcha-wrap">
                                                     <div class = "g-recaptcha" data-sitekey = "<?php echo $publickey; ?>"></div>
                                                 </div>
                                             </div>
@@ -193,7 +193,7 @@ if (isset($_POST['submitted'])) {
                             <div class="contact-map"><?php echo esc_sanitize_iframe(butterbelly_get_option('inkthemes_contact_map')); ?></div>
                         <?php } else { ?>
                             <div style="width: 100%; overflow:hidden;" class="contact-map"><iframe width="100%" height="480" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Chuna+Bhatti,+Bhopal,+Madhya+Pradesh,+India&amp;aq=0&amp;oq=bh&amp;sll=37.0625,-95.677068&amp;sspn=56.506174,79.013672&amp;ie=UTF8&amp;hq=&amp;hnear=Chuna+Bhatti,+Bhopal,+Madhya+Pradesh,+India&amp;t=m&amp;ll=23.202617,77.413874&amp;spn=0.037866,0.054932&amp;z=14&amp;iwloc=A&amp;output=embed"></iframe><br /></div>
-                        <?php } ?> 	
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="col-md-4">

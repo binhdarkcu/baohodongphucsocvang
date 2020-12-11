@@ -4,11 +4,11 @@
  *
  */
 get_header();
-?>  
+?>
 <div class="page_heading_container">
     <div class="container">
         <div class="row">
-            <div class="col-md-12">                 
+            <div class="col-md-12">
                 <div class="page_heading_content">
                     <h1><?php printf(__('Category Archives: %s', 'butterbelly'), '' . single_cat_title('', false) . ''); ?></h1>
                 </div>

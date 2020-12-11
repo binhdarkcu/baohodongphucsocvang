@@ -22,7 +22,7 @@ get_header();
             <div class="page-content">
                 <div class="col-md-8">
                     <div class="row">
-                        <div class="content-bar blog">   
+                        <div class="content-bar blog">
                             <?php
                             $limit = get_option('posts_per_page');
                             $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
@@ -46,7 +46,7 @@ get_header();
                             <?php
                             endif;
                             butterbelly_pagination();
-                            ?> 
+                            ?>
                         </div>
                     </div>
                 </div>

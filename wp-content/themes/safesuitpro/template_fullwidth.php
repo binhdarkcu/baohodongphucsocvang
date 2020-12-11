@@ -3,7 +3,7 @@
   Template Name: Fullwidth Page
  */
 get_header();
-?>  
+?>
 <div class="page_heading_container">
     <div class="container">
         <div class="row">
@@ -33,8 +33,8 @@ get_header();
                                 'link_after' => '</span>',
                             ));
                         endif;
-                        ?>	  
-                    </div> 
+                        ?>
+                    </div>
                 </div>
             </div>
             <div class="clear"></div>
