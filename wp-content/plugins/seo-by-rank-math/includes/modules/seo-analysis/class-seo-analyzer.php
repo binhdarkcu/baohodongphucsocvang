@@ -10,11 +10,14 @@
 
 namespace RankMath\SEO_Analysis;
 
+use Rollbar\Rollbar;
+use RankMath\Helper;
 use RankMath\Traits\Ajax;
 use RankMath\Traits\Hooker;
+use Rollbar\Payload\Level;
+use MyThemeShop\Helpers\Str;
 use RankMath\Helpers\Security;
 use MyThemeShop\Helpers\Param;
-use RankMath\Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -103,11 +106,7 @@ class SEO_Analyzer {
 		}
 
 		$this->display_graphs();
-		?>
-		<div class="rank-math-result-tables">
-		<?php $this->display_results(); ?>
-		</div>
-		<?php
+		$this->display_results();
 	}
 
 	/**
@@ -127,10 +126,9 @@ class SEO_Analyzer {
 	 * @return array
 	 */
 	private function get_graph_metrices() {
-		$total       = 0;
-		$percent     = 0;
-		$total_score = 0;
-		$statuses    = [
+		$total    = 0;
+		$percent  = 0;
+		$statuses = [
 			'ok'      => 0,
 			'fail'    => 0,
 			'info'    => 0,
@@ -141,24 +139,16 @@ class SEO_Analyzer {
 				continue;
 			}
 
-			if ( $result->is_hidden() ) {
-				continue;
-			}
-
 			$statuses[ $result->get_status() ]++;
 			$total++;
-
-			$total_score = $total_score + $result->get_score();
 
 			if ( 'ok' !== $result->get_status() ) {
 				continue;
 			}
-
 			$percent = $percent + $result->get_score();
 		}
 
-		$percent = round( ( $percent / $total_score ) * 100 );
-		$grade   = $this->get_graph_grade( $percent );
+		$grade = $this->get_graph_grade( $percent );
 
 		return compact( 'total', 'percent', 'statuses', 'grade' );
 	}
@@ -200,13 +190,13 @@ class SEO_Analyzer {
 		foreach ( $this->sort_results_by_category() as $category => $results ) :
 			$label = $this->get_category_label( $category );
 			?>
-			<div class="rank-math-result-table rank-math-result-category-<?php echo esc_attr( $category ); ?>">
+			<div class="rank-math-result-table rank-math-result-category-<?php echo $category; ?>">
 				<div class="category-title">
-					<?php echo $label; // phpcs:ignore ?>
+					<?php echo $label; ?>
 				</div>
 				<?php foreach ( $results as $result ) : ?>
 				<div class="table-row">
-					<?php echo $result; // phpcs:ignore ?>
+					<?php echo $result; ?>
 				</div>
 				<?php endforeach; ?>
 			</div>
@@ -254,7 +244,7 @@ class SEO_Analyzer {
 	private function move_priority_results_to_top() {
 		$priority = [];
 		foreach ( $this->results as $id => $result ) {
-			if ( is_array( $result ) && 'priority' === $result['category'] ) {
+			if ( is_array( $result ) && $result['category'] === 'priority' ) {
 				$priority[ $id ] = $result;
 				unset( $this->results[ $id ] );
 			}
@@ -267,21 +257,24 @@ class SEO_Analyzer {
 	 * Analyze page.
 	 */
 	public function analyze_me() {
-		$success   = true;
+		$success = true;
 		$directory = dirname( __FILE__ );
 		check_ajax_referer( 'rank-math-ajax-nonce', 'security' );
 		$this->has_cap_ajax( 'site_analysis' );
-		delete_option( 'rank_math_seo_analysis_results' );
 
 		if ( ! $this->run_api_tests() ) {
+			error_log( $this->api_error );
+			Rollbar::log( Level::WARNING, $this->api_error );
 			/* translators: API error */
-			echo '<div class="notice notice-error is-dismissible notice-seo-analysis-error rank-math-notice"><p>' . sprintf( __( '<strong>API Error:</strong> %s', 'rank-math' ), $this->api_error  ) . '</p></div>'; // phpcs:ignore
+			echo '<div class="notice notice-error is-dismissible notice-seo-analysis-error"><p>' . sprintf( __( '<strong>API Error:</strong> %s', 'rank-math' ), $this->api_error ) . '</p></div>';
 			$success = false;
+			delete_option( 'rank_math_seo_analysis_results' );
 			die;
 		}
 
 		if ( ! $this->analyse_subpage ) {
 			$this->run_local_tests();
+			$this->run_social_tests();
 			update_option( 'rank_math_seo_analysis_results', $this->results );
 		}
 
@@ -292,51 +285,18 @@ class SEO_Analyzer {
 	}
 
 	/**
-	 * Get page score.
-	 *
-	 * @param  string $url Url to get score for.
-	 *
-	 * @return int
-	 */
-	public function get_page_score( $url ) {
-		$this->analyse_url     = $url;
-		$this->analyse_subpage = true;
-		if ( ! $this->run_api_tests() ) {
-			error_log( $this->api_error ); // phpcs:ignore
-			return 0;
-		}
-
-		$this->build_results();
-
-		if ( empty( $this->results ) ) {
-			return 0;
-		}
-
-		$total = 0;
-		foreach ( $this->results as $id => $result ) {
-			if (
-				$result->is_hidden() ||
-				'ok' !== $result->get_status() ||
-				false === $this->can_count_result( $result )
-			) {
-				continue;
-			}
-
-			$total = $total + $result->get_score();
-		}
-
-		return $total;
-	}
-
-	/**
 	 * Enable auto update ajax handler.
 	 */
 	public function enable_auto_update() {
 		check_ajax_referer( 'rank-math-ajax-nonce', 'security' );
 		$this->has_cap_ajax( 'general' );
 
+		$settings                       = get_option( 'rank-math-options-general', array() );
+		$settings['enable_auto_update'] = '1';
+		rank_math()->settings->set( 'general', 'enable_auto_update', true );
+		update_option( 'rank-math-options-general', $settings );
+
 		$this->enable_auto_update_in_stored_data();
-		Helper::toggle_auto_update_setting( 'on' );
 
 		echo '1';
 		die;
@@ -410,21 +370,18 @@ class SEO_Analyzer {
 
 		$request = wp_remote_get( $api_url, [ 'timeout' => 30 ] );
 		if ( is_wp_error( $request ) ) {
-			$this->api_error = wp_strip_all_tags( $request->get_error_message() );
-			return false;
-		}
-
-		$status = absint( wp_remote_retrieve_response_code( $request ) );
-		if ( 200 !== $status ) {
-			// Translators: placeholder is a HTTP error code.
-			$this->api_error = sprintf( __( 'HTTP %d error.', 'rank-math' ), $status );
+			$this->api_error = strip_tags( $request->get_error_message() );
 			return false;
 		}
 
 		$response = wp_remote_retrieve_body( $request );
 		$response = json_decode( $response, true );
 		if ( ! is_array( $response ) ) {
-			$this->api_error = __( 'Unexpected API response.', 'rank-math' );
+			return false;
+		}
+
+		if ( 200 !== absint( wp_remote_retrieve_response_code( $request ) ) ) {
+			$this->api_error = join( ', ', $response['errors'] );
 			return false;
 		}
 
@@ -442,12 +399,59 @@ class SEO_Analyzer {
 					'api_test'    => false,
 					'title'       => $test['title'],
 					'description' => $test['description'],
-					'how_to_fix'  => isset( $test['how_to_fix'] ) ? $test['how_to_fix'] : '',
+					'how_to_fix'  => $test['how_to_fix'],
 					'category'    => $test['category'],
 					'info'        => [],
 				],
 				call_user_func( $test['callback'], $this )
 			);
+		}
+	}
+
+	/**
+	 * Run Social SEO Tests
+	 */
+	private function run_social_tests() {
+		$social_seo = [
+			'facebook'  => [
+				'name'  => esc_html__( 'Facebook', 'rank-math' ),
+				'title' => esc_html__( 'Facebook Connected', 'rank-math' ),
+			],
+			'instagram' => [
+				'name'  => esc_html__( 'Instagram', 'rank-math' ),
+				'title' => esc_html__( 'Instagram Connected', 'rank-math' ),
+			],
+			'linkedin'  => [
+				'name'  => esc_html__( 'Linkedin', 'rank-math' ),
+				'title' => esc_html__( 'Linkedin Connected', 'rank-math' ),
+			],
+			'twitter'   => [
+				'name'  => esc_html__( 'Twitter', 'rank-math' ),
+				'title' => esc_html__( 'Twitter Connected', 'rank-math' ),
+			],
+			'youtube'   => [
+				'name'  => esc_html__( 'Youtube', 'rank-math' ),
+				'title' => esc_html__( 'Youtube Connected', 'rank-math' ),
+			],
+		];
+
+		/* translators: link to social option setting */
+		$fix_content = sprintf( __( 'Add Social Schema to your website by linking your social profiles <a href="%s">here</a>.', 'rank-math' ), Helper::get_admin_url( 'options-titles#setting-panel-social' ) );
+		foreach ( $social_seo as $id => $social ) {
+			$found = Helper::get_settings( 'titles.social_url_' . $id );
+			$id    = $id . '_connected';
+
+			$this->results[ $id ] = [
+				'test_id'  => $id,
+				'api_test' => false,
+				'title'    => $social['title'],
+				'category' => 'social',
+				'info'     => [],
+				'status'   => $found ? 'ok' : 'fail',
+				/* translators: social name */
+				'message'  => $found ? sprintf( esc_html__( 'Your website has a %s page connected to it.', 'rank-math' ), $social['name'] ) : sprintf( esc_html__( 'Your website has no %s connected to it.', 'rank-math' ), $social['name'] ),
+				'fix'      => $found ? null : $fix_content,
+			];
 		}
 	}
 
@@ -479,9 +483,6 @@ class SEO_Analyzer {
 	private function sort_results_by_category() {
 		$data = [];
 		foreach ( $this->results as $result ) {
-			if ( $result->is_hidden() ) {
-				continue;
-			}
 			$category = $result->get_category();
 			if ( ! isset( $data[ $category ] ) ) {
 				$data[ $category ] = [];
@@ -505,6 +506,7 @@ class SEO_Analyzer {
 			'basic'       => esc_html__( 'Basic SEO', 'rank-math' ),
 			'performance' => esc_html__( 'Performance', 'rank-math' ),
 			'security'    => esc_html__( 'Security', 'rank-math' ),
+			'social'      => esc_html__( 'Social SEO', 'rank-math' ),
 		];
 
 		return isset( $category_map[ $category ] ) ? $category_map[ $category ] : '';

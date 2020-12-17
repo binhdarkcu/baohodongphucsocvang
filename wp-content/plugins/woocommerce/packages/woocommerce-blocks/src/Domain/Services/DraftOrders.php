@@ -1,4 +1,10 @@
 <?php
+/**
+ * Sets up all logic related to the Checkout Draft Orders service
+ *
+ * @package WooCommerce/Blocks
+ */
+
 namespace Automattic\WooCommerce\Blocks\Domain\Services;
 
 use Automattic\WooCommerce\Blocks\Domain\Package;
@@ -7,10 +13,6 @@ use WC_Order;
 
 /**
  * Service class for adding DraftOrder functionality to WooCommerce core.
- *
- * Sets up all logic related to the Checkout Draft Orders service
- *
- * @internal
  */
 class DraftOrders {
 
@@ -108,17 +110,7 @@ class DraftOrders {
 	 * @return array
 	 */
 	public function register_draft_order_post_status( array $statuses ) {
-		$statuses[ self::DB_STATUS ] = $this->get_post_status_properties();
-		return $statuses;
-	}
-
-	/**
-	 * Returns the properties of this post status for registration.
-	 *
-	 * @return array
-	 */
-	private function get_post_status_properties() {
-		return [
+		$statuses[ self::DB_STATUS ] = [
 			'label'                     => _x( 'Draft', 'Order status', 'woocommerce' ),
 			'public'                    => false,
 			'exclude_from_search'       => false,
@@ -127,6 +119,7 @@ class DraftOrders {
 			/* translators: %s: number of orders */
 			'label_count'               => _n_noop( 'Drafts <span class="count">(%s)</span>', 'Drafts <span class="count">(%s)</span>', 'woocommerce' ),
 		];
+		return $statuses;
 	}
 
 	/**
@@ -152,8 +145,7 @@ class DraftOrders {
 	public function delete_expired_draft_orders() {
 		$count      = 0;
 		$batch_size = 20;
-		$this->ensure_draft_status_registered();
-		$orders = wc_get_orders(
+		$orders     = wc_get_orders(
 			[
 				'date_modified' => '<=' . strtotime( '-1 DAY' ),
 				'limit'         => $batch_size,
@@ -176,22 +168,6 @@ class DraftOrders {
 			}
 		} catch ( Exception $error ) {
 			wc_caught_exception( $error, __METHOD__ );
-		}
-	}
-
-	/**
-	 * Since it's possible for third party code to clobber the `$wp_post_statuses` global,
-	 * we need to do a final check here to make sure the draft post status is
-	 * registered with the global so that it is not removed by WP_Query status
-	 * validation checks.
-	 */
-	private function ensure_draft_status_registered() {
-		$is_registered = get_post_stati( [ 'name' => self::DB_STATUS ] );
-		if ( empty( $is_registered ) ) {
-			register_post_status(
-				self::DB_STATUS,
-				$this->get_post_status_properties()
-			);
 		}
 	}
 

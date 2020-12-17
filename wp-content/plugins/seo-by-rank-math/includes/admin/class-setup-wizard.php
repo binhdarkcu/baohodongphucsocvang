@@ -108,8 +108,8 @@ class Setup_Wizard {
 				'class' => '\\RankMath\\Wizard\\Your_Site',
 			],
 
-			'analytics' => [
-				'name'  => esc_html__( 'Analytics', 'rank-math' ),
+			'searchconsole' => [
+				'name'  => esc_html__( 'Search Console', 'rank-math' ),
 				'class' => '\\RankMath\\Wizard\\Search_Console',
 			],
 
@@ -146,11 +146,6 @@ class Setup_Wizard {
 			],
 		];
 
-		if ( ! Helper::is_advanced_mode() ) {
-			unset( $this->steps['sitemaps'] );
-			unset( $this->steps['optimization'] );
-		}
-
 		$this->set_current_step();
 	}
 
@@ -170,16 +165,6 @@ class Setup_Wizard {
 		);
 
 		$this->wizard_step->form( $this );
-
-		/**
-		 * Add setting on specific Setup Wizard steps.
-		 *
-		 * The dynamic part of the hook name. $this->step, is the step ID.
-		 *
-		 * @param CMB2 $cmb CMB2 object.
-		 */
-		$this->do_action( 'wizard/settings/' . $this->step, $this->cmb );
-		
 		CMB2::pre_init( $this->cmb );
 	}
 
@@ -221,13 +206,17 @@ class Setup_Wizard {
 	public function save_wizard() {
 
 		// If no form submission, bail!
-		$referer = Param::post( '_wp_http_referer' );
 		if ( empty( $_POST ) ) {
-			return wp_safe_redirect( $referer );
+			return false;
 		}
 
 		check_admin_referer( 'rank-math-wizard', 'security' );
 		if ( ! Helper::has_cap( 'general' ) ) {
+			return false;
+		}
+
+		$referer = Param::post( '_wp_http_referer' );
+		if ( empty( $referer ) ) {
 			return false;
 		}
 
@@ -281,7 +270,7 @@ class Setup_Wizard {
 		wp_enqueue_style( 'rank-math-wizard', rank_math()->plugin_url() . 'assets/admin/css/setup-wizard.css', [ 'wp-admin', 'buttons', 'cmb2-styles', 'select2-rm', 'rank-math-common', 'rank-math-cmb2' ], rank_math()->version );
 
 		// Enqueue javascript.
-		wp_enqueue_script( 'rank-math-wizard', rank_math()->plugin_url() . 'assets/admin/js/wizard.js', [ 'media-editor', 'select2-rm', 'lodash', 'rank-math-common', 'rank-math-validate' ], rank_math()->version, true );
+		wp_enqueue_script( 'rank-math-wizard', rank_math()->plugin_url() . 'assets/admin/js/wizard.js', [ 'media-editor', 'select2-rm', 'rank-math-common', 'rank-math-validate' ], rank_math()->version, true );
 
 		Helper::add_json( 'currentStep', $this->step );
 		Helper::add_json( 'deactivated', esc_html__( 'Deactivated', 'rank-math' ) );
@@ -341,7 +330,7 @@ class Setup_Wizard {
 	 */
 	public function get_skip_link() {
 		?>
-		<a href="<?php echo esc_url( $this->step_next_link() ); ?>" class="button button-secondary button-skip"><?php esc_html_e( 'Skip Step', 'rank-math' ); ?></a>
+		<a href="<?php echo esc_url( $this->step_next_link() ); ?>" class="button button-secondary button-skip"><?php esc_html_e( 'Skip step', 'rank-math' ); ?></a>
 		<?php
 	}
 
@@ -351,6 +340,10 @@ class Setup_Wizard {
 	private function set_current_step() {
 		if ( $this->maybe_remove_import() ) {
 			unset( $this->steps['import'] );
+		}
+
+		if ( ! Helper::is_module_active( 'role-manager' ) ) {
+			unset( $this->steps['role'] );
 		}
 
 		$this->steps       = $this->do_filter( 'wizard/steps', $this->steps );
@@ -381,7 +374,7 @@ class Setup_Wizard {
 		}
 
 		if ( false === get_option( 'rank_math_is_configured' ) ) {
-			$detector = new Detector();
+			$detector = new Detector;
 			$plugins  = $detector->detect();
 			if ( ! empty( $plugins ) ) {
 				return false;

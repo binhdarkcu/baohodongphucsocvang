@@ -8,8 +8,6 @@
 
 use RankMath\Helper;
 
-defined( 'ABSPATH' ) || exit;
-
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
@@ -79,7 +77,7 @@ defined( 'ABSPATH' ) || exit;
 		</p>
 
 		<div class="rank-math-redirection-loading-animation">
-			<img src="<?php echo esc_url( rank_math()->plugin_url() . 'assets/admin/img/loader.svg' ); ?>">
+			<img src="<?php echo esc_url( $assets_uri . '/assets/loader.svg' ); ?>">
 		</div>
 		<div class="rank-math-redirection-loading-timer">
 			<?php /* translators: countdown seconds */ ?>

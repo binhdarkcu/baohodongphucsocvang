@@ -6,24 +6,7 @@
 
 add_filter( 'wpcf7_special_mail_tags', 'wpcf7_special_mail_tag', 10, 4 );
 
-/**
- * Returns output string of a special mail-tag.
- *
- * @param string $output The string to be output.
- * @param string $name The tag name of the special mail-tag.
- * @param bool $html Whether the mail-tag is used in an HTML content.
- * @param WPCF7_MailTag $mail_tag An object representation of the mail-tag.
- * @return string Output of the given special mail-tag.
- */
-function wpcf7_special_mail_tag( $output, $name, $html, $mail_tag = null ) {
-	if ( ! $mail_tag instanceof WPCF7_MailTag ) {
-		wpcf7_doing_it_wrong(
-			sprintf( '%s()', __FUNCTION__ ),
-			__( 'The fourth parameter ($mail_tag) must be an instance of the WPCF7_MailTag class.', 'contact-form-7' ),
-			'5.2.2'
-		);
-	}
-
+function wpcf7_special_mail_tag( $output, $name, $html, $mail_tag ) {
 	$name = preg_replace( '/^wpcf7\./', '_', $name ); // for back-compat
 
 	$submission = WPCF7_Submission::get_instance();
@@ -78,27 +61,9 @@ function wpcf7_special_mail_tag( $output, $name, $html, $mail_tag = null ) {
 	return $output;
 }
 
-
 add_filter( 'wpcf7_special_mail_tags', 'wpcf7_post_related_smt', 10, 4 );
 
-/**
- * Returns output string of a special mail-tag.
- *
- * @param string $output The string to be output.
- * @param string $name The tag name of the special mail-tag.
- * @param bool $html Whether the mail-tag is used in an HTML content.
- * @param WPCF7_MailTag $mail_tag An object representation of the mail-tag.
- * @return string Output of the given special mail-tag.
- */
-function wpcf7_post_related_smt( $output, $name, $html, $mail_tag = null ) {
-	if ( ! $mail_tag instanceof WPCF7_MailTag ) {
-		wpcf7_doing_it_wrong(
-			sprintf( '%s()', __FUNCTION__ ),
-			__( 'The fourth parameter ($mail_tag) must be an instance of the WPCF7_MailTag class.', 'contact-form-7' ),
-			'5.2.2'
-		);
-	}
-
+function wpcf7_post_related_smt( $output, $name, $html, $mail_tag ) {
 	if ( '_post_' != substr( $name, 0, 6 ) ) {
 		return $output;
 	}
@@ -145,27 +110,9 @@ function wpcf7_post_related_smt( $output, $name, $html, $mail_tag = null ) {
 	return $output;
 }
 
-
 add_filter( 'wpcf7_special_mail_tags', 'wpcf7_site_related_smt', 10, 4 );
 
-/**
- * Returns output string of a special mail-tag.
- *
- * @param string $output The string to be output.
- * @param string $name The tag name of the special mail-tag.
- * @param bool $html Whether the mail-tag is used in an HTML content.
- * @param WPCF7_MailTag $mail_tag An object representation of the mail-tag.
- * @return string Output of the given special mail-tag.
- */
-function wpcf7_site_related_smt( $output, $name, $html, $mail_tag = null ) {
-	if ( ! $mail_tag instanceof WPCF7_MailTag ) {
-		wpcf7_doing_it_wrong(
-			sprintf( '%s()', __FUNCTION__ ),
-			__( 'The fourth parameter ($mail_tag) must be an instance of the WPCF7_MailTag class.', 'contact-form-7' ),
-			'5.2.2'
-		);
-	}
-
+function wpcf7_site_related_smt( $output, $name, $html, $mail_tag ) {
 	$filter = $html ? 'display' : 'raw';
 
 	if ( '_site_title' == $name ) {
@@ -187,27 +134,9 @@ function wpcf7_site_related_smt( $output, $name, $html, $mail_tag = null ) {
 	return $output;
 }
 
-
 add_filter( 'wpcf7_special_mail_tags', 'wpcf7_user_related_smt', 10, 4 );
 
-/**
- * Returns output string of a special mail-tag.
- *
- * @param string $output The string to be output.
- * @param string $name The tag name of the special mail-tag.
- * @param bool $html Whether the mail-tag is used in an HTML content.
- * @param WPCF7_MailTag $mail_tag An object representation of the mail-tag.
- * @return string Output of the given special mail-tag.
- */
-function wpcf7_user_related_smt( $output, $name, $html, $mail_tag = null ) {
-	if ( ! $mail_tag instanceof WPCF7_MailTag ) {
-		wpcf7_doing_it_wrong(
-			sprintf( '%s()', __FUNCTION__ ),
-			__( 'The fourth parameter ($mail_tag) must be an instance of the WPCF7_MailTag class.', 'contact-form-7' ),
-			'5.2.2'
-		);
-	}
-
+function wpcf7_user_related_smt( $output, $name, $html, $mail_tag ) {
 	if ( '_user_' != substr( $name, 0, 6 )
 	or '_user_agent' == $name ) {
 		return $output;

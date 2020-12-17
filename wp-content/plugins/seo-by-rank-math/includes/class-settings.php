@@ -10,9 +10,6 @@
 
 namespace RankMath;
 
-use RankMath\Helper;
-use RankMath\Helpers\Sitepress;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -38,7 +35,7 @@ class Settings {
 	 * The Constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'init' ] );
+		add_action( 'wpml_loaded', [ $this, 'init' ] );
 
 		$this->add_options( 'titles', 'rank-math-options-titles' );
 		$this->add_options( 'general', 'rank-math-options-general' );
@@ -49,8 +46,9 @@ class Settings {
 	 * Init.
 	 */
 	public function init() {
-		if ( Sitepress::get()->is_active() ) {
-			$this->reset();
+		foreach ( $this->get_keys() as $id => $key ) {
+			do_action( 'wpml_multilingual_options', $key );
+			$this->add_options( $id, $key );
 		}
 	}
 

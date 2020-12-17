@@ -1,4 +1,3 @@
-/*! This file is auto-generated */
 /* ----------------------------------------------------------------------------
 
 NOTE: If you edit this file, you should make sure that the CSS rules for
@@ -47,8 +46,8 @@ TABLE OF CONTENTS:
 	display: inline-block;
 	text-decoration: none;
 	font-size: 13px;
-	line-height: 2.15384615; /* 28px */
-	min-height: 30px;
+	line-height: 2;
+	min-height: 28px;
 	margin: 0;
 	padding: 0 10px;
 	cursor: pointer;
@@ -72,15 +71,15 @@ TABLE OF CONTENTS:
 
 .wp-core-ui .button.button-large,
 .wp-core-ui .button-group.button-large .button {
-	min-height: 32px;
-	line-height: 2.30769231; /* 30px */
-	padding: 0 12px;
+	min-height: 30px;
+	line-height: 2.15384615;
+	padding: 0 12px 2px;
 }
 
 .wp-core-ui .button.button-small,
 .wp-core-ui .button-group.button-small .button {
-	min-height: 26px;
-	line-height: 2.18181818; /* 24px */
+	min-height: 24px;
+	line-height: 2;
 	padding: 0 8px;
 	font-size: 11px;
 }
@@ -182,6 +181,7 @@ TABLE OF CONTENTS:
 	border-color: #ddd !important;
 	background: #f7f7f7 !important;
 	box-shadow: none !important;
+	text-shadow: 0 1px 0 #fff !important;
 	cursor: default;
 	transform: none !important;
 }
@@ -206,7 +206,7 @@ TABLE OF CONTENTS:
 
 .wp-core-ui .button-link:hover,
 .wp-core-ui .button-link:active {
-	color: #006799;
+	color: #00a0d2;
 }
 
 .wp-core-ui .button-link:focus {
@@ -233,6 +233,9 @@ TABLE OF CONTENTS:
 	background: transparent !important;
 }
 
+.ie8 .wp-core-ui .button-link:focus {
+	outline: #5b9dd9 solid 1px;
+}
 
 /* ----------------------------------------------------------------------------
   3.0 - Primary Button Style
@@ -276,9 +279,9 @@ TABLE OF CONTENTS:
 .wp-core-ui .button-primary:disabled,
 .wp-core-ui .button-primary-disabled,
 .wp-core-ui .button-primary.disabled {
-	color: #a0a5aa !important;
-	background: #f7f7f7 !important;
-	border-color: #ddd !important;
+	color: #66c6e4 !important;
+	background: #008ec2 !important;
+	border-color: #008ec2 !important;
 	box-shadow: none !important;
 	text-shadow: none !important;
 	cursor: default;
@@ -346,17 +349,12 @@ TABLE OF CONTENTS:
 	input#publish,
 	input#save-post,
 	a.preview {
-		padding: 0 14px;
-		line-height: 2.71428571; /* 38px */
+		padding: 1px 14px;
+		line-height: 2;
 		font-size: 14px;
 		vertical-align: middle;
-		min-height: 40px;
+		height: auto;
 		margin-bottom: 4px;
-	}
-
-	/* Copy attachment URL button in the legacy edit media page. */
-	.wp-core-ui .copy-to-clipboard-container .copy-attachment-url {
-		margin-bottom: 0;
 	}
 
 	#media-upload.wp-core-ui .button {
@@ -379,9 +377,10 @@ TABLE OF CONTENTS:
 	/* Reset responsive styles in Press This, Customizer */
 
 	.wp-core-ui.wp-customizer .button {
+		padding: 0 10px 1px;
 		font-size: 13px;
-		line-height: 2.15384615; /* 28px */
-		min-height: 30px;
+		line-height: 2;
+		min-height: 28px;
 		margin: 0;
 		vertical-align: inherit;
 	}

@@ -38,6 +38,7 @@ const StripeLabel = ( props ) => {
 
 	return (
 		<PaymentMethodLabel
+			icon="card"
 			text={ __( 'Credit / Debit Card', 'woocommerce' ) }
 		/>
 	);

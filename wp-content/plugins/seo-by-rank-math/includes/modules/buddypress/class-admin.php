@@ -44,7 +44,7 @@ class Admin {
 		];
 
 		$tabs['buddypress-groups'] = [
-			'icon'  => 'rm-icon rm-icon-users',
+			'icon'  => 'dashicons dashicons-groups',
 			'title' => esc_html__( 'Groups', 'rank-math' ),
 			'desc'  => esc_html__( 'This tab contains SEO options for BuddyPress Group pages.', 'rank-math' ),
 			'file'  => dirname( __FILE__ ) . '/views/options-titles.php',

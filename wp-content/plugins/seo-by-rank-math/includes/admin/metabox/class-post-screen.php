@@ -41,7 +41,6 @@ class Post_Screen implements IScreen {
 	 */
 	public function __construct() {
 		$this->filter( 'rank_math/researches/tests', 'remove_tests', 10, 2 );
-		$this->action( 'rank_math/metabox/process_fields', 'save_general_meta' );
 	}
 
 	/**
@@ -80,8 +79,6 @@ class Post_Screen implements IScreen {
 		$is_elementor    = Helper::is_elementor_editor();
 		$is_block_editor = Helper::is_block_editor() && \rank_math_is_gutenberg();
 
-		Helper::add_json( 'postType', get_post_type() );
-
 		if ( ! $is_elementor ) {
 			$this->enqueue_custom_fields();
 		}
@@ -96,6 +93,7 @@ class Post_Screen implements IScreen {
 
 		if ( $is_block_editor || $is_elementor ) {
 			$this->enqueue_commons();
+			Helper::add_json( 'postType', get_post_type() );
 		}
 
 		if ( $is_block_editor && ! $is_elementor && Editor::can_add_editor() ) {
@@ -110,9 +108,6 @@ class Post_Screen implements IScreen {
 		// Classic.
 		if ( Helper::is_block_editor() ) {
 			wp_enqueue_script( 'rank-math-formats' );
-		}
-
-		if ( $is_block_editor ) {
 			wp_enqueue_script( 'rank-math-primary-term', rank_math()->plugin_url() . 'assets/admin/js/gutenberg-primary-term.js', [], rank_math()->version, true );
 		}
 	}
@@ -123,10 +118,9 @@ class Post_Screen implements IScreen {
 	 * @return array
 	 */
 	public function get_values() {
-		$post_type        = $this->get_current_post_type();
-		$sample_permalink = get_sample_permalink( $this->get_object_id(), null, null );
-
+		$post_type = $this->get_current_post_type();
 		return [
+			'homeUrl'                => home_url(),
 			'parentDomain'           => Url::get_domain( home_url() ),
 			'noFollowDomains'        => Str::to_arr_no_empty( Helper::get_settings( 'general.nofollow_domains' ) ),
 			'noFollowExcludeDomains' => Str::to_arr_no_empty( Helper::get_settings( 'general.nofollow_exclude_domains' ) ),
@@ -140,17 +134,17 @@ class Post_Screen implements IScreen {
 			'siteFavIcon'            => $this->get_site_icon(),
 			'frontEndScore'          => Frontend_SEO_Score::show_on(),
 			'postName'               => get_post_field( 'post_name', get_post() ),
-			'permalinkFormat'        => isset( $sample_permalink[0] ) ? $sample_permalink[0] : home_url(),
 			'assessor'               => [
 				'hasTOCPlugin'     => $this->has_toc_plugin(),
 				'sentimentKbLink'  => KB::get( 'sentiments' ),
 				'focusKeywordLink' => admin_url( 'edit.php?focus_keyword=%focus_keyword%&post_type=%post_type%' ),
-				'futureSeo'        => KB::get( 'pro-general-g' ),
+				'registrationUrl'  => Helper::get_connect_url(),
 				'hasBreadcrumb'    => Helper::get_settings( 'general.breadcrumbs' ),
 				'hasRedirection'   => Helper::is_module_active( 'redirections' ),
 				'isUserEdit'       => Admin_Helper::is_user_edit(),
 				'socialPanelLink'  => Helper::get_admin_url( 'options-titles#setting-panel-social' ),
 				'primaryTaxonomy'  => $this->get_primary_taxonomy(),
+				'stopwords'        => Helper::get_settings( 'general.url_strip_stopwords' ) ? $this->get_stopwords() : false,
 			],
 		];
 	}
@@ -214,59 +208,22 @@ class Post_Screen implements IScreen {
 	 * @param string $type  Object type. Can be post, user or term.
 	 */
 	public function remove_tests( $tests, $type ) {
-		if ( ! Admin_Helper::is_home_page() && ! Admin_Helper::is_posts_page() ) {
+		if ( ! Admin_Helper::is_home_page() ) {
 			return $tests;
 		}
 
-		return array_diff_assoc( $tests, $this->exclude_tests() );
-	}
-
-	/**
-	 * Save handler for metadata.
-	 *
-	 * @param CMB2 $cmb CMB2 instance.
-	 */
-	public function save_general_meta( $cmb ) {
-		if ( Helper::get_settings( "titles.pt_{$cmb->data_to_save['post_type']}_title" ) === $cmb->data_to_save['rank_math_title'] ) {
-			$cmb->data_to_save['rank_math_title'] = '';
-		}
-
-		return $cmb;
-	}
-
-	/**
-	 * Tests to exclude on Homepage and Blog page.
-	 *
-	 * @since 1.0.43
-	 *
-	 * @return array Array of excluded tests.
-	 */
-	private function exclude_tests() {
-		if ( Admin_Helper::is_home_page() ) {
-			return [
-				'contentHasTOC'        => true,
-				'keywordInPermalink'   => true,
-				'lengthPermalink'      => true,
-				'linksHasExternals'    => true,
-				'linksNotAllExternals' => true,
-				'titleSentiment'       => true,
-				'titleHasPowerWords'   => true,
-				'titleHasNumber'       => true,
-			];
-		}
-
-		return [
-			'contentHasTOC'             => true,
-			'contentHasShortParagraphs' => true,
-			'keywordIn10Percent'        => true,
-			'keywordInContent'          => true,
-			'keywordInSubheadings'      => true,
-			'keywordDensity'            => true,
-			'lengthContent'             => true,
-			'linksHasInternal'          => true,
-			'linksHasExternals'         => true,
-			'linksNotAllExternals'      => true,
+		$remove = [
+			'contentHasTOC'        => true,
+			'keywordInPermalink'   => true,
+			'lengthPermalink'      => true,
+			'linksHasExternals'    => true,
+			'linksNotAllExternals' => true,
+			'titleSentiment'       => true,
+			'titleHasPowerWords'   => true,
+			'titleHasNumber'       => true,
 		];
+
+		return array_diff_assoc( $tests, $remove );
 	}
 
 	/**
@@ -284,7 +241,7 @@ class Post_Screen implements IScreen {
 	 * Enqueque scripts common for all builders.
 	 */
 	private function enqueue_commons() {
-		wp_register_style( 'rank-math-post-metabox', rank_math()->plugin_url() . 'assets/admin/css/gutenberg.css', [], rank_math()->version );
+		wp_register_style( 'rank-math-post-metabox', rank_math()->plugin_url() . 'assets/admin/css/sidebar.css', [], rank_math()->version );
 	}
 
 	/**
@@ -314,7 +271,6 @@ class Post_Screen implements IScreen {
 			'rank-math-gutenberg',
 			rank_math()->plugin_url() . 'assets/admin/js/gutenberg.js',
 			[
-				'clipboard',
 				'tagify',
 				'wp-autop',
 				'wp-blocks',
@@ -330,6 +286,24 @@ class Post_Screen implements IScreen {
 			rank_math()->version,
 			true
 		);
+	}
+
+	/**
+	 * Function to replace domain with seo-by-rank-math in translation file.
+	 *
+	 * @param string|false $file   Path to the translation file to load. False if there isn't one.
+	 * @param string       $handle Name of the script to register a translation domain to.
+	 * @param string       $domain The text domain.
+	 */
+	public function load_script_translation_file( $file, $handle, $domain ) {
+		if ( 'rank-math' !== $domain ) {
+			return $file;
+		}
+
+		$data                       = explode( '/', $file );
+		$data[ count( $data ) - 1 ] = preg_replace( '/rank-math/', 'seo-by-rank-math', $data[ count( $data ) - 1 ], 1 );
+
+		return implode( '/', $data );
 	}
 
 	/**
@@ -358,7 +332,6 @@ class Post_Screen implements IScreen {
 
 		$plugins_found  = [];
 		$active_plugins = get_option( 'active_plugins' );
-		$active_plugins = is_multisite() ? array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', [] ) ) ) : $active_plugins;
 
 		/**
 		 * Allow developers to add plugins to the TOC list.
@@ -411,7 +384,7 @@ class Post_Screen implements IScreen {
 		 *
 		 * @param bool $return True to disable.
 		 */
-		if ( false === apply_filters_deprecated( 'rank_math/primary_term', [ false ], '1.0.43', 'rank_math/admin/disable_primary_term' )
+		if ( false === apply_filters_deprecated( 'rank_math/primary_term', array( false ), '1.0.43', 'rank_math/admin/disable_primary_term' )
 			&& false === $this->do_filter( 'admin/disable_primary_term', false ) ) {
 			$taxonomy = Helper::get_settings( 'titles.pt_' . $post_type . '_primary_taxonomy', false );
 		}
@@ -433,7 +406,7 @@ class Post_Screen implements IScreen {
 	}
 
 	/**
-	 * Get primary term ID.
+	 * Get primary term id.
 	 *
 	 * @return int
 	 */
@@ -446,5 +419,21 @@ class Post_Screen implements IScreen {
 		$id = Helper::get_post_meta( 'primary_' . $taxonomy['name'], $this->get_object_id() );
 
 		return $id ? absint( $id ) : 0;
+	}
+
+	/**
+	 * Get stop words.
+	 *
+	 * @return array List of stop words.
+	 */
+	private function get_stopwords() {
+
+		/* translators: this should be an array of stop words for your language, separated by comma's. */
+		$stopwords = explode( ',', esc_html__( "a,about,above,after,again,against,all,am,an,and,any,are,as,at,be,because,been,before,being,below,between,both,but,by,could,did,do,does,doing,down,during,each,few,for,from,further,had,has,have,having,he,he'd,he'll,he's,her,here,here's,hers,herself,him,himself,his,how,how's,i,i'd,i'll,i'm,i've,if,in,into,is,it,it's,its,itself,let's,me,more,most,my,myself,nor,of,on,once,only,or,other,ought,our,ours,ourselves,out,over,own,same,she,she'd,she'll,she's,should,so,some,such,than,that,that's,the,their,theirs,them,themselves,then,there,there's,these,they,they'd,they'll,they're,they've,this,those,through,to,too,under,until,up,very,was,we,we'd,we'll,we're,we've,were,what,what's,when,when's,where,where's,which,while,who,who's,whom,why,why's,with,would,you,you'd,you'll,you're,you've,your,yours,yourself,yourselves", 'rank-math' ) );
+
+		$custom = Helper::get_settings( 'general.stopwords' );
+		$custom = Str::to_arr_no_empty( $custom );
+
+		return array_unique( array_merge( $stopwords, $custom ) );
 	}
 }

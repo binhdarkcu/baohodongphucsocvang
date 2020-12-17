@@ -6,9 +6,6 @@
  * @package    RankMath
  * @subpackage RankMath\Sitemap
  * @author     Rank Math <support@rankmath.com>
- *
- * @copyright Copyright (C) 2008-2019, Yoast BV
- * The following code is a derivative work of the code from the Yoast(https://github.com/Yoast/wordpress-seo/), which is licensed under GPL v3.
  */
 
 namespace RankMath\Sitemap;
@@ -42,18 +39,17 @@ class Router {
 	public function init() {
 		global $wp;
 
-		$base = self::get_sitemap_base();
 		$wp->add_query_var( 'sitemap' );
 		$wp->add_query_var( 'sitemap_n' );
 		$wp->add_query_var( 'xsl' );
 
-		add_rewrite_rule( $base . 'sitemap_index\.xml$', 'index.php?sitemap=1', 'top' );
-		add_rewrite_rule( $base . '([^/]+?)-sitemap([0-9]+)?\.xml$', 'index.php?sitemap=$matches[1]&sitemap_n=$matches[2]', 'top' );
-		add_rewrite_rule( $base . '([a-z]+)?-?sitemap\.xsl$', 'index.php?xsl=$matches[1]', 'top' );
+		add_rewrite_rule( 'sitemap_index\.xml$', 'index.php?sitemap=1', 'top' );
+		add_rewrite_rule( '([^/]+?)-sitemap([0-9]+)?\.xml$', 'index.php?sitemap=$matches[1]&sitemap_n=$matches[2]', 'top' );
+		add_rewrite_rule( '([a-z]+)?-?sitemap\.xsl$', 'index.php?xsl=$matches[1]', 'top' );
 	}
 
 	/**
-	 * Serves sitemap when needed using correct sitemap module.
+	 * Serves sitemap when needed using correct sitemap module
 	 *
 	 * @param WP_Query $query The WP_Query instance (passed by reference).
 	 */
@@ -65,7 +61,7 @@ class Router {
 		$xsl = get_query_var( 'xsl' );
 		if ( ! empty( $xsl ) ) {
 			$this->filter( 'user_has_cap', 'filter_user_has_cap' );
-			$stylesheet = new Stylesheet();
+			$stylesheet = new Stylesheet;
 			$stylesheet->output( $xsl );
 			return;
 		}
@@ -79,7 +75,7 @@ class Router {
 	}
 
 	/**
-	 * Check the current request URI, if we can determine it's probably an XML sitemap, kill loading the widgets.
+	 * Check the current request URI, if we can determine it's probably an XML sitemap, kill loading the widgets
 	 */
 	public function reduce_query_load() {
 		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
@@ -93,7 +89,7 @@ class Router {
 	}
 
 	/**
-	 * Redirects `sitemap.xml` to `sitemap_index.xml`.
+	 * Redirects sitemap.xml to sitemap_index.xml.
 	 */
 	public function template_redirect() {
 		if ( ! $this->needs_sitemap_index_redirect() ) {
@@ -124,29 +120,19 @@ class Router {
 	 * @return string base URL (incl page)
 	 */
 	public static function get_base_url( $page ) {
-		$page = self::get_page_url( $page );
-		$base = self::get_sitemap_base();
-		return home_url( $base . $page );
-	}
-
-	/**
-	 * Create base URL for the sitemap.
-	 *
-	 * @since 1.0.43
-	 *
-	 * @return string Sitemap base.
-	 */
-	public static function get_sitemap_base() {
 		global $wp_rewrite;
 
-		$base = $wp_rewrite->using_index_permalinks() ? $wp_rewrite->index . '/' : '';
+		$page = self::get_page_url( $page );
+		$base = $wp_rewrite->using_index_permalinks() ? $wp_rewrite->index . '/' : '/';
 
 		/**
 		 * Filter the base URL of the sitemaps
 		 *
 		 * @param string $base The string that should be added to home_url() to make the full base URL.
 		 */
-		return apply_filters( 'rank_math/sitemap/base_url', $base );
+		$base = apply_filters( 'rank_math/sitemap/base_url', $base );
+
+		return home_url( $base . $page );
 	}
 
 	/**

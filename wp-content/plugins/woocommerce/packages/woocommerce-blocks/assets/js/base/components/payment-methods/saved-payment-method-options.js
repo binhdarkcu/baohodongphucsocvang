@@ -131,17 +131,15 @@ const SavedPaymentMethodOptions = ( { onSelect } ) => {
 					);
 				}
 			} );
-			if ( options.length > 0 ) {
-				currentOptions.current = options;
-				currentOptions.current.push( {
-					value: '0',
-					label: __(
-						'Use a new payment method',
-						'woo-gutenberg-product-blocks'
-					),
-					name: `wc-saved-payment-method-token-new`,
-				} );
-			}
+			currentOptions.current = options;
+			currentOptions.current.push( {
+				value: '0',
+				label: __(
+					'Use a new payment method',
+					'woo-gutenberg-product-blocks'
+				),
+				name: `wc-saved-payment-method-token-new`,
+			} );
 		}
 	}, [
 		customerPaymentMethods,

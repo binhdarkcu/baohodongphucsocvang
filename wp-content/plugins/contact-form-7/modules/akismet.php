@@ -4,9 +4,9 @@
 ** Akismet API: http://akismet.com/development/api/
 **/
 
-add_filter( 'wpcf7_spam', 'wpcf7_akismet', 10, 2 );
+add_filter( 'wpcf7_spam', 'wpcf7_akismet', 10, 1 );
 
-function wpcf7_akismet( $spam, $submission ) {
+function wpcf7_akismet( $spam ) {
 	if ( $spam ) {
 		return $spam;
 	}
@@ -15,7 +15,9 @@ function wpcf7_akismet( $spam, $submission ) {
 		return false;
 	}
 
-	if ( ! $params = wpcf7_akismet_submitted_params() ) {
+	$submission = WPCF7_Submission::get_instance();
+
+	if ( ! $submission or ! $params = wpcf7_akismet_submitted_params() ) {
 		return false;
 	}
 

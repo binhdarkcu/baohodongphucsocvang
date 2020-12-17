@@ -10,11 +10,6 @@
 
 namespace RankMath\Status;
 
-use RankMath\Google\Authentication;
-use RankMath\Admin\Admin_Helper;
-
-defined( 'ABSPATH' ) || exit;
-
 /**
  * System_Status class.
  */
@@ -27,7 +22,6 @@ class System_Status {
 		$this->prepare_info();
 
 		$this->display_system_info();
-		( new Error_Log() )->display();
 	}
 
 	/**
@@ -35,23 +29,21 @@ class System_Status {
 	 */
 	private function display_system_info() {
 		?>
-		<div class="rank-math-system-status rank-math-box">
-			<header>
-				<h3><?php esc_html_e( 'System Info', 'rank-math' ); ?></h3>
-			</header>
+		<h3>
+			<?php esc_html_e( 'System Info', 'rank-math' ); ?>
+		</h3>
 
-			<div class="site-health-copy-buttons">
-				<div class="copy-button-wrapper">
-					<button type="button" class="button copy-button" data-clipboard-text="<?php echo esc_attr( \WP_Debug_Data::format( $this->wp_info, 'debug' ) ); ?>">
-						<?php esc_html_e( 'Copy System Info to Clipboard', 'rank-math' ); ?>
-					</button>
-					<span class="success hidden" aria-hidden="true"><?php esc_html_e( 'Copied!', 'rank-math' ); ?></span>
-				</div>
+		<div class="site-health-copy-buttons">
+			<div class="copy-button-wrapper">
+				<button type="button" class="button copy-button" data-clipboard-text="<?php echo esc_attr( \WP_Debug_Data::format( $this->wp_info, 'debug' ) ); ?>">
+					<?php esc_html_e( 'Copy System Info to Clipboard', 'rank-math' ); ?>
+				</button>
+				<span class="success" aria-hidden="true"><?php esc_html_e( 'Copied!', 'rank-math' ); ?></span>
 			</div>
+		</div>
 
-			<div id="health-check-debug" class="health-check-accordion">
-				<?php $this->display_system_info_list(); ?>
-			</div>
+		<div id="health-check-debug" class="health-check-accordion">
+			<?php $this->display_system_info_list(); ?>
 		</div>
 		<?php
 	}
@@ -112,35 +104,17 @@ class System_Status {
 	private function prepare_info() {
 		global $wpdb;
 
-		$plan   = Admin_Helper::get_registration_data();
-		$tokens = Authentication::tokens();
+		$tables        = [];
+		$db_index_size = 0;
+		$db_data_size  = 0;
 
-		$rankmath = [
-			'label'  => esc_html__( 'Rank Math', 'rank-math' ),
-			'fields' => [
-				'version' => [
-					'label' => esc_html__( 'Version', 'rank-math' ),
-					'value' => get_option( 'rank_math_version' ),
-				],
-				'database_version' => [
-					'label' => esc_html__( 'Database version', 'rank-math' ),
-					'value' => get_option( 'rank_math_db_version' ),
-				],
-				'plugin_plan' => [
-					'label' => esc_html__( 'Plugin subscription plan', 'rank-math' ),
-					'value' => isset( $plan['plan'] ) ? \ucwords( $plan['plan'] ) : esc_html__( 'Free', 'rank-math' ),
-				],
-				'refresh_token' => [
-					'label' => esc_html__( 'Google Refresh token', 'rank-math' ),
-					'value' => empty( $tokens['refresh_token'] ) ? esc_html__( 'No token', 'rank-math' ) : esc_html__( 'Token exists', 'rank-math' ),
-				],
-			],
-		];
-
-		$database_tables = $wpdb->get_results(
+		$database_table_information = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT
-				table_name AS 'name'
+				table_name AS 'name',
+				engine AS 'engine',
+				round( ( data_length / 1024 / 1024 ), 2 ) 'data',
+				round( ( index_length / 1024 / 1024 ), 2 ) 'index'
 				FROM information_schema.TABLES
 				WHERE table_schema = %s
 				AND table_name LIKE %s
@@ -151,30 +125,25 @@ class System_Status {
 		);
 
 		$tables = [];
-		foreach ( $database_tables as $table ) {
-			$name = \str_replace( $wpdb->prefix, '', $table->name );
-			$tables[ $name ] = true;
-		}
-
-		$should_exists = [
-			'rank_math_404_logs'                  => esc_html__( 'Database Table: 404 Log', 'rank-math' ),
-			'rank_math_redirections'              => esc_html__( 'Database Table: Redirection', 'rank-math' ),
-			'rank_math_redirections_cache'        => esc_html__( 'Database Table: Redirection Cache', 'rank-math' ),
-			'rank_math_internal_links'            => esc_html__( 'Database Table: Internal Link', 'rank-math' ),
-			'rank_math_internal_meta'             => esc_html__( 'Database Table: Internal Link Meta', 'rank-math' ),
-			'rank_math_analytics_gsc'             => esc_html__( 'Database Table: Google Search Console', 'rank-math' ),
-			'rank_math_analytics_objects'         => esc_html__( 'Database Table: Flat Posts', 'rank-math' ),
-			'rank_math_analytics_ga'              => esc_html__( 'Database Table: Google Analytics', 'rank-math' ),
-			'rank_math_analytics_adsense'         => esc_html__( 'Database Table: Google AdSense', 'rank-math' ),
-			'rank_math_analytics_keyword_manager' => esc_html__( 'Database Table: Keyword Manager', 'rank-math' ),
-		];
-
-		foreach ( $should_exists as $name => $label ) {
-			$rankmath['fields'][ $name ] = [
-				'label' => $label,
-				'value' => isset( $tables[ $name ] ) ? esc_html__( 'Created', 'rank-math' ) : esc_html__( 'Doesn\'t exists', 'rank-math' ),
+		foreach ( $database_table_information as $table ) {
+			$tables[ $table->name ] = [
+				'data'   => $table->data,
+				'index'  => $table->index,
+				'engine' => $table->engine,
 			];
+
+			$db_data_size  += $table->data;
+			$db_index_size += $table->index;
 		}
+
+		$this->info = [
+			'database_version' => get_option( 'rank_math_db_version' ),
+			'table_prefix'     => $wpdb->prefix,
+			'tables'           => $tables,
+			'data_size'        => $db_data_size . 'MB',
+			'index_size'       => $db_index_size . 'MB',
+			'total_size'       => $db_data_size + $db_index_size . 'MB',
+		];
 
 		// Core debug data.
 		if ( ! class_exists( 'WP_Debug_Data' ) ) {
@@ -182,7 +151,19 @@ class System_Status {
 		}
 		wp_enqueue_style( 'site-health' );
 		wp_enqueue_script( 'site-health' );
-		$this->wp_info = [ 'rank-math' => $rankmath ] + \WP_Debug_Data::debug_data();
+		$this->wp_info = \WP_Debug_Data::debug_data();
 		unset( $this->wp_info['wp-paths-sizes'] );
+	}
+
+	/**
+	 * Adding prefix to the tables array.
+	 *
+	 * @param  string $table Table name.
+	 *
+	 * @return $table Table name with prefix.
+	 */
+	private function add_db_table_prefix( $table ) {
+		global $wpdb;
+		return $wpdb->prefix . $table;
 	}
 }

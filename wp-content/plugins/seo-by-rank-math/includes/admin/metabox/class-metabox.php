@@ -50,7 +50,7 @@ class Metabox implements Runner {
 			return;
 		}
 
-		$this->screen = new Screen();
+		$this->screen = new Screen;
 		if ( $this->screen->is_loaded() ) {
 			$this->action( 'cmb2_admin_init', 'add_main_metabox', 30 );
 			$this->action( 'rank_math/admin/enqueue_scripts', 'enqueue' );
@@ -74,14 +74,12 @@ class Metabox implements Runner {
 		$this->enqueue_commons();
 		$this->screen->enqueue();
 		$this->screen->localize();
-		$this->enqueue_translation();
 		rank_math()->variables->setup_json();
 
 		$is_gutenberg = Helper::is_block_editor() && \rank_math_is_gutenberg();
 		$is_elementor = 'elementor' === Param::get( 'action' );
-		Helper::add_json( 'knowledgegraphType', Helper::get_settings( 'titles.knowledgegraph_type' ) );
 
-		if ( ! $is_gutenberg && ! $is_elementor && 'rank_math_schema' !== $screen->post_type ) {
+		if ( ! $is_gutenberg && ! $is_elementor ) {
 			\CMB2_Hookup::enqueue_cmb_css();
 			wp_enqueue_style(
 				'rank-math-metabox',
@@ -99,14 +97,8 @@ class Metabox implements Runner {
 				[
 					'clipboard',
 					'wp-hooks',
-					'moment',
-					'wp-date',
-					'wp-data',
-					'wp-api-fetch',
-					'wp-components',
-					'wp-element',
-					'wp-i18n',
 					'wp-url',
+					'wp-i18n',
 					'rank-math-common',
 					'rank-math-analyzer',
 					'rank-math-validate',
@@ -124,14 +116,8 @@ class Metabox implements Runner {
 	 * Enqueque scripts common for all builders.
 	 */
 	private function enqueue_commons() {
-		wp_register_style( 'rank-math-post-metabox', rank_math()->plugin_url() . 'assets/admin/css/gutenberg.css', [], rank_math()->version );
 		wp_register_script( 'rank-math-analyzer', rank_math()->plugin_url() . 'assets/admin/js/analyzer.js', [ 'lodash', 'wp-autop', 'wp-wordcount' ], rank_math()->version, true );
-	}
 
-	/**
-	 * Enqueue translation.
-	 */
-	private function enqueue_translation() {
 		if ( function_exists( 'wp_set_script_translations' ) ) {
 			$this->filter( 'load_script_translation_file', 'load_script_translation_file', 10, 3 );
 			wp_set_script_translations( 'rank-math-analyzer', 'rank-math', rank_math()->plugin_dir() . 'languages/' );
@@ -153,6 +139,7 @@ class Metabox implements Runner {
 
 		$data                       = explode( '/', $file );
 		$data[ count( $data ) - 1 ] = preg_replace( '/rank-math/', 'seo-by-rank-math', $data[ count( $data ) - 1 ], 1 );
+
 		return implode( '/', $data );
 	}
 
@@ -362,31 +349,27 @@ class Metabox implements Runner {
 	private function get_tabs() {
 		$tabs = [
 			'general'  => [
-				'icon'       => 'rm-icon rm-icon-settings',
+				'icon'       => 'dashicons dashicons-admin-generic',
 				'title'      => esc_html__( 'General', 'rank-math' ),
 				'desc'       => esc_html__( 'This tab contains general options.', 'rank-math' ),
 				'file'       => rank_math()->includes_dir() . 'metaboxes/general.php',
 				'capability' => 'onpage_general',
 			],
 			'advanced' => [
-				'icon'       => 'rm-icon rm-icon-toolbox',
+				'icon'       => 'dashicons dashicons-admin-tools',
 				'title'      => esc_html__( 'Advanced', 'rank-math' ),
 				'desc'       => esc_html__( 'This tab contains advance options.', 'rank-math' ),
 				'file'       => rank_math()->includes_dir() . 'metaboxes/advanced.php',
 				'capability' => 'onpage_advanced',
 			],
 			'social'   => [
-				'icon'       => 'rm-icon rm-icon-social',
+				'icon'       => 'dashicons dashicons-share',
 				'title'      => esc_html__( 'Social', 'rank-math' ),
 				'desc'       => esc_html__( 'This tab contains social options.', 'rank-math' ),
 				'file'       => rank_math()->includes_dir() . 'metaboxes/social.php',
 				'capability' => 'onpage_social',
 			],
 		];
-
-		if ( ! Helper::is_advanced_mode() ) {
-			unset( $tabs['advanced'] );
-		}
 
 		/**
 		 * Allow developers to add new tabs in the main metabox.

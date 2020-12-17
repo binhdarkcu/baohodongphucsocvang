@@ -57,13 +57,13 @@ class Assets implements Runner {
 		wp_register_style( self::PREFIX . 'common', $css . 'common.css', null, rank_math()->version );
 		wp_register_style( self::PREFIX . 'cmb2', $css . 'cmb2.css', null, rank_math()->version );
 		wp_register_style( self::PREFIX . 'dashboard', $css . 'dashboard.css', [ 'rank-math-common' ], rank_math()->version );
-		wp_register_style( self::PREFIX . 'plugin-feedback', $css . 'feedback.css', null, rank_math()->version );
-		wp_register_style( self::PREFIX . 'dashabord-widget', $css . 'dashabord-widget.css', null, rank_math()->version );
+		wp_register_style( self::PREFIX . 'plugin-feedback', $css . 'feedback.css', [ 'rank-math-common' ], rank_math()->version );
 
 		// Scripts.
+		wp_register_script( 'clipboard', rank_math()->plugin_url() . 'assets/vendor/clipboard.min.js', null, '2.0.0', true );
 		wp_register_script( 'validate', rank_math()->plugin_url() . 'assets/vendor/jquery.validate.min.js', [ 'jquery' ], '1.19.0', true );
 		wp_register_script( self::PREFIX . 'validate', $js . 'validate.js', [ 'jquery' ], rank_math()->version, true );
-		wp_register_script( self::PREFIX . 'common', $js . 'common.js', [ 'jquery', 'validate', 'wp-i18n', 'lodash' ], rank_math()->version, true );
+		wp_register_script( self::PREFIX . 'common', $js . 'common.js', [ 'jquery', 'validate' ], rank_math()->version, true );
 		wp_register_script( self::PREFIX . 'dashboard', $js . 'dashboard.js', [ 'jquery', 'clipboard', 'validate' ], rank_math()->version, true );
 		wp_register_script( self::PREFIX . 'plugin-feedback', $js . 'feedback.js', [ 'jquery' ], rank_math()->version, true );
 
@@ -92,10 +92,6 @@ class Assets implements Runner {
 
 		if ( ! wp_script_is( 'wp-i18n', 'registered' ) ) {
 			wp_register_script( 'wp-i18n', rank_math()->plugin_url() . 'assets/vendor/i18n.js', [], rank_math()->version, true );
-		}
-
-		if ( ! wp_script_is( 'clipboard', 'registered' ) ) {
-			wp_register_script( 'clipboard', rank_math()->plugin_url() . 'assets/vendor/clipboard.min.js', [], rank_math()->version, true );
 		}
 
 		if ( ! wp_script_is( 'lodash', 'registered' ) ) {
@@ -140,10 +136,6 @@ class Assets implements Runner {
 	public function enqueue() {
 		$screen = get_current_screen();
 
-		if ( 'dashboard' === $screen->id ) {
-			wp_enqueue_style( self::PREFIX . 'dashabord-widget' );
-		}
-
 		// Our screens only.
 		if ( ! in_array( $screen->taxonomy, Helper::get_allowed_taxonomies(), true ) && ! in_array( $screen->id, $this->get_admin_screen_ids(), true ) ) {
 			return;
@@ -166,7 +158,7 @@ class Assets implements Runner {
 	 */
 	public function admin_footer_text( $text ) {
 		/* translators: plugin url */
-		return Helper::is_whitelabel() ? $text : sprintf( wp_kses_post( __( 'Thank you for using <a href="%s" target="_blank">Rank Math</a>', 'rank-math' ) ), 'https://s.rankmath.com/home' );
+		return Helper::is_whitelabel() ? $text : '<em>' . sprintf( wp_kses_post( __( 'Thank you for using <a href="%s" target="_blank">Rank Math</a>', 'rank-math' ) ), 'https://s.rankmath.com/home' ) . '</em>';
 	}
 
 	/**
@@ -199,7 +191,7 @@ class Assets implements Runner {
 	/**
 	 * Enqueues styles.
 	 *
-	 * @param string $style Name of the style.
+	 * @param string $style The name of the style to enqueue.
 	 */
 	public function enqueue_style( $style ) {
 		wp_enqueue_style( self::PREFIX . $style );
@@ -208,7 +200,7 @@ class Assets implements Runner {
 	/**
 	 * Enqueues scripts.
 	 *
-	 * @param string $script Name of the script.
+	 * @param string $script The name of the script to enqueue.
 	 */
 	public function enqueue_script( $script ) {
 		wp_enqueue_script( self::PREFIX . $script );
@@ -227,12 +219,11 @@ class Assets implements Runner {
 			'rank-math_page_rank-math-404-monitor',
 			'rank-math_page_rank-math-redirections',
 			'rank-math_page_rank-math-link-builder',
-			'rank-math_page_rank-math-analytics',
+			'rank-math_page_rank-math-search-console',
 			'rank-math_page_rank-math-import-export',
 			'rank-math_page_rank-math-help',
 			'user-edit',
 			'profile',
-			'rank_math_schema',
 		];
 
 		return array_merge( $pages, Helper::get_allowed_post_types() );

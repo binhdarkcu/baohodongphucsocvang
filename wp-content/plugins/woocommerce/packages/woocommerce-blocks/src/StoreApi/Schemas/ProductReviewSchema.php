@@ -1,10 +1,16 @@
 <?php
+/**
+ * Product Review Schema.
+ *
+ * @package WooCommerce/Blocks
+ */
+
 namespace Automattic\WooCommerce\Blocks\StoreApi\Schemas;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * ProductReviewSchema class.
- *
- * @internal This API is used internally by Blocks--it is still in flux and may be subject to revisions.
  */
 class ProductReviewSchema extends AbstractSchema {
 	/**
@@ -45,8 +51,7 @@ class ProductReviewSchema extends AbstractSchema {
 			],
 			'date_created'           => [
 				'description' => __( "The date the review was created, in the site's timezone.", 'woocommerce' ),
-				'type'        => 'string',
-				'format'      => 'date-time',
+				'type'        => 'date-time',
 				'context'     => [ 'view', 'edit' ],
 				'readonly'    => true,
 			],
@@ -58,8 +63,7 @@ class ProductReviewSchema extends AbstractSchema {
 			],
 			'date_created_gmt'       => [
 				'description' => __( 'The date the review was created, as GMT.', 'woocommerce' ),
-				'type'        => 'string',
-				'format'      => 'date-time',
+				'type'        => 'date-time',
 				'context'     => [ 'view', 'edit' ],
 				'readonly'    => true,
 			],

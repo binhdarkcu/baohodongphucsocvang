@@ -1,4 +1,10 @@
 <?php
+/**
+ * Holds the AbstractDependencyType class.
+ *
+ * @package WooCommerce\Blocks
+ */
+
 namespace Automattic\WooCommerce\Blocks\Registry;
 
 /**

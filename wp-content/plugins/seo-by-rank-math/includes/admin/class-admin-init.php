@@ -33,28 +33,27 @@ class Admin_Init {
 	 */
 	public function __construct() {
 
-		rank_math()->admin        = new Admin();
-		rank_math()->admin_assets = new Assets();
+		rank_math()->admin        = new Admin;
+		rank_math()->admin_assets = new Assets;
 
-		$this->load_review_reminders();
+		$this->load_review_tab();
 		$this->load_setup_wizard();
+		$this->search_console_ajax();
 		$this->load_post_columns_and_filters();
 
-		$this->run(
-			[
-				rank_math()->admin,
-				rank_math()->admin_assets,
-				new Admin_Menu(),
-				new Option_Center(),
-				new Notices(),
-				new CMB2_Fields(),
-				new Deactivate_Survey(),
-				new Metabox\Metabox(),
-				new Import_Export(),
-				new Updates(),
-				new Watcher(),
-			]
-		);
+		$this->run([
+			rank_math()->admin,
+			rank_math()->admin_assets,
+			new Admin_Menu,
+			new Option_Center,
+			new Notices,
+			new CMB2_Fields,
+			new Deactivate_Survey,
+			new Metabox\Metabox,
+			new Import_Export,
+			new Updates,
+			new Watcher,
+		]);
 
 		/**
 		 * Fires when admin is loaded.
@@ -67,19 +66,17 @@ class Admin_Init {
 	 */
 	private function load_post_columns_and_filters() {
 		if ( Admin_Helper::is_post_list() || Admin_Helper::is_media_library() || wp_doing_ajax() ) {
-			$this->run(
-				[
-					new Post_Columns(),
-					new Post_Filters(),
-				]
-			);
+			$this->run([
+				new Post_Columns,
+				new Post_Filters,
+			]);
 		}
 	}
 
 	/**
-	 * Load review tab in metabox & footer notice.
+	 * Load review tab in metabox.
 	 */
-	private function load_review_reminders() {
+	private function load_review_tab() {
 		if (
 			get_option( 'rank_math_already_reviewed' ) ||
 			get_option( 'rank_math_install_date' ) + ( 2 * WEEK_IN_SECONDS ) > current_time( 'timestamp' )
@@ -87,7 +84,7 @@ class Admin_Init {
 			return;
 		}
 
-		$this->run( [ new Ask_Review() ] );
+		$this->run( [ new Ask_Review ] );
 	}
 
 	/**
@@ -106,7 +103,22 @@ class Admin_Init {
 	 */
 	private function load_setup_wizard() {
 		if ( filter_input( INPUT_GET, 'page' ) === 'rank-math-wizard' || filter_input( INPUT_POST, 'action' ) === 'rank_math_save_wizard' ) {
-			new Setup_Wizard();
+			new Setup_Wizard;
+		}
+	}
+
+	/**
+	 * Search console ajax handler.
+	 */
+	private function search_console_ajax() {
+		if ( ! Conditional::is_ajax() || class_exists( 'Search_Console' ) ) {
+			return;
+		}
+
+		$action = Param::post( 'action' );
+		if ( $action && in_array( $action, [ 'rank_math_search_console_authentication', 'rank_math_search_console_deauthentication', 'rank_math_search_console_get_profiles' ], true ) ) {
+			Helper::update_modules( [ 'search-console' => 'on' ] );
+			new Search_Console;
 		}
 	}
 }

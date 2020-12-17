@@ -10,7 +10,6 @@
 
 namespace RankMath\WooCommerce;
 
-use RankMath\KB;
 use RankMath\Helper;
 use RankMath\Admin\Admin_Helper;
 use RankMath\Module\Base;
@@ -36,6 +35,10 @@ class Admin extends Base {
 			[
 				'id'        => 'woocommerce',
 				'directory' => $directory,
+				'help'      => [
+					'title' => esc_html__( 'WooCommerce', 'rank-math' ),
+					'view'  => $directory . '/views/help.php',
+				],
 			]
 		);
 		parent::__construct();
@@ -71,10 +74,9 @@ class Admin extends Base {
 			$tabs,
 			[
 				'woocommerce' => [
-					'icon'  => 'rm-icon rm-icon-cart',
+					'icon'  => 'dashicons dashicons-cart',
 					'title' => esc_html__( 'WooCommerce', 'rank-math' ),
-					/* translators: Link to kb article */
-					'desc'  => sprintf( esc_html__( 'Choose how you want Rank Math to handle your WooCommerce SEO. %s.', 'rank-math' ), '<a href="' . KB::get( 'woocommerce-settings' ) . '" target="_blank">' . esc_html__( 'Learn more', 'rank-math' ) . '</a>' ),
+					'desc'  => esc_html__( 'Choose how you want Rank Math to handle your WooCommerce SEO. These options help you create cleaner, SEO friendly URLs, and optimize your WooCommerce product pages.', 'rank-math' ),
 					'file'  => $this->directory . '/views/options-general.php',
 				],
 			],

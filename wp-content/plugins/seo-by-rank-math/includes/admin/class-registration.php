@@ -16,7 +16,6 @@ use RankMath\Traits\Hooker;
 use RankMath\Admin\Admin_Helper;
 use MyThemeShop\Helpers\Param;
 use RankMath\Helpers\Security;
-use RankMath\Google\Authentication;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -108,13 +107,13 @@ class Registration {
 		if ( 'cancel' === $status ) {
 			// User canceled activation.
 			Helper::add_notification( __( 'Rank Math plugin could not be connected.', 'rank-math' ), [ 'type' => 'error' ] );
-			return Security::remove_query_arg_raw( [ 'rankmath_connect', 'rankmath_auth' ] );
+			return Security::remove_query_arg_raw( array( 'rankmath_connect', 'rankmath_auth' ) );
 		}
 
 		if ( 'banned' === $status ) {
 			// User or site banned.
 			Helper::add_notification( __( 'Unable to connect Rank Math.', 'rank-math' ), [ 'type' => 'error' ] );
-			return Security::remove_query_arg_raw( [ 'rankmath_connect', 'rankmath_auth' ] );
+			return Security::remove_query_arg_raw( array( 'rankmath_connect', 'rankmath_auth' ) );
 		}
 
 		if ( 'ok' === $status && $auth_data = $this->get_registration_params() ) { // phpcs:ignore
@@ -123,22 +122,16 @@ class Registration {
 					'username'  => $auth_data['username'],
 					'email'     => $auth_data['email'],
 					'api_key'   => $auth_data['api_key'],
-					'plan'      => $auth_data['plan'],
 					'connected' => true,
 				]
 			);
-
-			if ( 1 == Param::get( 'analytics' ) ) {
-				wp_redirect( Authentication::get_auth_url() );
-				exit;
-			}
 
 			// Redirect to the wizard is registration successful.
 			if ( Param::get( 'page' ) === 'rank-math-registration' ) {
 				return Helper::get_admin_url( 'wizard' );
 			}
 
-			return Security::remove_query_arg_raw( [ 'rankmath_connect', 'rankmath_auth', 'nonce' ] );
+			return Security::remove_query_arg_raw( array( 'rankmath_connect', 'rankmath_auth', 'nonce' ) );
 		}
 
 		return false;
@@ -217,7 +210,7 @@ class Registration {
 			ob_end_clean();
 		}
 
-		$assets = new Assets();
+		$assets = new Assets;
 		$assets->register();
 
 		wp_styles()->done  = [];
@@ -229,6 +222,8 @@ class Registration {
 
 		// Wizard.
 		wp_enqueue_style( 'rank-math-wizard', rank_math()->plugin_url() . 'assets/admin/css/setup-wizard.css', [ 'wp-admin', 'buttons', 'cmb2-styles', 'rank-math-common', 'rank-math-cmb2' ], rank_math()->version );
+		wp_enqueue_script( 'rank-math-wizard', rank_math()->plugin_url() . 'assets/admin/js/wizard.js', [ 'jquery', 'rank-math-common', 'rank-math-validate' ], rank_math()->version, true );
+		wp_localize_script( 'rank-math-wizard', 'wp', [] );
 
 		$logo_url = '<a href="' . KB::get( 'logo' ) . '" target="_blank"><img src="' . esc_url( rank_math()->plugin_url() . 'assets/admin/img/logo.svg' ) . '"></a>';
 
@@ -252,6 +247,8 @@ class Registration {
 			<?php $this->header_content(); ?>
 		</header>
 
+		<span class="wp-header-end"></span>
+
 		<?php rank_math()->notification->display(); ?>
 
 		<?php $this->show_connect_button(); ?>
@@ -269,9 +266,18 @@ class Registration {
 	 */
 	private function show_connect_button() {
 		?>
-		<div class="text-center wp-core-ui rank-math-ui" style="margin-top: 30px;">
-			<button type="submit" class="button button-primary button-animated" name="rank_math_activate"><?php echo esc_attr__( 'Connect Your Account', 'rank-math' ); ?></button>
+		<div class="text-center wp-core-ui rank-math-ui" style="margin-bottom: 30px;">
+			<input type="submit" class="button button-primary button-xlarge" name="rank_math_activate" value="<?php echo esc_attr__( 'Activate Rank Math', 'rank-math' ); ?>">
 		</div>
+		<label for="rank-math-usage-tracking" class="cmb2-id-rank-math-usage-tracking">
+			<div>
+				<div class="alignleft" style="height: 80px; margin-right: 4px;">
+					<input type="checkbox" name="rank-math-usage-tracking" id="rank-math-usage-tracking" value="on" <?php checked( Helper::get_settings( 'general.usage_tracking' ) ); ?>>
+				</div>
+				<?php // translators: placeholder is a link to the Knowledge Base. ?>
+				<p class="description"><?php printf( __( 'Gathering usage data helps us make Rank Math SEO plugin better - for you. By understanding how you use Rank Math, we can introduce new features and find out if existing features are working well for you. If you don’t want us to collect data from your website, uncheck the tickbox. Please note that licensing information may still be sent back to us for authentication. We collect data anonymously, read more %s.', 'rank-math' ), '<a href="' . KB::get( 'rm-privacy' ) . '" target="_blank">here</a>' ); ?><p>
+			</div>
+		</label>
 		<?php
 	}
 
@@ -282,12 +288,14 @@ class Registration {
 		if ( $this->invalid ) :
 			?>
 			<h1><?php esc_html_e( 'Connect FREE Account', 'rank-math' ); ?></h1>
-			<p class="rank-math-gray-box">
-				<?php
-				/* translators: Link to Free Account Benefits KB article */
-				printf( esc_html__( 'By connecting your free account, you get keyword suggestions directly from Google when entering the focus keywords. Not only that, get access to our revolutionary SEO Analyzer inside WordPress that scans your website for SEO errors and suggest improvements. %s', 'rank-math' ), '<a href="' . KB::get( 'free-account-benefits' ) . '" target="_blank">' . esc_html__( 'Read more by following this link.', 'rank-math' ) . '</a>' );
-				?>
-			</p>
+			<div class="notice notice-warning rank-math-registration-notice inline">
+				<p>
+					<?php
+					/* translators: Link to Rank Math signup page */
+					printf( wp_kses_post( __( 'You need to connect with your <a href="%s" target="_blank"><strong>FREE Rank Math account</strong></a> to use Rank Math on this site.', 'rank-math' ) ), KB::get( 'free-account' ) );
+					?>
+				</p>
+			</div>
 			<?php
 			return;
 		endif;
@@ -314,6 +322,8 @@ class Registration {
 			return wp_safe_redirect( $referer );
 		}
 
+		Admin_Helper::allow_tracking();
+
 		$this->redirect_to_connect( $_POST );
 	}
 
@@ -326,6 +336,7 @@ class Registration {
 			exit;
 		}
 		add_option( 'rank_math_registration_skip', true );
+		Admin_Helper::allow_tracking();
 		wp_safe_redirect( Helper::get_admin_url( 'wizard' ) );
 		exit;
 	}
@@ -338,7 +349,7 @@ class Registration {
 	private function redirect_to_connect( $values ) {
 
 		if ( ! isset( $values['rank_math_activate'] ) ) {
-			Admin_Helper::deregister_user();
+			Admin_Helper::get_registration_data( false );
 			return;
 		}
 

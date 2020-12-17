@@ -3,19 +3,19 @@
  * Rank Math SEO Plugin.
  *
  * @package      RANK_MATH
- * @copyright    Copyright (C) 2019-2020, Rank Math - support@rankmath.com
+ * @copyright    Copyright (C) 2019, Rank Math - support@rankmath.com
  * @link         https://rankmath.com
  * @since        0.9.0
  *
  * @wordpress-plugin
  * Plugin Name:       Rank Math SEO
- * Version:           1.0.53.1
+ * Version:           1.0.42.2
  * Plugin URI:        https://s.rankmath.com/home
  * Description:       Rank Math is a revolutionary SEO product that combines the features of many SEO tools and lets you multiply your traffic in the easiest way possible.
  * Author:            Rank Math
  * Author URI:        https://s.rankmath.com/home
- * License:           GPL v3
- * License URI:       https://www.gnu.org/licenses/gpl-3.0.txt
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       rank-math
  * Domain Path:       /languages
  */
@@ -34,7 +34,7 @@ final class RankMath {
 	 *
 	 * @var string
 	 */
-	public $version = '1.0.53.1';
+	public $version = '1.0.42.2';
 
 	/**
 	 * Rank Math database version.
@@ -48,7 +48,7 @@ final class RankMath {
 	 *
 	 * @var string
 	 */
-	private $wordpress_version = '5.2';
+	private $wordpress_version = '4.9';
 
 	/**
 	 * Minimum version of PHP required to run Rank Math.
@@ -171,12 +171,12 @@ final class RankMath {
 	 * Instantiate the plugin.
 	 */
 	private function setup() {
-		// Define plugin constants.
-		$this->define_constants();
-
 		if ( ! $this->is_requirements_meet() ) {
 			return;
 		}
+
+		// Define plugin constants.
+		$this->define_constants();
 
 		// Include required files.
 		$this->includes();
@@ -201,7 +201,7 @@ final class RankMath {
 		// Check WordPress version.
 		if ( version_compare( get_bloginfo( 'version' ), $this->wordpress_version, '<' ) ) {
 			/* translators: WordPress Version */
-			$this->messages[] = sprintf( esc_html__( 'You are using the outdated WordPress, please update it to version %s or higher.', 'rank-math' ), $this->wordpress_version );
+			$this->messages[] = sprintf( esc_html__( 'Rank Math requires WordPress version %s or above. Please update WordPress to run this plugin.', 'rank-math' ), $this->wordpress_version );
 		}
 
 		// Check PHP version.
@@ -226,8 +226,8 @@ final class RankMath {
 	 */
 	public function auto_deactivate() {
 		deactivate_plugins( plugin_basename( RANK_MATH_FILE ) );
-		if ( isset( $_GET['activate'] ) ) { // phpcs:ignore
-			unset( $_GET['activate'] ); // phpcs:ignore
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
 		}
 	}
 
@@ -236,9 +236,9 @@ final class RankMath {
 	 */
 	public function activation_error() {
 		?>
-		<div class="notice rank-math-notice notice-error">
+		<div class="notice notice-error">
 			<p>
-				<?php echo join( '<br>', $this->messages ); // phpcs:ignore ?>
+				<?php echo join( '<br>', $this->messages ); ?>
 			</p>
 		</div>
 		<?php
@@ -272,33 +272,39 @@ final class RankMath {
 	 * Instantiate classes.
 	 */
 	private function instantiate() {
-		new \RankMath\Installer();
+		new \RankMath\Rollbar;
+		new \RankMath\Installer;
 
 		// Setting Manager.
-		$this->container['settings'] = new \RankMath\Settings();
+		$this->container['settings'] = new \RankMath\Settings;
 
 		// JSON Manager.
-		$this->container['json'] = new \MyThemeShop\Json_Manager();
+		$this->container['json'] = new \MyThemeShop\Json_Manager;
 
 		// Notification Manager.
 		$this->container['notification'] = new \MyThemeShop\Notification_Center( 'rank_math_notifications' );
 
 		// Product Registration.
-		$this->container['registration'] = new \RankMath\Admin\Registration();
+		$this->container['registration'] = new \RankMath\Admin\Registration;
 		if ( $this->container['registration']->invalid ) {
 			return;
 		}
 
-		$this->container['manager']   = new \RankMath\Module\Manager();
-		$this->container['variables'] = new \RankMath\Replace_Variables\Manager();
+		$this->container['manager']   = new \RankMath\Module\Manager;
+		$this->container['variables'] = new \RankMath\Replace_Variables\Manager;
 
 		// Just init without storing it in the container.
-		new \RankMath\Common();
-		$this->container['rewrite'] = new \RankMath\Rewrite();
-		new \RankMath\Compatibility();
+		new \RankMath\Common;
+		$this->container['rewrite'] = new \RankMath\Rewrite;
+		new \RankMath\Compatibility;
+
+		// Usage Tracking, if it's enabled and this is a CRON request.
+		if ( defined( 'DOING_CRON' ) && ! defined( 'DOING_AJAX' ) && \RankMath\Helper::get_settings( 'general.usage_tracking' ) ) {
+			new \RankMath\Tracking;
+		}
 
 		// Frontend SEO Score.
-		$this->container['frontend_seo_score'] = new \RankMath\Frontend_SEO_Score();
+		$this->container['frontend_seo_score'] = new \RankMath\Frontend_SEO_Score;
 		$this->load_3rd_party();
 	}
 
@@ -306,9 +312,8 @@ final class RankMath {
 	 * Initialize WordPress action and filter hooks.
 	 */
 	private function init_actions() {
-		//!make sure it is loaded before setup_modules and load_modules
-		add_action( 'plugins_loaded', [ $this, 'localization_setup' ], 9 );
-		add_action( 'init', [ $this, 'pass_admin_content' ] );
+
+		add_action( 'init', [ $this, 'localization_setup' ] );
 		add_filter( 'cron_schedules', [ $this, 'cron_schedules' ] );
 
 		// Add plugin action links.
@@ -318,6 +323,7 @@ final class RankMath {
 		// Booting.
 		add_action( 'plugins_loaded', [ $this, 'init' ], 14 );
 		add_action( 'rest_api_init', [ $this, 'init_rest_api' ] );
+		add_action( 'wp_login', [ $this, 'on_login' ] );
 
 		// Load admin-related functionality.
 		if ( is_admin() ) {
@@ -340,9 +346,9 @@ final class RankMath {
 	 */
 	public function init_rest_api() {
 		$controllers = [
-			new \RankMath\Rest\Admin(),
-			new \RankMath\Rest\Front(),
-			new \RankMath\Rest\Post(),
+			new \RankMath\Rest\Admin,
+			new \RankMath\Rest\Front,
+			new \RankMath\Rest\Post,
 		];
 
 		foreach ( $controllers as $controller ) {
@@ -358,7 +364,7 @@ final class RankMath {
 		if ( $this->container['registration']->invalid ) {
 			return;
 		}
-		new \RankMath\Admin\Admin_Init();
+		new \RankMath\Admin\Admin_Init;
 	}
 
 	/**
@@ -369,7 +375,7 @@ final class RankMath {
 		if ( $this->container['registration']->invalid ) {
 			return;
 		}
-		$this->container['frontend'] = new \RankMath\Frontend\Frontend();
+		$this->container['frontend'] = new \RankMath\Frontend\Frontend;
 	}
 
 	/**
@@ -378,7 +384,7 @@ final class RankMath {
 	private function load_3rd_party() {
 
 		if ( defined( 'ELEMENTOR_VERSION' ) ) {
-			new \RankMath\Elementor\Elementor();
+			new \RankMath\Elementor\Elementor;
 		}
 	}
 
@@ -390,6 +396,13 @@ final class RankMath {
 	}
 
 	/**
+	 * Add functionality on succeessful login.
+	 */
+	public function on_login() {
+		\RankMath\Search_Console\Client::get()->refresh_auth_token_on_login();
+	}
+
+	/**
 	 * Show action links on the plugin screen.
 	 *
 	 * @param  mixed $links Plugin Action links.
@@ -397,18 +410,18 @@ final class RankMath {
 	 */
 	public function plugin_action_links( $links ) {
 		$options = [
-			'options-general' => __( 'Settings', 'rank-math' ),
-			'wizard'          => __( 'Setup Wizard', 'rank-math' ),
+			'options-general' => esc_html__( 'Settings', 'rank-math' ),
+			'wizard'          => esc_html__( 'Setup Wizard', 'rank-math' ),
 		];
 
 		if ( $this->container['registration']->invalid ) {
 			$options = [
-				'registration' => __( 'Setup Wizard', 'rank-math' ),
+				'registration' => esc_html__( 'Setup Wizard', 'rank-math' ),
 			];
 		}
 
 		foreach ( $options as $link => $label ) {
-			$plugin_links[] = '<a href="' . \RankMath\Helper::get_admin_url( $link ) . '">' . esc_html( $label ) . '</a>';
+			$plugin_links[] = '<a href="' . \RankMath\Helper::get_admin_url( $link ) . '">' . $label . '</a>';
 		}
 
 		return array_merge( $links, $plugin_links );
@@ -446,20 +459,14 @@ final class RankMath {
 	 */
 	public function localization_setup() {
 		$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
-		$locale = apply_filters( 'plugin_locale', $locale, 'rank-math' ); // phpcs:ignore
+		$locale = apply_filters( 'plugin_locale', $locale, 'rank-math' );
 
 		unload_textdomain( 'rank-math' );
 		if ( false === load_textdomain( 'rank-math', WP_LANG_DIR . '/plugins/seo-by-rank-math-' . $locale . '.mo' ) ) {
 			load_textdomain( 'rank-math', WP_LANG_DIR . '/seo-by-rank-math/seo-by-rank-math-' . $locale . '.mo' );
 		}
-		load_plugin_textdomain( 'rank-math', false, rank_math()->plugin_dir() . 'languages/' );
+		load_plugin_textdomain( 'rank-math', false, rank_math()->plugin_dir() . '/languages/' );
 
-	}
-
-	/**
-	 * localize admin content to JS
-	 */
-	public function pass_admin_content(){
 		if ( is_user_logged_in() && is_admin_bar_showing() ) {
 			$this->container['json']->add( 'version', $this->version, 'rankMath' );
 			$this->container['json']->add( 'ajaxurl', admin_url( 'admin-ajax.php' ), 'rankMath' );
@@ -478,10 +485,10 @@ final class RankMath {
 	 */
 	public function cron_schedules( $schedules ) {
 
-		$schedules['weekly'] = [
+		$schedules['weekly'] = array(
 			'interval' => DAY_IN_SECONDS * 7,
 			'display'  => esc_html__( 'Once Weekly', 'rank-math' ),
-		];
+		);
 
 		return $schedules;
 	}

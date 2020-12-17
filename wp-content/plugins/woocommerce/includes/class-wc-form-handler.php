@@ -826,7 +826,6 @@ class WC_Form_Handler {
 			$quantity_set = false;
 
 			foreach ( $items as $item => $quantity ) {
-				$quantity = wc_stock_amount( $quantity );
 				if ( $quantity <= 0 ) {
 					continue;
 				}

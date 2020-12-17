@@ -1,14 +1,20 @@
 <?php
+/**
+ * Helper class to bridge the gap between the cart API and Woo core.
+ *
+ * @package WooCommerce/Blocks
+ */
+
 namespace Automattic\WooCommerce\Blocks\StoreApi\Utilities;
+
+defined( 'ABSPATH' ) || exit;
 
 use Automattic\WooCommerce\Blocks\StoreApi\Routes\RouteException;
 use Automattic\WooCommerce\Blocks\StoreApi\Utilities\NoticeHandler;
 
 /**
  * Woo Cart Controller class.
- * Helper class to bridge the gap between the cart API and Woo core.
  *
- * @internal This API is used internally by Blocks--it is still in flux and may be subject to revisions.
  * @since 2.5.0
  */
 class CartController {
@@ -26,7 +32,6 @@ class CartController {
 	 * @return string|Error
 	 */
 	public function add_to_cart( $request ) {
-		$cart    = $this->get_cart_instance();
 		$request = wp_parse_args(
 			$request,
 			[
@@ -39,7 +44,7 @@ class CartController {
 
 		$request = $this->filter_request_data( $this->parse_variation_data( $request ) );
 		$product = $this->get_product_for_cart( $request );
-		$cart_id = $cart->generate_cart_id(
+		$cart_id = wc()->cart->generate_cart_id(
 			$this->get_product_id( $product ),
 			$this->get_variation_id( $product ),
 			$request['variation'],
@@ -48,7 +53,7 @@ class CartController {
 
 		$this->validate_add_to_cart( $product, $request );
 
-		$existing_cart_id = $cart->find_product_in_cart( $cart_id );
+		$existing_cart_id = wc()->cart->find_product_in_cart( $cart_id );
 
 		if ( $existing_cart_id ) {
 			if ( $product->is_sold_individually() ) {
@@ -56,18 +61,18 @@ class CartController {
 					'woocommerce_rest_cart_product_sold_individually',
 					sprintf(
 						/* translators: %s: product name */
-						__( 'You cannot add another "%s" to your cart.', 'woocommerce' ),
+						__( '"%s" is already inside your cart.', 'woocommerce' ),
 						$product->get_name()
 					),
 					400
 				);
 			}
-			$cart->set_quantity( $existing_cart_id, $request['quantity'] + $cart->cart_contents[ $existing_cart_id ]['quantity'], true );
+			wc()->cart->set_quantity( $existing_cart_id, $request['quantity'] + wc()->cart->cart_contents[ $existing_cart_id ]['quantity'], true );
 
 			return $existing_cart_id;
 		}
 
-		$cart->cart_contents[ $cart_id ] = apply_filters(
+		wc()->cart->cart_contents[ $cart_id ] = apply_filters(
 			'woocommerce_add_cart_item',
 			array_merge(
 				$request['cart_item_data'],
@@ -84,7 +89,7 @@ class CartController {
 			$cart_id
 		);
 
-		$cart->cart_contents = apply_filters( 'woocommerce_cart_contents_changed', $cart->cart_contents );
+		wc()->cart->cart_contents = apply_filters( 'woocommerce_cart_contents_changed', wc()->cart->cart_contents );
 
 		do_action(
 			'woocommerce_add_to_cart',
@@ -125,14 +130,14 @@ class CartController {
 				'woocommerce_rest_cart_product_sold_individually',
 				sprintf(
 					/* translators: %s: product name */
-					__( 'You cannot add another "%s" to your cart.', 'woocommerce' ),
+					__( '"%s" is already inside your cart.', 'woocommerce' ),
 					$product->get_name()
 				),
 				400
 			);
 		}
-		$cart = $this->get_cart_instance();
-		$cart->set_quantity( $item_id, $quantity );
+
+		wc()->cart->set_quantity( $item_id, $quantity );
 	}
 
 	/**
@@ -218,7 +223,6 @@ class CartController {
 	 * @throws RouteException Exception if invalid data is detected.
 	 */
 	public function validate_cart_items() {
-		$cart       = $this->get_cart_instance();
 		$cart_items = $this->get_cart_items();
 
 		foreach ( $cart_items as $cart_item_key => $cart_item ) {
@@ -226,8 +230,8 @@ class CartController {
 		}
 
 		// Before running the woocommerce_check_cart_items hook, unhook validation from the core cart.
-		remove_action( 'woocommerce_check_cart_items', array( $cart, 'check_cart_items' ), 1 );
-		remove_action( 'woocommerce_check_cart_items', array( $cart, 'check_cart_coupons' ), 1 );
+		remove_action( 'woocommerce_check_cart_items', array( wc()->cart, 'check_cart_items' ), 1 );
+		remove_action( 'woocommerce_check_cart_items', array( wc()->cart, 'check_cart_coupons' ), 1 );
 
 		/**
 		 * Hook: woocommerce_check_cart_items
@@ -307,7 +311,7 @@ class CartController {
 
 		/**
 		 * Fire action to validate add to cart. Functions hooking into this should throw an \Exception to prevent
-		 * add to cart from occurring.
+		 * add to cart from occuring.
 		 *
 		 * @param \WC_Product $product Product object being added to the cart.
 		 * @param array       $cart_item Cart item array.
@@ -393,8 +397,7 @@ class CartController {
 	 * @return array
 	 */
 	public function get_cart_item( $item_id ) {
-		$cart = $this->get_cart_instance();
-		return isset( $cart->cart_contents[ $item_id ] ) ? $cart->cart_contents[ $item_id ] : [];
+		return isset( wc()->cart->cart_contents[ $item_id ] ) ? wc()->cart->cart_contents[ $item_id ] : [];
 	}
 
 	/**
@@ -404,8 +407,7 @@ class CartController {
 	 * @return array
 	 */
 	public function get_cart_items( $callback = null ) {
-		$cart = $this->get_cart_instance();
-		return $callback ? array_filter( $cart->get_cart(), $callback ) : array_filter( $cart->get_cart() );
+		return $callback ? array_filter( wc()->cart->get_cart(), $callback ) : array_filter( wc()->cart->get_cart() );
 	}
 
 	/**
@@ -414,13 +416,12 @@ class CartController {
 	 * @return array
 	 */
 	public function get_cart_hashes() {
-		$cart = $this->get_cart_instance();
 		return [
-			'line_items' => $cart->get_cart_hash(),
-			'shipping'   => md5( wp_json_encode( $cart->shipping_methods ) ),
-			'fees'       => md5( wp_json_encode( $cart->get_fees() ) ),
-			'coupons'    => md5( wp_json_encode( $cart->get_applied_coupons() ) ),
-			'taxes'      => md5( wp_json_encode( $cart->get_taxes() ) ),
+			'line_items' => wc()->cart->get_cart_hash(),
+			'shipping'   => md5( wp_json_encode( wc()->cart->shipping_methods ) ),
+			'fees'       => md5( wp_json_encode( wc()->cart->get_fees() ) ),
+			'coupons'    => md5( wp_json_encode( wc()->cart->get_applied_coupons() ) ),
+			'taxes'      => md5( wp_json_encode( wc()->cart->get_taxes() ) ),
 		];
 	}
 
@@ -428,8 +429,7 @@ class CartController {
 	 * Empty cart contents.
 	 */
 	public function empty_cart() {
-		$cart = $this->get_cart_instance();
-		$cart->empty_cart();
+		wc()->cart->empty_cart();
 	}
 
 	/**
@@ -439,8 +439,7 @@ class CartController {
 	 * @return bool
 	 */
 	public function has_coupon( $coupon_code ) {
-		$cart = $this->get_cart_instance();
-		return $cart->has_discount( $coupon_code );
+		return wc()->cart->has_discount( $coupon_code );
 	}
 
 	/**
@@ -450,8 +449,7 @@ class CartController {
 	 * @return array
 	 */
 	public function get_cart_coupons( $callback = null ) {
-		$cart = $this->get_cart_instance();
-		return $callback ? array_filter( $cart->get_applied_coupons(), $callback ) : array_filter( $cart->get_applied_coupons() );
+		return $callback ? array_filter( wc()->cart->get_applied_coupons(), $callback ) : array_filter( wc()->cart->get_applied_coupons() );
 	}
 
 	/**
@@ -593,9 +591,8 @@ class CartController {
 	 */
 	protected function validate_cart_coupon( \WC_Coupon $coupon ) {
 		if ( ! $coupon->is_valid() ) {
-			$cart = $this->get_cart_instance();
-			$cart->remove_coupon( $coupon->get_code() );
-			$cart->calculate_totals();
+			wc()->cart->remove_coupon( $coupon->get_code() );
+			wc()->cart->calculate_totals();
 			throw new RouteException(
 				'woocommerce_rest_cart_coupon_error',
 				sprintf(
@@ -616,8 +613,7 @@ class CartController {
 	 * @return int
 	 */
 	protected function get_product_quantity_in_cart( $product ) {
-		$cart               = $this->get_cart_instance();
-		$product_quantities = $cart->get_cart_item_quantities();
+		$product_quantities = wc()->cart->get_cart_item_quantities();
 		$product_id         = $product->get_stock_managed_by_id();
 
 		return isset( $product_quantities[ $product_id ] ) ? $product_quantities[ $product_id ] : 0;

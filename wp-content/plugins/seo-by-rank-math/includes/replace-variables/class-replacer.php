@@ -6,9 +6,6 @@
  * @package    RankMath
  * @subpackage RankMath\Replace_Variables
  * @author     Rank Math <support@rankmath.com>
- *
- * @copyright Copyright (C) 2008-2019, Yoast BV
- * The following code is a derivative work of the code from the Yoast(https://github.com/Yoast/wordpress-seo/), which is licensed under GPL v3.
  */
 
 namespace RankMath\Replace_Variables;
@@ -28,7 +25,7 @@ class Replacer {
 	 *
 	 * @var array
 	 */
-	public static $defaults = [
+	public static $defaults = array(
 		'ID'            => '',
 		'name'          => '',
 		'post_author'   => '',
@@ -41,7 +38,7 @@ class Replacer {
 		'term_id'       => '',
 		'term404'       => '',
 		'filename'      => '',
-	];
+	);
 
 	/**
 	 *  Replace `%variables%` with context-dependent value.

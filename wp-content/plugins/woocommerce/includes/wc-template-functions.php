@@ -348,11 +348,9 @@ function wc_body_class( $classes ) {
 function wc_no_js() {
 	?>
 	<script type="text/javascript">
-		(function () {
-			var c = document.body.className;
-			c = c.replace(/woocommerce-no-js/, 'woocommerce-js');
-			document.body.className = c;
-		})()
+		var c = document.body.className;
+		c = c.replace(/woocommerce-no-js/, 'woocommerce-js');
+		document.body.className = c;
 	</script>
 	<?php
 }

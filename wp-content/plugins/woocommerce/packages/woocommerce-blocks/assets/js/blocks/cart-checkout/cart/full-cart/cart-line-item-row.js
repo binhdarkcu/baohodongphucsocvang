@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import PropTypes from 'prop-types';
 import QuantitySelector from '@woocommerce/base-components/quantity-selector';
-import ProductPrice from '@woocommerce/base-components/product-price';
 import { getCurrency } from '@woocommerce/base-utils';
 import { useStoreCartItemQuantity } from '@woocommerce/base-hooks';
 import { Icon, trash } from '@woocommerce/icons';
@@ -15,6 +14,7 @@ import {
 	ProductLowStockBadge,
 	ProductMetadata,
 	ProductName,
+	ProductPrice,
 	ProductSaleBadge,
 } from '@woocommerce/base-components/cart-checkout';
 import Dinero from 'dinero.js';
@@ -156,11 +156,11 @@ const CartLineItemRow = ( { lineItem = {} } ) => {
 			<td className="wc-block-cart-item__total">
 				<ProductPrice
 					currency={ currency }
-					regularPrice={ getAmountFromRawPrice(
+					regularValue={ getAmountFromRawPrice(
 						regularAmount,
 						currency
 					) }
-					price={ getAmountFromRawPrice( purchaseAmount, currency ) }
+					value={ getAmountFromRawPrice( purchaseAmount, currency ) }
 				/>
 				<ProductSaleBadge
 					currency={ currency }

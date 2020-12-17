@@ -24,7 +24,6 @@ trait Api {
 	 * @param array  $options Set of options.
 	 */
 	public static function add_notification( $message, $options = [] ) {
-		$options['classes'] = ! empty( $options['classes'] ) ? $options['classes'] . ' rank-math-notice' : 'rank-math-notice';
 		rank_math()->notification->add( $message, $options );
 	}
 
@@ -46,32 +45,6 @@ trait Api {
 	 */
 	public static function get_settings( $field_id = '', $default = false ) {
 		return rank_math()->settings->get( $field_id, $default );
-	}
-
-	/**
-	 * Get Auto update setting status.
-	 *
-	 * @return bool
-	 */
-	public static function get_auto_update_setting() {
-		return in_array( 'seo-by-rank-math/rank-math.php', (array) get_site_option( 'auto_update_plugins', [] ), true );
-	}
-
-	/**
-	 * Toggle auto updates option.
-	 *
-	 * @param string $toggle       New status.
-	 * @return void
-	 */
-	public static function toggle_auto_update_setting( $toggle ) {
-		$auto_updates = (array) get_site_option( 'auto_update_plugins', [] );
-		if ( ! empty( $toggle ) && 'off' !== $toggle ) {
-			$auto_updates[] = 'seo-by-rank-math/rank-math.php';
-			update_site_option( 'auto_update_plugins', array_unique( $auto_updates ) );
-			return;
-		}
-
-		update_site_option( 'auto_update_plugins', array_diff( $auto_updates, [ 'seo-by-rank-math/rank-math.php' ] ) );
 	}
 
 	/**

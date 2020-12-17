@@ -1,10 +1,10 @@
 === WooCommerce Admin ===
-Contributors: woocommerce, automattic
+Contributors: automattic
 Tags: ecommerce, e-commerce, store, sales, reports, analytics, dashboard, activity, notices, insights, stats, woo commerce, woocommerce
 Requires at least: 5.3.0
 Tested up to: 5.4.2
 Requires PHP: 5.6.20
-Stable tag: 1.6.2
+Stable tag: 1.5.0
 License: GPLv3
 License URI: https://github.com/woocommerce/woocommerce-admin/blob/main/license.txt
 
@@ -71,75 +71,26 @@ Release and roadmap notes are available on the [WooCommerce Developers Blog](htt
 
 == Changelog ==
 
-= 1.6.2 10/16/2020 =
-- Fix: Missing activity panels on ugraded sites #5400
-- Fix: Casting of onboarding profile data to array #5415
-- Fix: Gutenberg 9.1.1 compat for inbox on home screen not showing #5416
-- Fix: i18n of Performance Indicator strings #5405
-- Fix: Gutenberg 9.1.1 compat for empty data sets #5409
-
-= 1.6.1 10/13/2020 =
-- Fix: Hide setup checklist shortcut when setup checklist skipped #5360
-- Fix: use of undefined function on WC < 4.0.0.
-
-= 1.6.0 10/9/2020 =
-- Dev: Reviews wp.data store #4941
-- Dev: Notes wp.data store #4943
-- Dev: Add woocommerce_analytics_update_order_stats_data filter #4934
-- Dev: Remove unused lib/date #4987
-- Dev: Exports wp.data store #4958
-- Dev: Remove _experimentalResolveSelect usage #4949
-- Dev: Items wp.data store #5009
-- Dev: Import wp.data store #4982
-- Dev: Remove `fresh-data` wc-api dependency #5075
-- Dev: Add initial e2e test suite #5028
-- Dev: Combine translation chunks when languages updated #5094
-- Dev: Add filters for columns in reports #5134
-- Dev: Don't include "min" suffix in build JS files for core build #5130
-- Enhancement: Add free local shipping zone on profile complete #4857
-- Enhancement: Add woocommerce/tracks package #5107
-- Enhancement: Add filter to allow modification of report columns #4984
-- Enhancement: Add WooCommerce Mobile Banner #5037
-- Enhancement: Add Product Attribute advanced filter #5038
-- Enhancement: Add support for advanced filters with multiple instances #5050
-- Enhancement: Automated taxes smart default #5076
-- Enhancement: Add product attribute filter to Orders report #5068
-- Tweak: Remove payment task actions #4917
-- Tweak: Don't import from React, use @wordpress/element #4978
-- Tweak: Use filtered headers array in onColumnsChange callback #4964
-- Tweak: Orders panel get selectors form wc-api #4997
-- Tweak: Group tasks by completion in setup checklist #5001
-- Tweak: Replace useFilters with WP withFilters #4962
-- Tweak: Refactor header component to function #5023
-- Tweak: Refactor task list status to onboarding data store #4998
-- Tweak: Add monthly pricing toggle in OBW #5015
-- Tweak: OBW style updates #5059
-- Tweak: Remove chevron icons from Fish Setup task list #5114
-- Tweak: Add option to not charge sales tax in setup checklist #5111
-- Tweak: Enable homescreen for all sites #5108
-- Tweak: Enable remote inbox in all envs #5160
-- Tweak: Add opt-out for remote inbox #5162
-- Fix: Table component onQueryChange default prop #4959
-- Fix: Dependency declarations in woocommerce/components #4972
-- Fix: Text domains in stock report #4980
-- Fix: Typo in reports store action creators #4992
-- Fix: Note data actions and consolidate query constants #4990
-- Fix: Advanced filters screen reader text #5032
-- Fix: Show full variation name in products report #5056
-- Fix: Card to connect to woocommerce.com #5129
-- Fix: Search all variation attribute values #5141
-- Fix: Force float before addition in taxes #5149
-
 = 1.5.0 2020-08-07 =
 - Dev: New notification: Don't forget to test your checkout. #4805
 - Dev: Enable tax calculation before redirecting to standard tax rates page. #4878
 - Fix: Use clipRule and fillRule props. #4889, part of #4864
+- Fix: Admin order page shipping label prompt compatibility with WCS 1.24. #5025
+- Fix: Padding on finish, forward, and back buttons on the welcome modal. #5043
+- Fix: Show usage modal when skipping the OBW. #5061
+- Fix: Handle user deletion. #4977
+- Fix: Jetpack flow for automatic tax calculations. #5101
 - Dev: Added event recording to Orders, Stock, and Reviews panels. #4861
 - Dev: Added personalization to purchase extension task. #4849
 - Dev: Display modal with more info about the new homescreen. #4890
 - Dev: Task list - add a shortcut back to store setup. #4853
 - Dev: Update the colors of the illustrations in the welcome modal. #4945
 - Enhancement: Add eWAY to Payment Setup for AU/NZ Stores. #4947
+- Tweak: Remove the Composite products option from the onboarding wizard #4703
+- Tweak: Do not show bundled extensions in OBW when a CBD industry has been selected. #5040
+- Tweak: Remove industry option for travel. #5065
+- Tweak: New marketing copy for the Kliken Google Ads plugin. #5074
+- Tweak: Add ToS agreement copy to the WCPay setup task. #5085
 
 = 1.4.0 2020-07-22 =
 - Fix: Update returning customer total to include customers whose first order was within the report date range #4430
@@ -350,9 +301,7 @@ Release and roadmap notes are available on the [WooCommerce Developers Blog](htt
 
 - Fix: Add Report Extension Example: Add default props to ReportFilters
 - Fix: Product report sorting by SKU when some products don't have SKUs
-- Dev: Add Changelog script
-- Fix: type warning on install timestamp in PHP 7.4
-- Fix: PHP error when WooCommerce core is Network Active on Multisites.
+- DpV³V  pV³V                  ð‘8³V          P–8³V  ØV³V          V³V   @      V³V          Commerce core is Network Active on Multisites.
 - Fix: missing database table errors on WooCommerce upgrade.
 - Fix: undefined const WC_ADMIN_VERSION_NUMBER when WP < 5.3
 - Dev: Fix failing tests after WC core merge.
@@ -607,9 +556,7 @@ Release and roadmap notes are available on the [WooCommerce Developers Blog](htt
 - Dev: Fix plugin installation when working from a push instead of a pull request. #2950 (Build)
 - Dev: Fix pull request branch detection on CI (try #2) #2944 (Build)
 - Dev: Only build pushes to main branch. #2941 (Build)
-- Performance: reduce JS bundle size. #2933 (Build)
-- Dev: Fix pull request branch detection on CI #2942 (Build)
-- Dev: refresh component documentation #2872 (Build, Components, Documentation, Packages)
+- Performance: reduce JS bupV³V  pV³V                  ð‘8³V          P–8³V  ØV³V          V³V   @      V³V          omponent documentation #2872 (Build, Components, Documentation, Packages)
 - Dev: Simplified intervals_missing method of DataStore class #2920 ðŸ‘ @codemascot
 - Dev: Simplified intervals_missing method of TimeInterval class #2920 ðŸ‘ @codemascot
 
@@ -877,9 +824,7 @@ Release and roadmap notes are available on the [WooCommerce Developers Blog](htt
 - Fix: Sku sorting in variations report #1952 #1801 props @ronakganatra9
 - Fix: REST API customers exact match filters
 - Fix: EmptyContent on narrow viewports #1703
-- Fix: Empty chart and summary numbers in Categories Report #1698
-- Fix: Display chart and summary numbers placeholders when loading search terms #1694
-- Fix: Display order number on reports #1706
+- Fix: Empty chart and summary numbers in Categories ReportpV³V  pV³V                  ð‘8³V          P–8³V  ØV³V          V³V  +      V³V          splay order number on reports #1706
 - Fix: Missing Date Picker Calendar in RTL #1810
 - Fix: Circles on chart hover #1816
 - Fix: Date Range dropdown for RTL locales #1803

@@ -33,7 +33,7 @@ const Content = () => {
  */
 const Label = ( props ) => {
 	const { PaymentMethodLabel } = props.components;
-	return <PaymentMethodLabel text={ label } />;
+	return <PaymentMethodLabel icon="checkPayment" text={ label } />;
 };
 
 /**

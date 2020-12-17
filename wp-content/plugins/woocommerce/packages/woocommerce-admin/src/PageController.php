@@ -129,6 +129,7 @@ class PageController {
 				}
 			}
 		}
+
 		$this->current_page = false;
 	}
 

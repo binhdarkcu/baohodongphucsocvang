@@ -6,17 +6,14 @@
  * @subpackage RankMath\Admin
  */
 
-defined( 'ABSPATH' ) || exit;
-
 $backups = get_option( 'rank_math_backups', [] );
 ?>
-<button type="button" class="button button-primary alignright rank-math-action" data-action="createBackup"><?php esc_html_e( 'Create Backup', 'rank-math' ); ?></button>
+<div class="rank-math-export-form cmb2-form">
 
-<h3><?php esc_html_e( 'Settings Backup', 'rank-math' ); ?></h3>
+	<button type="button" class="button button-primary alignright rank-math-action" data-action="createBackup"><?php esc_html_e( 'Create Backup', 'rank-math' ); ?></button>
 
-<p class="description"><?php esc_html_e( 'Take a backup of your plugin settings in case you wish to restore them in future. Use it as backup before making substantial changes to Rank Math settings. For taking a backup of the SEO data of your content, use the XML Export option.', 'rank-math' ); ?></p>
+	<h3><?php esc_html_e( 'Backups', 'rank-math' ); ?></h3>
 
-<div class="rank-math-settings-backup-form cmb2-form">
 	<div class="list-table with-action">
 		<table class="form-table">
 			<tbody>
@@ -24,13 +21,13 @@ $backups = get_option( 'rank_math_backups', [] );
 					<tr>
 						<th>
 							<?php
-							/* translators: Snapshot formatted date */
+							/* translators: Backup formatted date */
 							printf( esc_html__( 'Backup: %s', 'rank-math' ), date_i18n( 'M jS Y, H:i a', $key ) );
 							?>
 						</th>
 						<td style="width:195px;padding-left:0;">
-							<button type="button" class="button button-secondary button-small rank-math-action" data-action="restoreBackup" data-key="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'Restore', 'rank-math' ); ?></button>
-							<button type="button" class="button button-link-delete button-small rank-math-action" data-action="deleteBackup" data-key="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'Delete', 'rank-math' ); ?></button>
+							<button type="button" class="button button-primary rank-math-action" data-action="restoreBackup" data-key="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'Restore', 'rank-math' ); ?></button>
+							<button type="button" class="button button-link-delete rank-math-action" data-action="deleteBackup" data-key="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'Delete', 'rank-math' ); ?></button>
 						</td>
 					</tr>
 				<?php endforeach; ?>

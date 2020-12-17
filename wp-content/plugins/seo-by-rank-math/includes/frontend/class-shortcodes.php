@@ -94,7 +94,7 @@ class Shortcodes {
 		foreach ( $allowed as $element ) {
 			$method = 'display_' . $element;
 			if ( method_exists( $this, $method ) ) {
-				echo '<div class="rank-math-contact-section rank-math-contact-' . esc_attr( $element ) . '">';
+				echo '<div class="rank-math-contact-section rank-math-contact-' . $element . '">';
 				$this->$method();
 				echo '</div>';
 			}
@@ -114,12 +114,11 @@ class Shortcodes {
 	 * @return array
 	 */
 	private function get_allowed_info( $args ) {
-		$type = Helper::get_settings( 'titles.knowledgegraph_type' );
+		if ( 'person' === Helper::get_settings( 'titles.knowledgegraph_type' ) ) {
+			return [ 'address' ];
+		}
 
-		$allowed = 'person' === $type
-		? [ 'name', 'email', 'person_phone', 'address' ]
-		: [ 'name', 'email', 'address', 'hours', 'phone', 'map' ];
-
+		$allowed = [ 'address', 'hours', 'phone', 'social', 'map' ];
 		if ( ! empty( $args['show'] ) && 'all' !== $args['show'] ) {
 			$allowed = array_intersect( array_map( 'trim', explode( ',', $args['show'] ) ), $allowed );
 		}
@@ -213,8 +212,7 @@ class Shortcodes {
 
 				printf(
 					'<div class="rank-math-opening-hours"><span class="rank-math-opening-days">%1$s</span><span class="rank-math-opening-time">%2$s</span></div>',
-					join( ', ', $days ),
-					$time
+					join( ', ', $days ), $time
 				);
 			}
 			?>
@@ -274,33 +272,48 @@ class Shortcodes {
 			return;
 		}
 
-		$choices = Helper::choices_phone_types();
-
 		foreach ( $phones as $phone ) :
 			$number = esc_html( $phone['number'] );
-			$label  = isset( $choices[ $phone['type'] ] ) ? $choices[ $phone['type'] ] : ''
 			?>
 			<div class="rank-math-phone-number type-<?php echo sanitize_html_class( $phone['type'] ); ?>">
-				<label><?php echo esc_html( $label ); ?>:</label>
-				<span><?php echo isset( $phone['number'] ) ? '<a href="tel://' . $number . '">' . $number . '</a>' : ''; ?></span>
+				<label><?php esc_html_e( ucwords( $phone['type'] ) ); ?>:</label> <span><?php echo isset( $phone['number'] ) ? '<a href="tel://' . $number . '">' . $number . '</a>' : ''; ?></span>
 			</div>
 			<?php
 		endforeach;
 	}
 
 	/**
-	 * Output Person phone number.
+	 * Output social identities.
 	 */
-	private function display_person_phone() {
-		$phone = Helper::get_settings( 'titles.phone' );
-		if ( empty( $phone ) ) {
-			return;
-		}
+	private function display_social() {
+		$networks = [
+			'facebook'      => 'Facebook',
+			'twitter'       => 'Twitter',
+			'google_places' => 'Google Places',
+			'yelp'          => 'Yelp',
+			'foursquare'    => 'FourSquare',
+			'flickr'        => 'Flickr',
+			'reddit'        => 'Reddit',
+			'linkedin'      => 'LinkedIn',
+			'instagram'     => 'Instagram',
+			'youtube'       => 'YouTube',
+			'pinterest'     => 'Pinterest',
+			'soundcloud'    => 'SoundClound',
+			'tumblr'        => 'Tumblr',
+			'myspace'       => 'MySpace',
+		];
 		?>
-			<div class="rank-math-phone-numberx">
-				<label><?php echo esc_html__( 'Telephone', 'rank-math' ); ?>:</label>
-				<span><a href="tel://<?php echo esc_attr( $phone ); ?>"><?php echo esc_html( $phone ); ?></a></span>
-			</div>
+		<div class="rank-math-social-networks">
+			<?php
+			foreach ( $networks as $id => $label ) :
+				if ( $url = Helper::get_settings( 'titles.social_url_' . $id ) ) : // phpcs:ignore
+					?>
+					<a class="social-item type-<?php echo $id; ?>" href="<?php echo esc_url( $url ); ?>"><?php echo $label; ?></a>
+					<?php
+				endif;
+			endforeach;
+			?>
+		</div>
 		<?php
 	}
 
@@ -319,42 +332,9 @@ class Shortcodes {
 		 * @param string $address
 		 */
 		$address = $this->do_filter( 'shortcode/contact/map_address', implode( ' ', $address ) );
-		$address = $this->do_filter( 'shortcode/contact/map_iframe_src', '//maps.google.com/maps?q=' . rawurlencode( $address ) . '&z=15&output=embed&key=' . rawurlencode( Helper::get_settings( 'titles.maps_api_key' ) ) );
+		$address = $this->do_filter( 'shortcode/contact/map_iframe_src', '//maps.google.com/maps?q=' . urlencode( $address ) . '&z=15&output=embed&key=' . urlencode( Helper::get_settings( 'titles.maps_api_key' ) ) );
 		?>
 		<iframe src="<?php echo esc_url( $address ); ?>"></iframe>
-		<?php
-	}
-
-	/**
-	 * Output name.
-	 */
-	private function display_name() {
-		$name = Helper::get_settings( 'titles.knowledgegraph_name' );
-		if ( false === $name ) {
-			return;
-		}
-
-		$url = Helper::get_settings( 'titles.url' );
-		?>
-		<h4 class="rank-math-name">
-			<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $name ); ?></a>
-		</h3>
-		<?php
-	}
-
-	/**
-	 * Output email.
-	 */
-	private function display_email() {
-		$email = Helper::get_settings( 'titles.email' );
-		if ( false === $email ) {
-			return;
-		}
-		?>
-		<div class="rank-math-email">
-			<label><?php esc_html_e( 'Email:', 'rank-math' ); ?></label>
-			<a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_html( $email ); ?></a>
-		</div>
 		<?php
 	}
 

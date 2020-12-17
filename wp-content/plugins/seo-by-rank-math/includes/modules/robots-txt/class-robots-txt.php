@@ -63,13 +63,11 @@ class Robots_Txt {
 			$tabs,
 			[
 				'robots' => [
-					'icon'      => 'rm-icon rm-icon-robots',
-					'title'     => esc_html__( 'Edit robots.txt', 'rank-math' ),
+					'icon'  => 'fa fa-simplybuilt',
+					'title' => esc_html__( 'Edit robots.txt', 'rank-math' ),
 					/* translators: Link to kb article */
-					'desc'      => sprintf( esc_html__( 'Edit your robots.txt file to control what bots see. %s.', 'rank-math' ), '<a href="' . KB::get( 'edit-robotstxt' ) . '" target="_blank">' . esc_html__( 'Learn more', 'rank-math' ) . '</a>' ),
-					'file'      => dirname( __FILE__ ) . '/options.php',
-					'classes'   => 'rank-math-advanced-option',
-					'after_row' => '<div class="rank-math-desc">' . __( 'Leave the field empty to let WordPress handle the contents dynamically. If an actual robots.txt file is present in the root folder of your site, this option won\'t take effect and you have to edit the file directly, or delete it and then edit from here.', 'rank-math' ) . '</div>',
+					'desc'  => sprintf( esc_html__( 'Here you can edit the virtual robots.txt file. Leave the field empty to let WordPress handle the contents dynamically. If an actual robots.txt file is present in the root folder of your site, this option won\'t take effect and you have to edit the file directly, or delete it and then edit from here. %s.', 'rank-math' ), '<a href="' . KB::get( 'edit-robotstxt' ) . '" target="_blank">' . esc_html__( 'Learn more', 'rank-math' ) . '</a>' ),
+					'file'  => dirname( __FILE__ ) . '/options.php',
 				],
 			],
 			5
@@ -101,6 +99,7 @@ class Robots_Txt {
 		if ( 0 === $public ) {
 			$default .= "Disallow: /\n";
 		} else {
+			$site_url = parse_url( site_url() );
 			$default .= "Disallow: /wp-admin/\n";
 			$default .= "Allow: /wp-admin/admin-ajax.php\n";
 		}

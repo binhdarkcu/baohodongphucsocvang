@@ -90,7 +90,9 @@ class Table extends List_Table {
 	 * @param object $item The current item.
 	 */
 	public function column_cb( $item ) {
-		return sprintf( '<input type="checkbox" name="log[]" value="%s" />', $item['id'] );
+		return sprintf(
+			'<input type="checkbox" name="log[]" value="%s" />', $item['id']
+		);
 	}
 
 	/**
@@ -108,7 +110,7 @@ class Table extends List_Table {
 	 * @param object $item The current item.
 	 */
 	protected function column_referer( $item ) {
-		return '<a href="' . esc_url( $item['referer'] ) . '" target="_blank">' . esc_html( $item['referer'] ) . '</a>';
+		return '<a href="' . esc_attr( $item['referer'] ) . '" target="_blank">' . esc_html( $item['referer'] ) . '</a>';
 	}
 
 	/**
@@ -187,8 +189,7 @@ class Table extends List_Table {
 
 		$actions['redirect'] = sprintf(
 			'<a href="%1$s" class="rank-math-404-redirect-btn">%2$s</a>',
-			$url,
-			esc_html__( 'Redirect', 'rank-math' )
+			$url, esc_html__( 'Redirect', 'rank-math' )
 		);
 	}
 

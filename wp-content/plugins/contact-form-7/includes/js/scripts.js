@@ -208,10 +208,6 @@
 						$( n.into, $form ).each( function() {
 							wpcf7.notValidTip( this, n.message );
 							$( '.wpcf7-form-control', this ).addClass( 'wpcf7-not-valid' );
-							$( '.wpcf7-form-control', this ).attr(
-								'aria-describedby',
-								n.error_id
-							);
 							$( '[aria-invalid]', this ).attr( 'aria-invalid', 'true' );
 						} );
 					} );
@@ -269,9 +265,11 @@
 
 			$( '.screen-reader-response', $form.closest( '.wpcf7' ) ).each( function() {
 				var $response = $( this );
-				$( '[role="status"]', $response ).html( data.message );
+				$response.html( '' ).append( data.message );
 
 				if ( data.invalid_fields ) {
+					var $invalids = $( '<ul></ul>' );
+
 					$.each( data.invalid_fields, function( i, n ) {
 						if ( n.idref ) {
 							var $li = $( '<li></li>' ).append( $( '<a></a>' ).attr( 'href', '#' + n.idref ).append( n.message ) );
@@ -279,11 +277,13 @@
 							var $li = $( '<li></li>' ).append( n.message );
 						}
 
-						$li.attr( 'id', n.error_id );
-
-						$( 'ul', $response ).append( $li );
+						$invalids.append( $li );
 					} );
+
+					$response.append( $invalids );
 				}
+
+				$response.focus();
 			} );
 
 			if ( data.posted_data_hash ) {
@@ -320,11 +320,10 @@
 
 	wpcf7.setStatus = function( form, status ) {
 		var $form = $( form );
-		var prevStatus = $form.attr( 'data-status' );
+		var prevStatus = $form.data( 'status' );
 
 		$form.data( 'status', status );
 		$form.addClass( status );
-		$form.attr( 'data-status', status );
 
 		if ( prevStatus && prevStatus !== status ) {
 			$form.removeClass( prevStatus );
@@ -407,6 +406,7 @@
 
 		$( '<span></span>' ).attr( {
 			'class': 'wpcf7-not-valid-tip',
+			'role': 'alert',
 			'aria-hidden': 'true',
 		} ).text( message ).appendTo( $target );
 
@@ -485,11 +485,7 @@
 
 	wpcf7.clearResponse = function( form ) {
 		var $form = $( form );
-
-		$form.siblings( '.screen-reader-response' ).each( function() {
-			$( '[role="status"]', this ).html( '' );
-			$( 'ul', this ).html( '' );
-		} );
+		$form.siblings( '.screen-reader-response' ).html( '' );
 
 		$( '.wpcf7-not-valid-tip', $form ).remove();
 		$( '[aria-invalid]', $form ).attr( 'aria-invalid', 'false' );

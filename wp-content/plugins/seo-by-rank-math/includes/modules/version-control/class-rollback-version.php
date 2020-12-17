@@ -8,10 +8,10 @@
 
 namespace RankMath;
 
+use RankMath\Helper;
 use RankMath\Traits\Hooker;
+use MyThemeShop\Helpers\Str;
 use MyThemeShop\Helpers\Param;
-
-defined( 'ABSPATH' ) || exit;
 
 /**
  * Rollback_Version class.
@@ -64,7 +64,6 @@ class Rollback_Version {
 		$title        = __( 'Rollback Plugin', 'rank-math' );
 		$parent_file  = 'plugins.php';
 		$submenu_file = 'plugins.php';
-		$new_version  = Param::post( 'rm_rollback_version' );
 
 		wp_enqueue_script( 'updates' );
 		$plugin = 'seo-by-rank-math/rank-math.php';
@@ -74,11 +73,8 @@ class Rollback_Version {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 		}
 
-		update_option( self::ROLLBACK_VERSION_OPTION, $new_version );
-		// Downgrade version number if necessary.
-		if ( version_compare( rank_math()->version, $new_version, '>' ) ) {
-			update_option( 'rank_math_version', $new_version );
-		}
+		update_option( self::ROLLBACK_VERSION_OPTION, Param::post( 'rm_rollback_version' ) );
+		update_option( 'rank_math_version', Param::post( 'rm_rollback_version' ) );
 
 		add_filter( 'pre_site_transient_update_plugins', [ $this, 'pre_transient_update_plugins' ], 20 );
 		add_filter( 'gettext', [ $this, 'change_updater_strings' ], 20, 3 );

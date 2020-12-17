@@ -22,22 +22,22 @@ trait Where {
 	 *     ->where('age', '>', 18)
 	 *     ->where('name', 'in', ['charles', 'john', 'jeffry'])
 	 *
-	 * @throws \Exception If $type is not 'AND', 'OR', 'WHERE'.
+	 * @throws \Exception If $type is not 'and', 'or', 'where'.
 	 *
 	 * @param mixed  $column The SQL column.
 	 * @param mixed  $param1 Operator or value depending if $param2 isset.
 	 * @param mixed  $param2 The value if $param1 is an operator.
-	 * @param string $type the where type ( AND, OR ).
+	 * @param string $type the where type ( and, or ).
 	 *
 	 * @return self The current query builder.
 	 */
-	public function where( $column, $param1 = null, $param2 = null, $type = 'AND' ) {
+	public function where( $column, $param1 = null, $param2 = null, $type = 'and' ) {
 
 		$this->is_valid_type( $type );
 
 		$sub_type = is_null( $param1 ) ? $type : $param1;
-		if ( ! $this->has_sql_clause( 'where' ) ) {
-			$type = 'WHERE';
+		if ( empty( $this->statements['wheres'] ) ) {
+			$type = 'where';
 		}
 
 		// When column is an array we assume to make a bulk and where.
@@ -46,7 +46,7 @@ trait Where {
 			return $this;
 		}
 
-		$this->add_sql_clause( 'where', $this->generateWhere( $column, $param1, $param2, $type ) );
+		$this->statements['wheres'][] = $this->generateWhere( $column, $param1, $param2, $type );
 
 		return $this;
 	}
@@ -61,7 +61,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhere( $column, $param1 = null, $param2 = null ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, $param1, $param2, 'OR' );
+		return $this->where( $column, $param1, $param2, 'or' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereIn( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'IN', $options );
+		return $this->where( $column, 'in', $options );
 	}
 
 	/**
@@ -89,7 +89,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereIn( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'IN', $options, 'OR' );
+		return $this->where( $column, 'in', $options, 'or' );
 	}
 
 	/**
@@ -103,7 +103,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereNotIn( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'NOT IN', $options );
+		return $this->where( $column, 'not in', $options );
 	}
 
 	/**
@@ -117,7 +117,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereNotIn( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'NOT IN', $options, 'OR' );
+		return $this->where( $column, 'not in', $options, 'or' );
 	}
 
 	/**
@@ -131,7 +131,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereBetween( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'BETWEEN', $options );
+		return $this->where( $column, 'between', $options );
 	}
 
 	/**
@@ -145,7 +145,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereBetween( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'BETWEEN', $options, 'OR' );
+		return $this->where( $column, 'between', $options, 'or' );
 	}
 
 	/**
@@ -159,7 +159,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereNotBetween( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'NOT BETWEEN', $options );
+		return $this->where( $column, 'not between', $options );
 	}
 
 	/**
@@ -173,7 +173,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereNotBetween( $column, $options ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'NOT BETWEEN', $options, 'OR' );
+		return $this->where( $column, 'not between', $options, 'or' );
 	}
 
 	/**
@@ -191,7 +191,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereLike( $column, $value, $start = '%', $end = '%' ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'LIKE', $this->esc_like( $value, $start, $end ) );
+		return $this->where( $column, 'like', $this->esc_like( $value, $start, $end ) );
 	}
 
 	/**
@@ -209,7 +209,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereLike( $column, $value, $start = '%', $end = '%' ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'LIKE', $this->esc_like( $value, $start, $end ), 'OR' );
+		return $this->where( $column, 'like', $this->esc_like( $value, $start, $end ), 'or' );
 	}
 
 	/**
@@ -227,7 +227,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereNotLike( $column, $value, $start = '%', $end = '%' ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'NOT LIKE', $this->esc_like( $value, $start, $end ) );
+		return $this->where( $column, 'not like', $this->esc_like( $value, $start, $end ) );
 	}
 
 	/**
@@ -245,7 +245,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereNotLike( $column, $value, $start = '%', $end = '%' ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'NOT LIKE', $this->esc_like( $value, $start, $end ), 'OR' );
+		return $this->where( $column, 'not like', $this->esc_like( $value, $start, $end ), 'or' );
 	}
 
 	/**
@@ -258,7 +258,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereNull( $column ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'IS', 'NULL' );
+		return $this->where( $column, 'is', 'null' );
 	}
 
 	/**
@@ -271,7 +271,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereNull( $column ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'IS', 'NULL', 'OR' );
+		return $this->where( $column, 'is', 'null', 'or' );
 	}
 
 	/**
@@ -284,7 +284,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function whereNotNull( $column ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'IS NOT', 'NULL' );
+		return $this->where( $column, 'is not', 'null' );
 	}
 
 	/**
@@ -297,7 +297,7 @@ trait Where {
 	 * @return self The current query builder.
 	 */
 	public function orWhereNotNull( $column ) { // @codingStandardsIgnoreLine
-		return $this->where( $column, 'IS NOT', 'NULL', 'OR' );
+		return $this->where( $column, 'is not', 'null', 'or' );
 	}
 
 	/**
@@ -306,11 +306,11 @@ trait Where {
 	 * @param string $column The SQL column.
 	 * @param mixed  $param1 Operator or value depending if $param2 isset.
 	 * @param mixed  $param2 The value if $param1 is an operator.
-	 * @param string $type the where type ( AND, or ).
+	 * @param string $type the where type ( and, or ).
 	 *
 	 * @return string
 	 */
-	protected function generateWhere( $column, $param1 = null, $param2 = null, $type = 'AND' ) { // @codingStandardsIgnoreLine
+	protected function generateWhere( $column, $param1 = null, $param2 = null, $type = 'and' ) { // @codingStandardsIgnoreLine
 
 		// when param2 is null we replace param2 with param one as the
 		// value holder and make param1 to the = operator.
@@ -323,12 +323,12 @@ trait Where {
 		// have an "in" or "between" statement which has no need for duplicates.
 		if ( is_array( $param2 ) ) {
 			$param2 = $this->esc_array( array_unique( $param2 ) );
-			$param2 = in_array( $param1, array( 'BETWEEN', 'NOT BETWEEN' ), true ) ? join( ' AND ', $param2 ) : '(' . join( ', ', $param2 ) . ')';
+			$param2 = in_array( $param1, [ 'between', 'not between' ], true ) ? join( ' and ', $param2 ) : '(' . join( ', ', $param2 ) . ')';
 		} elseif ( is_scalar( $param2 ) ) {
 			$param2 = $this->esc_value( $param2 );
 		}
 
-		return join( ' ', array( $type, $column, $param1, $param2 ) );
+		return join( ' ', [ $type, $column, $param1, $param2 ] );
 	}
 
 	/**
@@ -339,7 +339,7 @@ trait Where {
 	 * @throws \Exception If not a valid type.
 	 */
 	private function is_valid_type( $type ) {
-		if ( ! in_array( $type, array( 'AND', 'OR', 'WHERE' ), true ) ) {
+		if ( ! in_array( $type, [ 'and', 'or', 'where' ], true ) ) {
 			throw new \Exception( 'Invalid where type "' . $type . '"' );
 		}
 	}
@@ -347,13 +347,13 @@ trait Where {
 	/**
 	 * Create bulk where statement.
 	 *
-	 * @param array  $where    Array of statments.
+	 * @param array  $wheres   Array of statments.
 	 * @param string $type     Statement type.
 	 * @param string $sub_type Statement sub-type.
 	 */
-	private function bulk_where( $where, $type, $sub_type ) {
-		$subquery = array();
-		foreach ( $where as $value ) {
+	private function bulk_where( $wheres, $type, $sub_type ) {
+		$subquery = [];
+		foreach ( $wheres as $value ) {
 			if ( ! isset( $value[2] ) ) {
 				$value[2] = $value[1];
 				$value[1] = '=';
@@ -361,6 +361,6 @@ trait Where {
 			$subquery[] = $this->generateWhere( $value[0], $value[1], $value[2], empty( $subquery ) ? '' : $sub_type );
 		}
 
-		$this->add_sql_clause( 'where', $type . ' ( ' . trim( join( ' ', $subquery ) ) . ' )' );
+		$this->statements['wheres'][] = $type . ' ( ' . trim( join( ' ', $subquery ) ) . ' )';
 	}
 }

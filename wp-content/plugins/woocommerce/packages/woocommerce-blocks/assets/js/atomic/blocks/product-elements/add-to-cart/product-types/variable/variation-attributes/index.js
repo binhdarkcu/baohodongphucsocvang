@@ -7,10 +7,17 @@ import { getAttributes, getVariationAttributes } from './utils';
 
 /**
  * VariationAttributes component.
+ *
+ * @param {*} props Component props.
  */
-const VariationAttributes = ( { product, dispatchers } ) => {
-	const attributes = getAttributes( product.attributes );
-	const variationAttributes = getVariationAttributes( product.variations );
+const VariationAttributes = ( { product } ) => {
+	const {
+		attributes: productAttributes = {},
+		variations: productVariations = [],
+	} = product;
+
+	const attributes = getAttributes( productAttributes );
+	const variationAttributes = getVariationAttributes( productVariations );
 
 	if (
 		Object.keys( attributes ).length === 0 ||
@@ -23,7 +30,6 @@ const VariationAttributes = ( { product, dispatchers } ) => {
 		<AttributePicker
 			attributes={ attributes }
 			variationAttributes={ variationAttributes }
-			setRequestParams={ dispatchers.setRequestParams }
 		/>
 	);
 };

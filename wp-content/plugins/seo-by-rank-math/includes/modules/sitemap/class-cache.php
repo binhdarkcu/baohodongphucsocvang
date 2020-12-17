@@ -6,9 +6,6 @@
  * @package    RankMath
  * @subpackage RankMath\Sitemap
  * @author     Rank Math <support@rankmath.com>
- *
- * @copyright Copyright (C) 2008-2019, Yoast BV
- * The following code is a derivative work of the code from the Yoast(https://github.com/Yoast/wordpress-seo/), which is licensed under GPL v3.
  */
 
 namespace RankMath\Sitemap;
@@ -150,8 +147,7 @@ class Cache {
 	 * @return string
 	 */
 	public static function get_cache_directory() {
-		$dir     = wp_upload_dir();
-		$default = $dir['basedir'] . '/rank-math';
+		$default = rank_math()->plugin_dir() . 'sitemap-cache';
 
 		/**
 		 * Filter XML sitemap cache directory.

@@ -6,9 +6,6 @@
  * @package    RankMath
  * @subpackage RankMath\Frontend
  * @author     Rank Math <support@rankmath.com>
- *
- * @copyright Copyright (C) 2015, WooCommerce
- * The following code is a derivative work of the code from the WooCommerce(https://github.com/woocommerce/woocommerce/), which is licensed under GPL v3.
  */
 
 namespace RankMath\Frontend;
@@ -57,7 +54,7 @@ class Breadcrumbs {
 
 		$instance = false;
 		if ( Helper::get_settings( 'general.breadcrumbs' ) && false === $instance ) {
-			$instance = new Breadcrumbs();
+			$instance = new Breadcrumbs;
 		}
 
 		return $instance;
@@ -119,7 +116,7 @@ class Breadcrumbs {
 				$args,
 				[
 					'delimiter'   => '&nbsp;&#47;&nbsp;',
-					'wrap_before' => '<nav aria-label="breadcrumbs" class="rank-math-breadcrumb"><p>',
+					'wrap_before' => '<nav class="rank-math-breadcrumb"><p>',
 					'wrap_after'  => '</p></nav>',
 					'before'      => '',
 					'after'       => '',
@@ -148,7 +145,7 @@ class Breadcrumbs {
 			$html .= $args['before'] . $link . $args['after'];
 
 			if ( $size !== $key + 1 ) {
-				$html .= '<span class="separator"> ' . wp_kses_post( $this->settings['separator'] ) . ' </span>';
+				$html .= '<span class="separator"> ' . $this->settings['separator'] . ' </span>';
 			}
 		}
 

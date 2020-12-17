@@ -17,8 +17,6 @@ use RankMath\Helpers\Security;
 use MyThemeShop\Helpers\Param;
 use MyThemeShop\Helpers\Conditional;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Redirections class.
  *
@@ -35,9 +33,7 @@ class Redirections {
 		$this->load_admin();
 
 		if ( ! is_admin() ) {
-			// Delay the redirection when BuddyPress plugin  is active since it uses template_redirect hook to show the group page content.
-			$hook = class_exists( 'BuddyPress' ) ? 'template_redirect' : 'wp';
-			$this->action( $hook, 'do_redirection', 11 );
+			$this->action( 'wp', 'do_redirection' );
 		}
 
 		if ( Helper::has_cap( 'redirections' ) ) {
@@ -54,11 +50,11 @@ class Redirections {
 	 */
 	private function load_admin() {
 		if ( is_admin() ) {
-			$this->admin = new Admin();
+			$this->admin = new Admin;
 		}
 
 		if ( is_admin() || Conditional::is_rest() ) {
-			new Watcher();
+			new Watcher;
 		}
 	}
 
@@ -78,7 +74,7 @@ class Redirections {
 			return;
 		}
 
-		$redirector = new Redirector();
+		$redirector = new Redirector;
 	}
 
 	/**

@@ -10,8 +10,6 @@
 
 namespace RankMath\Module;
 
-use RankMath\Helper;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -93,7 +91,7 @@ class Module {
 			return;
 		}
 		?>
-		<a href="<?php echo esc_url( $this->args['settings'] ); ?>" class="module-settings button button-secondary"><?php esc_html_e( 'Settings', 'rank-math' ); ?></a>
+		<a class="module-settings" href="<?php echo esc_url( $this->args['settings'] ); ?>"><?php esc_html_e( 'Settings', 'rank-math' ); ?></a>
 		<?php
 	}
 
@@ -104,28 +102,6 @@ class Module {
 	 */
 	public function is_disabled() {
 		return isset( $this->args['disabled'] ) && $this->args['disabled'];
-	}
-
-	/**
-	 * Does module has PRO version?
-	 *
-	 * @return bool
-	 */
-	public function is_probadge() {
-		return isset( $this->args['probadge'] ) && $this->args['probadge'] && defined( 'RANK_MATH_PRO_FILE' );
-	}
-
-	/**
-	 * Is module disabled.
-	 *
-	 * @return bool
-	 */
-	public function is_hidden() {
-		if ( Helper::is_advanced_mode() ) {
-			return false;
-		}
-
-		return in_array( $this->get_id(), [ '404-monitor', 'acf', 'bbpress', 'buddypress', 'redirections', 'role-manager', 'image-seo' ], true );
 	}
 
 	/**

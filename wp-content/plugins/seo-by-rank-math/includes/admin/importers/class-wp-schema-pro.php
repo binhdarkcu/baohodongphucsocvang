@@ -12,8 +12,6 @@ namespace RankMath\Admin\Importers;
 
 use RankMath\Helper;
 use RankMath\Admin\Admin_Helper;
-use RankMath\Schema\JsonLD;
-use RankMath\Schema\Singular;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -49,20 +47,6 @@ class WP_Schema_Pro extends Plugin_Importer {
 	 * @var array
 	 */
 	protected $choices = [ 'settings', 'postmeta' ];
-
-	/**
-	 * JsonLD.
-	 *
-	 * @var JsonLD
-	 */
-	private $json_ld;
-
-	/**
-	 * Singular.
-	 *
-	 * @var Singular
-	 */
-	private $single;
 
 	/**
 	 * Convert SEOPress variables if needed.
@@ -120,8 +104,12 @@ class WP_Schema_Pro extends Plugin_Importer {
 
 		// Social.
 		$hash = [
-			'facebook' => 'social_url_facebook',
-			'twitter'  => 'twitter_author_names',
+			'facebook'  => 'social_url_facebook',
+			'twitter'   => 'twitter_author_names',
+			'instagram' => 'social_url_instagram',
+			'linkedin'  => 'social_url_linkedin',
+			'youtube'   => 'social_url_youtube',
+			'pinterest' => 'social_url_pinterest',
 		];
 		$this->replace( $hash, $schema_social, $this->titles );
 
@@ -145,10 +133,6 @@ class WP_Schema_Pro extends Plugin_Importer {
 	protected function postmeta() {
 		$this->set_pagination( $this->get_post_ids( true ) );
 
-		// Set Converter.
-		$this->json_ld = new JsonLD();
-		$this->single  = new Singular();
-
 		foreach ( $this->get_post_ids() as $snippet_post ) {
 			$post_id = $snippet_post->ID;
 			$snippet = $this->get_snippet_details( $post_id );
@@ -165,7 +149,7 @@ class WP_Schema_Pro extends Plugin_Importer {
 	/**
 	 * Update post meta.
 	 *
-	 * @param int   $post_id Post ID.
+	 * @param int   $post_id Post id.
 	 * @param array $snippet Snippet data.
 	 */
 	private function update_postmeta( $post_id, $snippet ) {
@@ -196,18 +180,6 @@ class WP_Schema_Pro extends Plugin_Importer {
 		}
 
 		update_post_meta( $post_id, 'rank_math_rich_snippet', $schema_type );
-
-		// Convert post now.
-		$data = $this->json_ld->get_old_schema( $post_id, $this->single );
-		if ( isset( $data['richSnippet'] ) ) {
-			$data             = $data['richSnippet'];
-			$type             = $data['@type'];
-			$data['metadata'] = [
-				'title' => $type,
-				'type'  => 'template',
-			];
-			update_post_meta( $post_id, 'rank_math_schema_' . $type, $data );
-		}
 	}
 
 	/**
@@ -215,7 +187,7 @@ class WP_Schema_Pro extends Plugin_Importer {
 	 *
 	 * @param  array  $details       Array of details.
 	 * @param  string $snippet_key   Snippet key.
-	 * @param  string $post_id       Post ID.
+	 * @param  string $post_id       Post id.
 	 * @param  array  $snippet       Snippet data.
 	 * @param  string $snippet_value Snippet value.
 	 * @return string
@@ -238,7 +210,7 @@ class WP_Schema_Pro extends Plugin_Importer {
 	 *
 	 * @param  array  $details       Array of details.
 	 * @param  string $snippet_key   Snippet key.
-	 * @param  string $post_id       Post ID.
+	 * @param  string $post_id       Post id.
 	 * @param  array  $snippet       Snippet data.
 	 * @param  string $snippet_value Snippet value.
 	 * @return string
@@ -266,7 +238,7 @@ class WP_Schema_Pro extends Plugin_Importer {
 	 *
 	 * @param  array  $details       Array of details.
 	 * @param  string $snippet_key   Snippet key.
-	 * @param  string $post_id       Post ID.
+	 * @param  string $post_id       Post id.
 	 * @param  array  $snippet       Snippet data.
 	 * @param  string $snippet_value Snippet value.
 	 * @return string
@@ -380,7 +352,7 @@ class WP_Schema_Pro extends Plugin_Importer {
 	/**
 	 * Get Snippet Details stored in aiosrs-schema posts
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int $post_id Post id.
 	 * @return array
 	 */
 	private function get_snippet_details( $post_id ) {

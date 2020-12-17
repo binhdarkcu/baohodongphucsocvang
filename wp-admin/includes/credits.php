@@ -15,8 +15,8 @@
  * @return array|false A list of all of the contributors, or false on error.
  */
 function wp_credits() {
-	// Include an unmodified $wp_version.
-	require ABSPATH . WPINC . '/version.php';
+	// include an unmodified $wp_version
+	include( ABSPATH . WPINC . '/version.php' );
 
 	$locale = get_user_locale();
 
@@ -78,7 +78,7 @@ function _wp_credits_build_object_link( &$data ) {
 }
 
 /**
- * Displays the title for a given group of contributors.
+ * Display a the title for a given group of contributors.
  *
  * @since 5.3.0
  *
@@ -106,7 +106,7 @@ function wp_credits_section_title( $group_data = array() ) {
 }
 
 /**
- * Displays a list of contributors for a given group.
+ * Display a list of contributors for a given group.
  *
  * @since 5.3.0
  *

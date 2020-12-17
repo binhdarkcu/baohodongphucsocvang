@@ -3,32 +3,22 @@ const Event = window.Event || null;
 /**
  * Wrapper function to dispatch an event so it's compatible with IE11.
  *
- * @param {string}    name                 Name of the event to dispatch.
- * @param {Object}    [options]            Some additional options to modify
- *                                         the event.
- * @param {boolean}   [options.bubbles]    Whether the event bubbles.
- * @param {boolean}   [options.cancelable] Whether the event is cancelable.
- * @param {HTMLNode}  [options.element]    Element that dispatches the event. By
- *                                         default, the body.
+ * @param {string}  name       Name of the event to dispatch.
+ * @param {boolean} bubbles    Whether the event bubbles.
+ * @param {boolean} cancelable Whether the event is cancelable.
  */
-export const dispatchEvent = (
-	name,
-	{ bubbles = false, cancelable = false, element }
-) => {
-	if ( ! element ) {
-		element = document.body;
-	}
+const dispatchEvent = ( name, bubbles = false, cancelable = false ) => {
 	// In IE, Event is an object and can't be instantiated with `new Event()`.
 	if ( typeof Event === 'function' ) {
 		const event = new Event( name, {
 			bubbles,
 			cancelable,
 		} );
-		element.dispatchEvent( event );
+		document.body.dispatchEvent( event );
 	} else {
 		const event = document.createEvent( 'Event' );
 		event.initEvent( name, bubbles, cancelable );
-		element.dispatchEvent( event );
+		document.body.dispatchEvent( event );
 	}
 };
 
@@ -36,7 +26,7 @@ export const dispatchEvent = (
 // that relies on the store, see
 // https://github.com/woocommerce/woocommerce-gutenberg-products-block/issues/1247
 export const triggerFragmentRefresh = () => {
-	dispatchEvent( 'wc_fragment_refresh', { bubbles: true, cancelable: true } );
+	dispatchEvent( 'wc_fragment_refresh', true, true );
 };
 
 /**
@@ -63,7 +53,7 @@ export const translateJQueryEventToNative = (
 	}
 
 	const eventDispatcher = () => {
-		dispatchEvent( nativeEventName, { bubbles, cancelable } );
+		dispatchEvent( nativeEventName, bubbles, cancelable );
 	};
 
 	// @ts-ignore -- jQuery is window global

@@ -11,11 +11,8 @@
 namespace RankMath\Redirections;
 
 use RankMath\Helper;
-use RankMath\Helpers\Sitepress;
 use MyThemeShop\Helpers\Param;
 use MyThemeShop\Admin\List_Table;
-
-defined( 'ABSPATH' ) || exit;
 
 /**
  * Table class.
@@ -104,16 +101,11 @@ class Table extends List_Table {
 	 * @param string $column_name The current column name.
 	 */
 	public function column_default( $item, $column_name ) {
-		$default = apply_filters( "rank_math/redirection/admin_column_{$column_name}", false, $item );
-		if ( ! empty( $default ) ) {
-			return $default;
-		}
-
 		if ( in_array( $column_name, [ 'hits', 'header_code', 'url_to' ], true ) ) {
-			return esc_html( $item[ $column_name ] );
+			return $item[ $column_name ];
 		}
 
-		return esc_html( print_r( $item, true ) );
+		return print_r( $item, true );
 	}
 
 	/**
@@ -166,12 +158,11 @@ class Table extends List_Table {
 	 * @return string
 	 */
 	private function get_source_html( $source, $comparison_hash ) {
-		Sitepress::get()->remove_home_url_filter();
 		$html = '<span class="value-url_from"><strong><a href="' . esc_url( home_url( $source['pattern'] ) ) . '" target="_blank">' . esc_html( stripslashes( $source['pattern'] ) ) . '</a></strong></span>';
 		if ( 'exact' !== $source['comparison'] ) {
 			$html .= ' <span class="value-source-comparison">(' . esc_html( $comparison_hash[ $source['comparison'] ] ) . ')</span>';
 		}
-		Sitepress::get()->restore_home_url_filter();
+
 		return $html;
 	}
 
@@ -218,17 +209,14 @@ class Table extends List_Table {
 	 * @return array
 	 */
 	public function get_columns() {
-		return apply_filters(
-			'rank_math/redirection/admin_columns',
-			[
-				'cb'            => '<input type="checkbox" />',
-				'sources'       => esc_html__( 'From', 'rank-math' ),
-				'url_to'        => esc_html__( 'To', 'rank-math' ),
-				'header_code'   => esc_html__( 'Type', 'rank-math' ),
-				'hits'          => esc_html__( 'Hits', 'rank-math' ),
-				'last_accessed' => esc_html__( 'Last Accessed', 'rank-math' ),
-			]
-		);
+		return [
+			'cb'            => '<input type="checkbox" />',
+			'sources'       => esc_html__( 'From', 'rank-math' ),
+			'url_to'        => esc_html__( 'To', 'rank-math' ),
+			'header_code'   => esc_html__( 'Type', 'rank-math' ),
+			'hits'          => esc_html__( 'Hits', 'rank-math' ),
+			'last_accessed' => esc_html__( 'Last Accessed', 'rank-math' ),
+		];
 	}
 
 	/**
@@ -255,19 +243,17 @@ class Table extends List_Table {
 	 */
 	public function get_bulk_actions() {
 		if ( $this->is_trashed_page() ) {
-			$actions = [
+			return [
 				'restore' => esc_html__( 'Restore', 'rank-math' ),
 				'delete'  => esc_html__( 'Delete Permanently', 'rank-math' ),
 			];
-		} else {
-			$actions = [
-				'activate'   => esc_html__( 'Activate', 'rank-math' ),
-				'deactivate' => esc_html__( 'Deactivate', 'rank-math' ),
-				'trash'      => esc_html__( 'Move to Trash', 'rank-math' ),
-			];
 		}
 
-		return apply_filters( 'rank_math/redirection/bulk_actions', $actions );
+		return [
+			'activate'   => esc_html__( 'Activate', 'rank-math' ),
+			'deactivate' => esc_html__( 'Deactivate', 'rank-math' ),
+			'trash'      => esc_html__( 'Move to Trash', 'rank-math' ),
+		];
 	}
 
 	/**
@@ -321,9 +307,6 @@ class Table extends List_Table {
 	 */
 	public function extra_tablenav( $which ) {
 		parent::extra_tablenav( $which );
-
-		do_action( 'rank_math/redirection/extra_tablenav', $which );
-
 		if ( ! $this->is_trashed_page() ) {
 			return;
 		}

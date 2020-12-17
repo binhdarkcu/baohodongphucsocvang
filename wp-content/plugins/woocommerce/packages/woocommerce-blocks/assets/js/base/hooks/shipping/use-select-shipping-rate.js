@@ -15,9 +15,7 @@ See also: https://github.com/woocommerce/woocommerce-gutenberg-products-block/tr
  * - selectShippingRate    A function that immediately returns the selected
  * rate and dispatches an action generator.
  * - selectedShippingRates An object of selected shipping rates and package id as key, maintained
- * locally by a state and updated optimistically, this will only return packages that has selected
- * shipping rates.
- *
+ * locally by a state and updated optimistically.
  */
 export const useSelectShippingRate = ( shippingRates ) => {
 	const throwError = useThrowError();
@@ -36,9 +34,7 @@ export const useSelectShippingRate = ( shippingRates ) => {
 				)
 				// A fromEntries ponyfill, creates an object from an array of arrays.
 				.reduce( ( obj, [ key, val ] ) => {
-					if ( val ) {
-						obj[ key ] = val;
-					}
+					obj[ key ] = val;
 					return obj;
 				}, {} ),
 		[ shippingRates ]

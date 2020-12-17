@@ -62,8 +62,8 @@ class WC_Admin_Notes_Woo_Subscriptions_Notes {
 			return;
 		}
 
-		// The site is connected.
-		if ( $this->is_connected() ) {
+		// The site just connected.
+		if ( empty( $old_token ) && ! empty( $new_token ) ) {
 			$this->remove_notes();
 			$this->refresh_subscription_notes();
 			return;

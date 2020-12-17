@@ -1,4 +1,13 @@
 <?php
+/**
+ * Temporary integration of the stripe payment method for the new cart and
+ * checkout blocks. Once the api is demonstrated to be stable, this integration
+ * will be moved to the Stripe extension
+ *
+ * @package WooCommerce/Blocks
+ * @since 2.6.0
+ */
+
 namespace Automattic\WooCommerce\Blocks\Payments\Integrations;
 
 use Exception;
@@ -10,10 +19,6 @@ use Automattic\WooCommerce\Blocks\Payments\PaymentResult;
 
 /**
  * Stripe payment method integration
- *
- * Temporary integration of the stripe payment method for the new cart and
- * checkout blocks. Once the api is demonstrated to be stable, this integration
- * will be moved to the Stripe extension
  *
  * @since 2.6.0
  */
@@ -81,19 +86,18 @@ final class Stripe extends AbstractPaymentMethodType {
 	 */
 	public function get_payment_method_data() {
 		return [
-			'stripeTotalLabel'    => $this->get_total_label(),
-			'publicKey'           => $this->get_publishable_key(),
-			'allowPrepaidCard'    => $this->get_allow_prepaid_card(),
-			'button'              => [
+			'stripeTotalLabel' => $this->get_total_label(),
+			'publicKey'        => $this->get_publishable_key(),
+			'allowPrepaidCard' => $this->get_allow_prepaid_card(),
+			'button'           => [
 				'type'   => $this->get_button_type(),
 				'theme'  => $this->get_button_theme(),
 				'height' => $this->get_button_height(),
 				'locale' => $this->get_button_locale(),
 			],
-			'inline_cc_form'      => $this->get_inline_cc_form(),
-			'icons'               => $this->get_icons(),
-			'allowSavedCards'     => $this->get_allow_saved_cards(),
-			'allowPaymentRequest' => $this->get_allow_payment_request(),
+			'inline_cc_form'   => $this->get_inline_cc_form(),
+			'icons'            => $this->get_icons(),
+			'allowSavedCards'  => $this->get_allow_saved_cards(),
 		];
 	}
 
@@ -138,16 +142,6 @@ final class Stripe extends AbstractPaymentMethodType {
 	 */
 	private function get_allow_prepaid_card() {
 		return apply_filters( 'wc_stripe_allow_prepaid_card', true );
-	}
-
-	/**
-	 * Determine if store allows Payment Request buttons - e.g. Apple Pay / Chrome Pay.
-	 *
-	 * @return bool True if merchant has opted into payment request.
-	 */
-	private function get_allow_payment_request() {
-		$option = isset( $this->settings['payment_request'] ) ? $this->settings['payment_request'] : false;
-		return filter_var( $option, FILTER_VALIDATE_BOOLEAN );
 	}
 
 	/**

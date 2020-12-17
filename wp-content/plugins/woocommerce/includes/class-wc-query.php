@@ -23,7 +23,7 @@ class WC_Query {
 	/**
 	 * Reference to the main product query on the page.
 	 *
-	 * @var WP_Query
+	 * @var array
 	 */
 	private static $product_query;
 
@@ -569,7 +569,7 @@ class WC_Query {
 	 * @since 3.6.0
 	 *
 	 * @param array    $args Query args.
-	 * @param WP_Query $wp_query WP_Query object.
+	 * @param WC_Query $wp_query WC_Query object.
 	 *
 	 * @return array
 	 */
@@ -761,7 +761,7 @@ class WC_Query {
 	/**
 	 * Get the main query which product queries ran against.
 	 *
-	 * @return WP_Query
+	 * @return array
 	 */
 	public static function get_main_query() {
 		return self::$product_query;

@@ -42,9 +42,10 @@ class WC_Admin_Notes_Home_Screen_Feedback {
 			return;
 		}
 
-		// Set the current time stamp, as the home screen is the default
-		// experience.
-		update_option( self::HOMESCREEN_ACCESSED_OPTION_NAME, time() );
+		// If the homescreen is enabled, set the current time stamp.
+		if ( 'yes' === get_option( 'woocommerce_homescreen_enabled', 'no' ) ) {
+			update_option( self::HOMESCREEN_ACCESSED_OPTION_NAME, time() );
+		}
 	}
 
 	/**

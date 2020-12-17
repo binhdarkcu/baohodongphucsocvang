@@ -86,7 +86,7 @@ class Paper {
 			return self::$instance;
 		}
 
-		self::$instance = new Paper();
+		self::$instance = new Paper;
 		self::$instance->setup();
 		return self::$instance;
 	}
@@ -98,13 +98,9 @@ class Paper {
 		foreach ( $this->get_papers() as $class_name => $is_valid ) {
 			if ( $this->do_filter( 'paper/is_valid/' . strtolower( $class_name ), $is_valid ) ) {
 				$class_name  = '\\RankMath\\Paper\\' . $class_name;
-				$this->paper = new $class_name();
+				$this->paper = new $class_name;
 				break;
 			}
-		}
-
-		if ( ! method_exists( $this->paper, 'set_object' ) ) {
-			return;
 		}
 
 		if ( Post::is_home_static_page() ) {
@@ -243,17 +239,6 @@ class Paper {
 			return;
 		}
 
-		$this->robots = array_intersect_key(
-			$this->robots,
-			[
-				'index'        => '',
-				'follow'       => '',
-				'noarchive'    => '',
-				'noimageindex' => '',
-				'nosnippet'    => '',
-			]
-		);
-
 		// Add Index and Follow.
 		if ( ! isset( $this->robots['index'] ) ) {
 			$this->robots = [ 'index' => 'index' ] + $this->robots;
@@ -267,6 +252,7 @@ class Paper {
 	 * Add Advanced robots.
 	 */
 	private function advanced_robots() {
+
 		// Early Bail if robots is set to noindex or nosnippet!
 		if ( ( isset( $this->robots['index'] ) && 'noindex' === $this->robots['index'] ) || ( isset( $this->robots['nosnippet'] ) && 'nosnippet' === $this->robots['nosnippet'] ) ) {
 			return;
@@ -285,15 +271,6 @@ class Paper {
 
 			$advanced_robots = self::advanced_robots_combine( $advanced_robots );
 		}
-
-		$advanced_robots = array_intersect_key(
-			$advanced_robots,
-			[
-				'max-snippet'       => '',
-				'max-video-preview' => '',
-				'max-image-preview' => '',
-			]
-		);
 
 		/**
 		 * Allows filtering of the advanced meta robots.

@@ -60,11 +60,10 @@ trait WordPress {
 	 *
 	 * @param  string  $key     Internal key of the value to get (without prefix).
 	 * @param  integer $post_id Post ID of the post to get the value for.
-	 * @param  string  $default  Default value to use.
 	 * @return mixed
 	 */
-	public static function get_post_meta( $key, $post_id = 0, $default = '' ) {
-		return Post::get_meta( $key, $post_id, $default );
+	public static function get_post_meta( $key, $post_id = 0 ) {
+		return Post::get_meta( $key, $post_id );
 	}
 
 	/**
@@ -73,7 +72,7 @@ trait WordPress {
 	 * @codeCoverageIgnore
 	 *
 	 * @param  string $key      Internal key of the value to get (without prefix).
-	 * @param  mixed  $term     Term to get the meta value for either (string) term name, (int) term ID or (object) term.
+	 * @param  mixed  $term     Term to get the meta value for either (string) term name, (int) term id or (object) term.
 	 * @param  string $taxonomy Name of the taxonomy to which the term is attached.
 	 * @return mixed
 	 */
@@ -87,7 +86,7 @@ trait WordPress {
 	 * @codeCoverageIgnore
 	 *
 	 * @param  string $key  Internal key of the value to get (without prefix).
-	 * @param  mixed  $user User to get the meta value for either (int) user ID or (object) user.
+	 * @param  mixed  $user User to get the meta value for either (int) user id or (object) user.
 	 * @return mixed
 	 */
 	public static function get_user_meta( $key, $user = 0 ) {
@@ -346,42 +345,16 @@ trait WordPress {
 	/**
 	 * Convert timestamp and ISO to date.
 	 *
-	 * @param string  $value            Value to convert.
-	 * @param boolean $include_timezone Whether to include timezone.
+	 * @param string $value Value to convert.
 	 *
 	 * @return string
 	 */
-	public static function convert_date( $value, $include_timezone = false ) {
+	public static function convert_date( $value ) {
 		if ( Str::contains( 'T', $value ) ) {
 			$value = \strtotime( $value );
 		}
 
-		return $include_timezone ? date_i18n( 'Y-m-d H:i-T', $value ) : date_i18n( 'Y-m-d H:i', $value );
-	}
-
-	/**
-	 * Helper function to convert ISO 8601 duration to seconds.
-	 * For example "PT1H12M24S" becomes 5064.
-	 *
-	 * @param string $iso8601 Duration which need to be converted to seconds.
-	 * @return int
-	 */
-	public static function duration_to_seconds( $iso8601 ) {
-		$end = substr( $iso8601, -1 );
-		if ( ! in_array( $end, [ 'D', 'H', 'M', 'S' ], true ) ) {
-			$iso8601 = $iso8601 . 'S';
-		}
-		$iso8601  = ! Str::starts_with( 'P', $iso8601 ) ? 'PT' . $iso8601 : $iso8601;
-		$interval = new \DateInterval( $iso8601 );
-
-		return array_sum(
-			[
-				$interval->d * DAY_IN_SECONDS,
-				$interval->h * HOUR_IN_SECONDS,
-				$interval->i * MINUTE_IN_SECONDS,
-				$interval->s,
-			]
-		);
+		return date_i18n( 'Y-m-d H:i', $value );
 	}
 
 	/**

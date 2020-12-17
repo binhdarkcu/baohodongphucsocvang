@@ -12,8 +12,6 @@ namespace RankMath\Admin\Importers;
 
 use RankMath\Admin\Admin_Helper;
 use MyThemeShop\Helpers\DB;
-use RankMath\Schema\JsonLD;
-use RankMath\Schema\Singular;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -51,32 +49,15 @@ class AIO_Rich_Snippet extends Plugin_Importer {
 	protected $choices = [ 'postmeta' ];
 
 	/**
-	 * JsonLD.
-	 *
-	 * @var JsonLD
-	 */
-	private $json_ld;
-
-	/**
-	 * Singular.
-	 *
-	 * @var Singular
-	 */
-	private $single;
-
-	/**
 	 * Import post meta of plugin.
 	 *
 	 * @return array
 	 */
 	protected function postmeta() {
 		$this->set_pagination( $this->get_post_ids( true ) );
+		$snippet_posts = $this->get_post_ids();
 
-		// Set Converter.
-		$this->json_ld = new JsonLD();
-		$this->single  = new Singular();
-
-		foreach ( $this->get_post_ids() as $snippet_post ) {
+		foreach ( $snippet_posts as $snippet_post ) {
 			$type      = $this->is_allowed_type( $snippet_post->meta_value );
 			$meta_keys = $this->get_metakeys( $type );
 			if ( false === $type || false === $meta_keys ) {
@@ -93,7 +74,7 @@ class AIO_Rich_Snippet extends Plugin_Importer {
 	/**
 	 * Set snippet meta.
 	 *
-	 * @param int    $post_id   Post ID.
+	 * @param int    $post_id   Post id.
 	 * @param string $type      Type to get keys for.
 	 * @param array  $meta_keys Array of meta keys to save.
 	 */
@@ -109,17 +90,6 @@ class AIO_Rich_Snippet extends Plugin_Importer {
 			}
 
 			update_post_meta( $post_id, 'rank_math_snippet_' . $snippet_value, $value );
-		}
-		// Convert post now.
-		$data = $this->json_ld->get_old_schema( $post_id, $this->single );
-		if ( isset( $data['richSnippet'] ) ) {
-			$data             = $data['richSnippet'];
-			$type             = $data['@type'];
-			$data['metadata'] = [
-				'title' => $type,
-				'type'  => 'template',
-			];
-			update_post_meta( $post_id, 'rank_math_schema_' . $type, $data );
 		}
 	}
 
@@ -151,7 +121,7 @@ class AIO_Rich_Snippet extends Plugin_Importer {
 	}
 
 	/**
-	 * Get all post IDs of all allowed post types only.
+	 * Get all post ids of all allowed post types only.
 	 *
 	 * @param bool $count If we need count only for pagination purposes.
 	 * @return int|array

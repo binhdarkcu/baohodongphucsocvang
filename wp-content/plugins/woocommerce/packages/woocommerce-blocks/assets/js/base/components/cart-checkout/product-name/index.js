@@ -9,7 +9,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import './style.scss';
 
-const ProductName = ( { name, permalink, disabled = false } ) => {
+const ProductName = ( { name, permalink, disabled } ) => {
 	return (
 		// we use tabIndex -1 to prevent the link from being focused, pointer-events
 		// disabled click events, so we get an almost disabled link.
@@ -24,7 +24,6 @@ const ProductName = ( { name, permalink, disabled = false } ) => {
 };
 
 ProductName.propTypes = {
-	disabled: PropTypes.bool,
 	name: PropTypes.string,
 	permalink: PropTypes.string,
 };

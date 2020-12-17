@@ -21,7 +21,7 @@ import ProductBadge from '../product-badge';
  * @return {*} The component.
  */
 const ProductSaleBadge = ( { currency, saleAmount } ) => {
-	if ( ! saleAmount || saleAmount <= 0 ) {
+	if ( ! saleAmount ) {
 		return null;
 	}
 	return (

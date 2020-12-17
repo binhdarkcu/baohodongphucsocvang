@@ -6,12 +6,9 @@
  * @subpackage RankMath\Admin\Wizard
  */
 
+global $wp_version;
 use RankMath\Helper;
 use RankMath\KB;
-
-defined( 'ABSPATH' ) || exit;
-
-global $wp_version;
 
 update_option( 'rank_math_wizard_completed', true );
 
@@ -19,27 +16,21 @@ $php_version           = phpversion();
 $php_version_ok        = version_compare( $php_version, rank_math()->php_version, '>' );
 $php_version_recommend = version_compare( $php_version, '7', '<' );
 
+$wp_version_ok = version_compare( $wp_version, rank_math()->wordpress_version, '>' );
 $dom_ext       = extension_loaded( 'dom' );
 $simplexml_ext = extension_loaded( 'SimpleXML' );
 $gd_ext        = extension_loaded( 'gd' );
-$mb_string     = extension_loaded( 'mbstring' );
-$openssl       = extension_loaded( 'openssl' );
-$all_good      = $php_version_ok && $dom_ext && $simplexml_ext && $gd_ext && $mb_string && $openssl;
 
-?>
-
-<?php $wizard->cmb->show_form(); ?>
-
-<?php
+$all_good = $php_version_ok && $wp_version_ok && $dom_ext && $simplexml_ext && $gd_ext;
 
 if ( $all_good ) :
 	?>
 <br>
-<h2 class="text-center compatibility-check">
+<h2 class="text-center">
 	<i class="dashicons <?php echo $php_version_recommend ? 'dashicons-warning' : 'dashicons-yes'; ?>"></i> <?php esc_html_e( 'Your website is compatible to run Rank Math SEO', 'rank-math' ); ?>
 	<a href="#" data-target="rank-math-compatibility-collapsible" class="rank-math-collapsible-trigger">
-		<span class="dashicons dashicons-arrow-down-alt2"><span><?php esc_html_e( 'More', 'rank-math' ); ?></span></span>
-		<span class="dashicons dashicons-arrow-up-alt2"><span><?php esc_html_e( 'Less', 'rank-math' ); ?></span></span>
+		<span class="dashicons dashicons-arrow-down"><span><?php esc_html_e( 'More', 'rank-math' ); ?></span></span>
+		<span class="dashicons dashicons-arrow-up"><span><?php esc_html_e( 'Less', 'rank-math' ); ?></span></span>
 	</a>
 </h2>
 <div id="rank-math-compatibility-collapsible" class="rank-math-collapsible-content">
@@ -72,13 +63,17 @@ if ( $all_good ) :
 			</th>
 			<td><span class="dashicons dashicons-<?php echo $php_version_ok ? ( $php_version_recommend ? 'warning' : 'yes' ) : 'no'; ?>"></span></td>
 		</tr>
-		<tr class="check-yes">
+		<tr class="check-<?php echo $wp_version_ok ? 'yes' : 'no'; ?>">
 			<th>
 				<?php
-				echo esc_html__( 'You are using minimum recommended WordPress version.', 'rank-math' );
+				echo $wp_version_ok ?
+					/* translators: WordPress version */
+					sprintf( esc_html__( 'WordPress Version: %s', 'rank-math' ), $wp_version ) :
+					/* translators: WordPress version */
+					( is_multisite() ? '' : '<a href="' . admin_url( 'update-core.php' ) . '">' ) . sprintf( esc_html__( 'Your WordPress Version: %s | Recommended version: 4.4+', 'rank-math' ), $wp_version ) . ( is_multisite() ? '' : '</a>' );
 				?>
 			</th>
-			<td><span class="dashicons dashicons-yes"></span></td>
+			<td><span class="dashicons dashicons-<?php echo $wp_version_ok ? 'yes' : 'no'; ?>"></span></td>
 		</tr>
 		<tr class="check-<?php echo $dom_ext ? 'yes' : 'no'; ?>">
 			<th>
@@ -97,18 +92,6 @@ if ( $all_good ) :
 				<?php echo $gd_ext ? esc_html__( 'PHP GD Extension installed', 'rank-math' ) : esc_html__( 'PHP GD Extension missing', 'rank-math' ); ?>
 			</th>
 			<td><span class="dashicons dashicons-<?php echo $gd_ext ? 'yes' : 'no'; ?>"></span></td>
-		</tr>
-		<tr class="check-<?php echo $mb_string ? 'yes' : 'no'; ?>">
-			<th>
-				<?php echo $mb_string ? esc_html__( 'PHP MBstring Extension installed', 'rank-math' ) : esc_html__( 'PHP MBstring Extension missing', 'rank-math' ); ?>
-			</th>
-			<td><span class="dashicons dashicons-<?php echo $mb_string ? 'yes' : 'no'; ?>"></span></td>
-		</tr>
-		<tr class="check-<?php echo $openssl ? 'yes' : 'no'; ?>">
-			<th>
-				<?php echo $openssl ? esc_html__( 'PHP OpenSSL Extension installed', 'rank-math' ) : esc_html__( 'PHP OpenSSL Extension missing', 'rank-math' ); ?>
-			</th>
-			<td><span class="dashicons dashicons-<?php echo $mb_string ? 'yes' : 'no'; ?>"></span></td>
 		</tr>
 	</table>
 	<?php if ( $all_good ) { ?>
@@ -143,7 +126,7 @@ if ( $all_good ) :
 					esc_html__( 'The following active plugins on your site may cause conflict issues when used alongside this plugin: ', 'rank-math' );
 			?>
 		</p>
-		<table class="form-table wp-core-ui wizard-conflicts">
+		<table class="form-table wizard-conflicts">
 			<?php foreach ( $conflicting_plugins as $pk => $plugin ) { ?>
 				<tr>
 					<td><span class="dashicons dashicons-warning"></span></td>
@@ -166,6 +149,6 @@ if ( $all_good ) :
 
 <footer class="form-footer rank-math-custom wp-core-ui rank-math-ui text-center">
 	<?php if ( $all_good ) : ?>
-	<button type="submit" class="button button-primary button-animated"><?php esc_html_e( 'Start Wizard', 'rank-math' ); ?> <i class="dashicons dashicons-arrow-right-alt2"></i></button>
+	<button type="submit" class="button button-primary"><?php esc_html_e( 'Start Wizard', 'rank-math' ); ?> <i class="dashicons dashicons-arrow-right-alt2"></i></button>
 	<?php endif; ?>
 </footer>

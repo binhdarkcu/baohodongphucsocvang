@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 interface IScreen {
 
 	/**
-	 * Get object ID.
+	 * Get object id
 	 *
 	 * @return int
 	 */

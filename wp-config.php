@@ -56,6 +56,7 @@ define('AUTH_SALT',        'khóa không trùng nhau');
 define('SECURE_AUTH_SALT', 'khóa không trùng nhau');
 define('LOGGED_IN_SALT',   'khóa không trùng nhau');
 define('NONCE_SALT',       'khóa không trùng nhau');
+//define('WC_REMOVE_ALL_DATA', true);
 
 /**#@-*/
 

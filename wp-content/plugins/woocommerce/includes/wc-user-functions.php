@@ -162,10 +162,10 @@ function wc_create_new_customer_username( $email, $new_user_args = array(), $suf
 	}
 
 	/**
-	 * WordPress 4.4 - filters the list of blocked usernames.
+	 * WordPress 4.4 - filters the list of blacklisted usernames.
 	 *
 	 * @since 3.7.0
-	 * @param array $usernames Array of blocked usernames.
+	 * @param array $usernames Array of blacklisted usernames.
 	 */
 	$illegal_logins = (array) apply_filters( 'illegal_user_logins', array() );
 

@@ -14,7 +14,6 @@ use RankMath\Post;
 use RankMath\Helper;
 use RankMath\Helpers\Security;
 use MyThemeShop\Helpers\WordPress;
-use MyThemeShop\Helpers\Str;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -77,12 +76,7 @@ class Singular implements IPaper {
 		$canonical_unpaged  = $canonical;
 		$canonical_override = Post::get_meta( 'canonical_url', $object_id );
 
-		/**
-		 * Fix paginated pages canonical, but only if the page is truly paginated.
-		 *
-		 * @copyright Copyright (C) 2008-2019, Yoast BV
- 		 * The following code is a derivative work of the code from the Yoast(https://github.com/Yoast/wordpress-seo/), which is licensed under GPL v3.
-		 */
+		// Fix paginated pages canonical, but only if the page is truly paginated.
 		if ( get_query_var( 'page' ) > 1 ) {
 			$num_pages = ( substr_count( get_queried_object()->post_content, '<!--nextpage-->' ) + 1 );
 			if ( $num_pages && get_query_var( 'page' ) <= $num_pages ) {
@@ -171,7 +165,7 @@ class Singular implements IPaper {
 		// 3. Description template set in the Titles & Meta.
 		$post_type = isset( $object->post_type ) ? $object->post_type : $object->query_var;
 
-		return Str::truncate( Paper::get_from_options( "pt_{$post_type}_description", $object ), 160 );
+		return wp_html_excerpt( Paper::get_from_options( "pt_{$post_type}_description", $object ), 160 );
 	}
 
 	/**
@@ -192,7 +186,7 @@ class Singular implements IPaper {
 			$robots = Paper::robots_combine( Helper::get_settings( "titles.pt_{$post_type}_robots" ), true );
 		}
 
-		// `noindex` these conditions.
+		// Noindex these conditions.
 		$noindex_private            = 'private' === $object->post_status;
 		$no_index_subpages          = is_paged() && Helper::get_settings( 'titles.noindex_paginated_pages' );
 		$noindex_password_protected = ! empty( $object->post_password ) && Helper::get_settings( 'titles.noindex_password_protected' );

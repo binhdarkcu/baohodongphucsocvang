@@ -10,8 +10,6 @@
 
 namespace RankMath\Wizard;
 
-use RankMath\Helper;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -38,7 +36,6 @@ class Ready implements Wizard_Step {
 	 * @return void
 	 */
 	public function form( $wizard ) {
-		Helper::is_configured( true );
 	}
 
 	/**

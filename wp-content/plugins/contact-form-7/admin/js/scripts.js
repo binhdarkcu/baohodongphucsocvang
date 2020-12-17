@@ -150,11 +150,9 @@
 
 			var section = $( this ).attr( 'data-config-field' );
 
-			$( this ).attr( 'aria-describedby', 'wpcf7-config-error-for-' + section );
-
 			if ( errors[ section ] ) {
 				var $list = $( '<ul></ul>' ).attr( {
-					'id': 'wpcf7-config-error-for-' + section,
+					'role': 'alert',
 					'class': 'config-error'
 				} );
 

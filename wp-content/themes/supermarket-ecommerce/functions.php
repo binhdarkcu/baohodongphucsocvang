@@ -270,6 +270,19 @@ function supermarket_ecommerce_sanitize_choices( $input, $setting ) {
 // define('SUPERMARKET_ECOMMERCE_BUY_NOW','https://www.luzuk.com/themes/wordpress-ecommerce-theme/','supermarket-ecommerce');
 // define('SUPERMARKET_ECOMMERCE_SUPPORT','https://wordpress.org/support/theme/supermarket-ecommerce/','supermarket-ecommerce');
 // define('SUPERMARKET_ECOMMERCE_CREDIT','https://www.luzuk.com/themes/free-wordpress-ecommerce-theme/','supermarket-ecommerce');
+// Remove CSS and/or JS for Select2 used by WooCommerce, see https://gist.github.com/Willem-Siebe/c6d798ccba249d5bf080.
+
+add_action( 'wp_enqueue_scripts', 'wsis_dequeue_stylesandscripts_select2', 100 );
+
+function wsis_dequeue_stylesandscripts_select2() {
+    if ( class_exists( 'woocommerce' ) ) {
+        wp_dequeue_style( 'selectWoo' );
+        wp_deregister_style( 'selectWoo' );
+
+        wp_dequeue_script( 'selectWoo');
+        wp_deregister_script('selectWoo');
+    }
+}
 
 define('TEMPLATE_PATH',get_bloginfo('template_url'));
 define('HOME_URL',get_home_url());
@@ -516,9 +529,9 @@ function add_opengraph_doctype( $output ) {
         return $output . ' xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml"';
     }
 add_filter('language_attributes', 'add_opengraph_doctype');
- 
+
 //Lets add Open Graph Meta Info
- 
+
 function insert_fb_in_head() {
     global $post;
     if ( !is_singular()) //if it is not a post or a page

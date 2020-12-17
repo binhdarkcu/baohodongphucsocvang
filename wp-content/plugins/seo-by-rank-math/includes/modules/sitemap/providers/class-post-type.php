@@ -6,9 +6,6 @@
  * @package    RankMath
  * @subpackage RankMath\Sitemap
  * @author     Rank Math <support@rankmath.com>
- *
- * @copyright Copyright (C) 2008-2019, Yoast BV
- * The following code is a derivative work of the code from the Yoast(https://github.com/Yoast/wordpress-seo/), which is licensed under GPL v3.
  */
 
 namespace RankMath\Sitemap\Providers;
@@ -30,7 +27,7 @@ class Post_Type implements Provider {
 	use Hooker;
 
 	/**
-	 * Holds the `home_url()` value to speed up loops.
+	 * Holds the home_url() value to speed up loops.
 	 *
 	 * @var string
 	 */
@@ -74,7 +71,7 @@ class Post_Type implements Provider {
 	public function handles_type( $type ) {
 		if (
 			false === post_type_exists( $type ) ||
-			! Helper::get_settings( 'sitemap.pt_' . $type . '_sitemap' ) ||
+			false === Helper::get_settings( 'sitemap.pt_' . $type . '_sitemap' ) ||
 			( 'attachment' === $type && Helper::get_settings( 'general.attachment_redirect_urls', true ) )
 		) {
 			return false;
@@ -100,7 +97,7 @@ class Post_Type implements Provider {
 		global $wpdb;
 
 		$post_types          = Helper::get_accessible_post_types();
-		$post_types          = array_filter( $post_types, [ $this, 'handles_type' ] );
+		$post_types          = array_filter( $post_types, array( $this, 'handles_type' ) );
 		$last_modified_times = Sitemap::get_last_modified_gmt( $post_types, true );
 		$index               = [];
 
@@ -141,10 +138,10 @@ class Post_Type implements Provider {
 					$date = $last_modified_times[ $post_type ];
 				}
 
-				$index[] = [
+				$index[] = array(
 					'loc'     => Router::get_base_url( $post_type . '-sitemap' . $current_page . '.xml' ),
 					'lastmod' => $date,
-				];
+				);
 			}
 		}
 
@@ -190,7 +187,7 @@ class Post_Type implements Provider {
 
 			foreach ( $posts as $post ) {
 				$post_id = (int) $post->ID;
-				if ( ! Sitemap::is_object_indexable( $post_id ) ) {
+				if ( ! Helper::is_post_indexable( $post_id ) ) {
 					continue;
 				}
 
@@ -236,7 +233,7 @@ class Post_Type implements Provider {
 		global $wpdb;
 
 		if ( ! is_array( $post_types ) ) {
-			$post_types = [ $post_types ];
+			$post_types = array( $post_types );
 		}
 
 		/**
@@ -281,10 +278,10 @@ class Post_Type implements Provider {
 
 		if ( ! $this->get_page_on_front_id() && ( 'post' === $post_type || 'page' === $post_type ) ) {
 			$needs_archive = false;
-			$links[]       = [ 'loc' => $this->get_home_url() ];
+			$links[]       = array( 'loc' => $this->get_home_url() );
 		} elseif ( $this->get_page_on_front_id() && 'post' === $post_type && $this->get_page_for_posts_id() ) {
 			$needs_archive = false;
-			$links[]       = Sitemap::is_object_indexable( $this->get_page_for_posts_id() ) ? [ 'loc' => get_permalink( $this->get_page_for_posts_id() ) ] : '';
+			$links[]       = Helper::is_post_indexable( $this->get_page_for_posts_id() ) ? array( 'loc' => get_permalink( $this->get_page_for_posts_id() ) ) : '';
 		}
 
 		if ( ! $needs_archive ) {
@@ -302,10 +299,10 @@ class Post_Type implements Provider {
 		$archive_url = $this->do_filter( 'sitemap/post_type_archive_link', $archive_url, $post_type );
 
 		if ( $archive_url ) {
-			$links[] = [
+			$links[] = array(
 				'loc' => $archive_url,
 				'mod' => Sitemap::get_last_modified_gmt( $post_type ),
-			];
+			);
 		}
 
 		return $links;
@@ -340,7 +337,7 @@ class Post_Type implements Provider {
 		global $wpdb;
 
 		if ( ! is_array( $post_types ) ) {
-			$post_types = [ $post_types ];
+			$post_types = array( $post_types );
 		}
 
 		$where = $this->get_sql_where_clause( $post_types );
@@ -486,7 +483,7 @@ class Post_Type implements Provider {
 	 */
 	protected function get_image_parser() {
 		if ( is_null( $this->image_parser ) ) {
-			$this->image_parser = new Image_Parser();
+			$this->image_parser = new Image_Parser;
 		}
 
 		return $this->image_parser;

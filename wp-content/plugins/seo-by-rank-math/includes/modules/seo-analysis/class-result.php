@@ -10,8 +10,6 @@
 
 namespace RankMath\SEO_Analysis;
 
-use RankMath\Helper;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -20,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 class Result {
 
 	/**
-	 * Result ID.
+	 * Result id.
 	 *
 	 * @var string
 	 */
@@ -79,7 +77,7 @@ class Result {
 			<div class="row-content">
 
 				<?php if ( $this->has_fix() ) : ?>
-				<a href="#" class="button button-secondary button-small result-action"><?php esc_html_e( 'How to fix', 'rank-math' ); ?></a>
+				<a href="#" class="button button-secondary result-action"><?php esc_html_e( 'How to fix', 'rank-math' ); ?></a>
 				<?php endif; ?>
 
 				<?php echo wp_kses_post( $this->result['message'] ); ?>
@@ -198,7 +196,7 @@ class Result {
 
 		$explode = [ 'h1_heading', 'h2_headings', 'title_length', 'description_length', 'canonical' ];
 		if ( in_array( $this->id, $explode, true ) ) {
-			echo '<code class="full-width">' . join( ', ', (array) $data ) . '</code>';
+			echo '<br><code>' . join( ', ', (array) $data ) . '</code>';
 			return;
 		}
 	}
@@ -239,35 +237,24 @@ class Result {
 	}
 
 	/**
-	 * Render tag cloud.
+	 * Render tag cloud
 	 *
 	 * @param array $data Keywords.
 	 */
 	private function the_tag_cloud( $data ) {
-		echo $this->get_tag_cloud( $data );
-	}
-	
-	/**
-	 * Get tag cloud HTML.
-	 *
-	 * @param array $data Keywords.
-	 */
-	private function get_tag_cloud( $data ) {
 		$font_size_max = 22;
 		$font_size_min = 10;
 
 		$max = max( $data );
 
-		$html = '<div class="wp-tag-cloud">';
+		echo '<div class="wp-tag-cloud">';
 		foreach ( $data as $keyword => $occurrences ) {
 			$size = ( $occurrences / $max ) * ( $font_size_max - $font_size_min ) + $font_size_min;
 			$size = round( $size, 2 );
 
-			$html .= sprintf( '<span class="keyword-cloud-item" style="font-size: %.2fpx">%s</span>', $size, htmlspecialchars( $keyword, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8' ) );
+			printf( '<span class="keyword-cloud-item" style="font-size: %.2fpx">%s</span>', $size, htmlspecialchars( $keyword, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8' ) );
 		}
-		$html .= '</div>';
-
-		return apply_filters( 'rank_math/seo_analysis/tag_cloud_html', $html, $data );
+		echo '</div>';
 	}
 
 	/**
@@ -299,32 +286,6 @@ class Result {
 	}
 
 	/**
-	 * Is test hidden.
-	 *
-	 * @return bool
-	 */
-	public function is_hidden() {
-		$hidden_tests = [
-			// Performance.
-			'image_header',
-			'minify_css',
-			'minify_js',
-			'page_objects',
-			'page_size',
-			'response_time',
-
-			// Security.
-			'directory_listing',
-			'safe_browsing',
-			'ssl',
-			'active_plugins',
-			'active_theme',
-		];
-
-		return ! Helper::is_advanced_mode() && in_array( $this->id, $hidden_tests, true );
-	}
-
-	/**
 	 * Get tests score.
 	 *
 	 * @return int
@@ -336,7 +297,7 @@ class Result {
 			'img_alt'             => 4,
 			'keywords_meta'       => 5,
 			'links_ratio'         => 3,
-			'title_length'        => 4,
+			'title_length'        => 3,
 			'permalink_structure' => 7,
 			'focus_keywords'      => 3,
 			'post_titles'         => 4,
@@ -363,6 +324,13 @@ class Result {
 			'directory_listing'   => 1,
 			'safe_browsing'       => 8,
 			'ssl'                 => 7,
+
+			// Social SEO.
+			'facebook_connected'  => 1,
+			'instagram_connected' => 1,
+			'linkedin_connected'  => 1,
+			'twitter_connected'   => 1,
+			'youtube_connected'   => 1,
 		];
 
 		return isset( $score[ $this->id ] ) ? $score[ $this->id ] : 0;

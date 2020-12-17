@@ -6,9 +6,7 @@
  * @return {boolean} True if a rate exists.
  */
 const hasShippingRate = ( shippingRatePackages ) => {
-	return shippingRatePackages.some(
-		( shippingRatePackage ) => shippingRatePackage.shipping_rates.length
-	);
+	return shippingRatePackages.some( shippingRatePackage  => shippingRatePackage.shipping_rates.length );
 };
 
 export default hasShippingRate;

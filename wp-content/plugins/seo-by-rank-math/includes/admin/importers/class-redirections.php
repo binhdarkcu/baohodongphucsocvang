@@ -72,9 +72,7 @@ class Redirections extends Plugin_Importer {
 				]
 			);
 
-			$id = $item->save();
-			if ( false !== $id ) {
-				do_action( 'rank_math/redirection/after_import', $id, $row );
+			if ( false !== $item->save() ) {
 				$count++;
 			}
 		}

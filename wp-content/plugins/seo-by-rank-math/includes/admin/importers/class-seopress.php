@@ -13,8 +13,6 @@ namespace RankMath\Admin\Importers;
 use RankMath\Helper;
 use RankMath\Admin\Admin_Helper;
 use RankMath\Redirections\Redirection;
-use RankMath\Schema\JsonLD;
-use RankMath\Schema\Singular;
 use MyThemeShop\Helpers\DB;
 
 defined( 'ABSPATH' ) || exit;
@@ -29,7 +27,7 @@ class SEOPress extends Plugin_Importer {
 	 *
 	 * @var string
 	 */
-	protected $plugin_name = 'SEOPress';
+	protected $plugin_name = 'SEOPress SEO';
 
 	/**
 	 * Plugin options meta key.
@@ -51,20 +49,6 @@ class SEOPress extends Plugin_Importer {
 	 * @var array
 	 */
 	protected $choices = [ 'settings', 'postmeta', 'termmeta', 'redirections' ];
-
-	/**
-	 * JsonLD.
-	 *
-	 * @var JsonLD
-	 */
-	private $json_ld;
-
-	/**
-	 * Singular.
-	 *
-	 * @var Singular
-	 */
-	private $single;
 
 	/**
 	 * Convert SEOPress variables if needed.
@@ -193,10 +177,6 @@ class SEOPress extends Plugin_Importer {
 			'_seopress_robots_breadcrumbs'   => 'rank_math_breadcrumb_title',
 		];
 
-		// Set Converter.
-		$this->json_ld = new JsonLD();
-		$this->single  = new Singular();
-
 		foreach ( $post_ids as $post ) {
 			$post_id = $post->ID;
 			$this->replace_meta( $hash, null, $post_id, 'post', 'convert_variables' );
@@ -221,14 +201,12 @@ class SEOPress extends Plugin_Importer {
 	 */
 	protected function termmeta() {
 		$count = 0;
-		$terms = new \WP_Term_Query(
-			[
-				'meta_key'   => '_seopress_titles_title',
-				'fields'     => 'ids',
-				'hide_empty' => false,
-				'get'        => 'all',
-			]
-		);
+		$terms = new \WP_Term_Query([
+			'meta_key'   => '_seopress_titles_title',
+			'fields'     => 'ids',
+			'hide_empty' => false,
+			'get'        => 'all',
+		]);
 
 		if ( empty( $terms ) || is_wp_error( $terms ) ) {
 			return false;
@@ -265,12 +243,10 @@ class SEOPress extends Plugin_Importer {
 	 * @return array
 	 */
 	protected function redirections() {
-		$redirections = get_posts(
-			[
-				'posts_per_page' => -1,
-				'post_type'      => 'seopress_404',
-			]
-		);
+		$redirections = get_posts([
+			'posts_per_page' => -1,
+			'post_type'      => 'seopress_404',
+		]);
 
 		if ( empty( $redirections ) ) {
 			return false;
@@ -326,19 +302,17 @@ class SEOPress extends Plugin_Importer {
 			return false;
 		}
 
-		$item = Redirection::from(
-			[
-				'sources'     => [
-					[
-						'pattern'    => $redirection['source'],
-						'comparison' => 'exact',
-					],
+		$item = Redirection::from([
+			'sources'     => [
+				[
+					'pattern'    => $redirection['source'],
+					'comparison' => 'exact',
 				],
-				'url_to'      => $redirection['destination'],
-				'header_code' => $redirection['code'],
-				'status'      => $redirection['status'] ? 'active' : 'inactive',
-			]
-		);
+			],
+			'url_to'      => $redirection['destination'],
+			'header_code' => $redirection['code'],
+			'status'      => $redirection['status'] ? 'active' : 'inactive',
+		]);
 
 		return $item->save();
 	}
@@ -355,6 +329,13 @@ class SEOPress extends Plugin_Importer {
 			'seopress_social_facebook_admin_id'          => 'facebook_admin_id',
 			'seopress_social_facebook_app_id'            => 'facebook_app_id',
 			'seopress_social_accounts_twitter'           => 'twitter_author_names',
+			'seopress_social_accounts_instagram'         => 'social_url_instagram',
+			'seopress_social_accounts_linkedin'          => 'social_url_linkedin',
+			'seopress_social_accounts_youtube'           => 'social_url_youtube',
+			'seopress_social_accounts_pinterest'         => 'social_url_pinterest',
+			'seopress_social_accounts_myspace'           => 'social_url_myspace',
+			'seopress_social_accounts_soundcloud'        => 'social_url_soundcloud',
+			'seopress_social_accounts_tumblr'            => 'social_url_tumblr',
 			'seopress_social_knowledge_name'             => 'knowledgegraph_name',
 			'seopress_social_knowledge_img'              => 'knowledgegraph_logo',
 		];
@@ -477,6 +458,7 @@ class SEOPress extends Plugin_Importer {
 		$this->replace( $hash, $seopress_advanced, $this->settings, 'convert_bool' );
 
 		$this->settings['attachment_redirect_urls'] = ! empty( $seopress_advanced['seopress_advanced_advanced_attachments'] ) ? 'on' : 'off';
+		$this->settings['url_strip_stopwords']      = ! empty( $seopress_advanced['seopress_advanced_advanced_stop_words'] ) ? 'on' : 'off';
 		$this->settings['strip_category_base']      = ! empty( $seopress_advanced['seopress_advanced_advanced_category_url'] ) ? 'on' : 'off';
 
 		$set_alt   = ! empty( $seopress_advanced['seopress_advanced_advanced_image_auto_alt_editor'] ) ? 'on' : 'off';
@@ -578,7 +560,7 @@ class SEOPress extends Plugin_Importer {
 	/**
 	 * Set schema data.
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int $post_id Post id.
 	 */
 	private function set_schema_data( $post_id ) {
 		if ( ! $type = get_post_meta( $post_id, '_seopress_pro_rich_snippets_type', true ) ) { // phpcs:ignore
@@ -596,18 +578,6 @@ class SEOPress extends Plugin_Importer {
 				}
 
 				update_post_meta( $post_id, "rank_math_snippet_{$data}", $value );
-			}
-
-			// Convert post now.
-			$data = $this->json_ld->get_old_schema( $post_id, $this->single );
-			if ( isset( $data['richSnippet'] ) ) {
-				$data             = $data['richSnippet'];
-				$type             = $data['@type'];
-				$data['metadata'] = [
-					'title' => $type,
-					'type'  => 'template',
-				];
-				update_post_meta( $post_id, 'rank_math_schema_' . $type, $data );
 			}
 		}
 	}
@@ -643,7 +613,7 @@ class SEOPress extends Plugin_Importer {
 	/**
 	 * Get snippet value.
 	 *
-	 * @param int $post_id  Post ID.
+	 * @param int $post_id  Post id.
 	 * @param int $meta_key Meta key.
 	 *
 	 * @return string $value Snippet value
@@ -742,7 +712,7 @@ class SEOPress extends Plugin_Importer {
 	/**
 	 * Set primary term for post
 	 *
-	 * @param int[] $post_ids Post IDs.
+	 * @param int[] $post_ids Post ids.
 	 */
 	private function set_primary_term( $post_ids ) {
 		$post_ids = wp_list_pluck( $post_ids, 'ID' );

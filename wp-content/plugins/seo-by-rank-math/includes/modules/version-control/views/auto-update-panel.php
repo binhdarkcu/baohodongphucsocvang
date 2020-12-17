@@ -6,14 +6,10 @@
  * @subpackage RankMath\Version_Control
  */
 
-defined( 'ABSPATH' ) || exit;
-
 ?>
-<form id="cmb2-metabox-rank-math-auto-update" class="rank-math-auto-update-form cmb2-form rank-math-box" action="" method="post">
+<form id="cmb2-metabox-rank-math-auto-update" class="rank-math-export-form rank-math-auto-update-form cmb2-form" action="" method="post">
 
-	<header>
-		<h3><?php esc_html_e( 'Auto Update', 'rank-math' ); ?></h3>
-	</header>
+	<h3><?php esc_html_e( 'Auto Update', 'rank-math' ); ?></h3>
 
 	<p><?php esc_html_e( 'Turn on auto-updates to automatically update to stable versions of Rank Math as soon as they are released. The beta versions will never install automatically.', 'rank-math' ); ?></p>
 
@@ -47,7 +43,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<footer>
 		<?php wp_nonce_field( 'rank-math-auto-update' ); ?>
-		<button type="submit" class="button button-primary button-xlarge"><?php esc_html_e( 'Save Changes', 'rank-math' ); ?></button>
+		<button type="submit" class="button button-primary button-large"><?php esc_html_e( 'Save Changes', 'rank-math' ); ?></button>
 	</footer>
 
 </form>

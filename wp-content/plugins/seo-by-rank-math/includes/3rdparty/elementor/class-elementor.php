@@ -28,7 +28,6 @@ class Elementor {
 	 */
 	public function __construct() {
 		$this->action( 'init', 'init' );
-		$this->filter( 'rank_math/frontend/robots', 'robots' );
 	}
 
 	/**
@@ -80,7 +79,6 @@ class Elementor {
 			'wp-data',
 			'wp-api-fetch',
 			'wp-media-utils',
-			'site-health',
 			'rank-math-analyzer',
 			'backbone-marionette',
 			'elementor-common-modules',
@@ -90,7 +88,6 @@ class Elementor {
 		wp_deregister_style( 'rank-math-post-metabox' );
 
 		wp_enqueue_style( 'wp-components' );
-		wp_enqueue_style( 'site-health' );
 		wp_enqueue_style( 'rank-math-elementor', rank_math()->plugin_url() . 'assets/admin/css/elementor.css', [], rank_math()->version );
 
 		if ( 'light' !== $mode ) {
@@ -125,13 +122,13 @@ class Elementor {
 	}
 
 	/**
-	 * Add SEO tab in Elementor Page Builder.
+	 * Can add SEO tab in Elementor Page Builder.
 	 *
 	 * @return bool
 	 */
 	private function can_add_seo_tab() {
 		/**
-		 * Filter to show/hide SEO Tab in the Elementor Editor.
+		 * Filter to show/hide SEO Tab in Elementor Editor.
 		 */
 		if ( ! $this->do_filter( 'elementor/add_seo_tab', true ) ) {
 			return false;
@@ -143,21 +140,5 @@ class Elementor {
 		}
 
 		return Editor::can_add_editor();
-	}
-
-	/**
-	 * Change robots for Elementor Templates pages
-	 *
-	 * @param array $robots Array of robots to sanitize.
-	 *
-	 * @return array Modified robots.
-	 */
-	public function robots( $robots ) {
-		if ( is_singular( 'elementor_library' ) ) {
-			$robots['index']  = 'noindex';
-			$robots['follow'] = 'nofollow';
-		}
-
-		return $robots;
 	}
 }

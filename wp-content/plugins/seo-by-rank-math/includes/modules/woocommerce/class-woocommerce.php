@@ -40,16 +40,16 @@ class WooCommerce extends WC_Vars {
 		$this->remove_parent_slugs  = Helper::get_settings( 'general.wc_remove_category_parent_slugs' );
 
 		if ( is_admin() ) {
-			new Admin();
+			new Admin;
 		}
 
 		$this->integrations();
 
 		if ( $this->remove_product_base || $this->remove_category_base ) {
-			new Product_Redirection();
+			new Product_Redirection;
 		}
 
-		new Permalink_Watcher();
+		new Permalink_Watcher;
 		parent::__construct();
 	}
 
@@ -176,7 +176,7 @@ class WooCommerce extends WC_Vars {
 		}
 
 		$long_desc = $this->get_long_description( $product );
-		return '' !== $long_desc ? Str::truncate( $long_desc, 156 ) : '';
+		return '' !== $long_desc ? wp_html_excerpt( $long_desc, 156 ) : '';
 	}
 
 	/**

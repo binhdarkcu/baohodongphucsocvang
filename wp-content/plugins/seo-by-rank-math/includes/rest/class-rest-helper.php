@@ -86,11 +86,7 @@ class Rest_Helper {
 			return $post;
 		}
 
-		if ( 'rank_math_locations' === $post->post_type ) {
-			return true;
-		}
-
-		if ( ! Helper::is_post_type_accessible( $post->post_type ) && 'rank_math_schema' !== $post->post_type ) {
+		if ( ! Helper::is_post_type_accessible( $post->post_type ) ) {
 			return new WP_Error(
 				'rest_cannot_edit',
 				__( 'Sorry, you are not allowed to edit this post type.', 'rank-math' ),

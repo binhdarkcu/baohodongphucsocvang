@@ -6,9 +6,6 @@
  * @package    RankMath
  * @subpackage RankMath\OpenGraph
  * @author     Rank Math <support@rankmath.com>
- *
- * @copyright Copyright (C) 2008-2019, Yoast BV
- * The following code is a derivative work of the code from the Yoast(https://github.com/Yoast/wordpress-seo/), which is licensed under GPL v3.
  */
 
 namespace RankMath\OpenGraph;
@@ -82,11 +79,11 @@ class Twitter extends OpenGraph {
 	}
 
 	/**
-	 * Set `use_facebook` variable.
+	 * Set use_facebook variable.
 	 */
 	public function use_facebook() {
 		$use_facebook = ( is_category() || is_tag() || is_tax() ) ? Helper::get_term_meta( 'twitter_use_facebook' ) :
-			Helper::get_post_meta( 'twitter_use_facebook', 0, true );
+			Helper::get_post_meta( 'twitter_use_facebook' );
 
 		if ( $use_facebook ) {
 			$this->prefix = 'facebook';
@@ -117,7 +114,7 @@ class Twitter extends OpenGraph {
 	}
 
 	/**
-	 * Output App card.
+	 * Output app card.
 	 */
 	public function app() {
 
@@ -176,7 +173,7 @@ class Twitter extends OpenGraph {
 	 * Output the Twitter account for the site.
 	 */
 	public function website() {
-		$this->site = Helper::get_settings( 'titles.twitter_author_names' );
+		$this->site = $this->get_twitter_id( Helper::get_settings( 'titles.social_url_twitter' ) );
 		if ( Str::is_non_empty( $this->site ) ) {
 			$this->tag( 'twitter:site', '@' . $this->site );
 		}
@@ -200,7 +197,9 @@ class Twitter extends OpenGraph {
 	 */
 	public function article_author() {
 		$author = Helper::get_user_meta( 'twitter_author', $GLOBALS['post']->post_author );
-		$author = $author ? $author : get_user_meta( $GLOBALS['post']->post_author, 'twitter', true );
+		if ( ! $author && ! $author = get_user_meta( $GLOBALS['post']->post_author, 'twitter', true ) ) { // phpcs:ignore
+			$author = Helper::get_settings( 'titles.twitter_author_names' );
+		}
 		$author = $this->get_twitter_id( ltrim( trim( $author ), '@' ) );
 
 		if ( Str::is_non_empty( $author ) ) {
@@ -237,12 +236,12 @@ class Twitter extends OpenGraph {
 	}
 
 	/**
-	 * Checks if the given ID is actually an ID or a URL and if URL, distills the ID from it.
+	 * Checks if the given id is actually an id or a url and if url, distills the id from it.
 	 *
-	 * Solves issues with filters returning URLs and theme's/other plugins also adding a user meta
-	 * twitter field which expects URL rather than an ID (which is what we expect).
+	 * Solves issues with filters returning urls and theme's/other plugins also adding a user meta
+	 * twitter field which expects url rather than an id (which is what we expect).
 	 *
-	 * @param string $id Twitter ID or URL.
+	 * @param string $id Twitter ID or url.
 	 *
 	 * @return string|bool Twitter ID or false if it failed to get a valid Twitter ID.
 	 */

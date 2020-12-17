@@ -69,8 +69,9 @@ export const Block = ( {
 						[ `${ parentClassName }__product-title` ]: parentClassName,
 						[ `wc-block-components-product-title--align-${ align }` ]:
 							align && isFeaturePluginBuild(),
-						[ titleClasses ]: isFeaturePluginBuild(),
-					}
+						[ titleClasses ]: isFeaturePluginBuild()
+					},
+
 				) }
 				style={ gatedStyledText( {
 					color: customColor,
@@ -90,9 +91,9 @@ export const Block = ( {
 				'wc-block-components-product-title',
 				{
 					[ `${ parentClassName }__product-title` ]: parentClassName,
-					[ `wc-block-components-product-title--align-${ align }` ]:
+					[ `wc-block-components-product-title__align-${ align }` ]:
 						align && isFeaturePluginBuild(),
-				}
+				},
 			) }
 		>
 			{ productLink ? (
@@ -110,17 +111,7 @@ export const Block = ( {
 					{ productName }
 				</a>
 			) : (
-				<span
-					className={ classnames( {
-						[ titleClasses ]: isFeaturePluginBuild(),
-					} ) }
-					style={ gatedStyledText( {
-						color: customColor,
-						fontSize: customFontSize,
-					} ) }
-				>
-					{ productName }
-				</span>
+				productName
 			) }
 		</TagName>
 	);

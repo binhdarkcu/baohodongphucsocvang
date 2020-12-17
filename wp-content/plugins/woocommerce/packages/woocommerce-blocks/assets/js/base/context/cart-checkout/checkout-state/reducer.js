@@ -17,7 +17,6 @@ const {
 	INCREMENT_CALCULATING,
 	DECREMENT_CALCULATING,
 	SET_ORDER_ID,
-	SET_ORDER_NOTES,
 } = TYPES;
 
 const {
@@ -67,9 +66,9 @@ export const prepareResponseData = ( data ) => {
  */
 export const reducer = (
 	state = DEFAULT_STATE,
-	{ url, type, orderId, orderNotes, data }
+	{ url, type, orderId, data }
 ) => {
-	let newState = state;
+	let newState;
 	switch ( type ) {
 		case SET_PRISTINE:
 			newState = DEFAULT_STATE;
@@ -184,14 +183,6 @@ export const reducer = (
 				...state,
 				orderId,
 			};
-			break;
-		case SET_ORDER_NOTES:
-			if ( state.orderNotes !== orderNotes ) {
-				newState = {
-					...state,
-					orderNotes,
-				};
-			}
 			break;
 	}
 	// automatically update state to idle from pristine as soon as it

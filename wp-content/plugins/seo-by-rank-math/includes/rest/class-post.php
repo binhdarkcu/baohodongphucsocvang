@@ -62,12 +62,7 @@ class Post extends WP_REST_Controller {
 
 		foreach ( $rows as $post_id => $data ) {
 			$post_id = absint( $post_id );
-			if ( ! $post_id ) {
-				continue;
-			}
-
-			$post_type = get_post_type( $post_id );
-			if ( ! Helper::is_post_type_accessible( $post_type ) && 'attachment' !== $post_type ) {
+			if ( ! $post_id || ! Helper::is_post_type_accessible( get_post_type( $post_id ) ) ) {
 				continue;
 			}
 
@@ -80,7 +75,7 @@ class Post extends WP_REST_Controller {
 	/**
 	 * Save single row.
 	 *
-	 * @param int   $post_id Post ID.
+	 * @param int   $post_id Post id.
 	 * @param array $data    Post data.
 	 */
 	private function save_row( $post_id, $data ) {
@@ -92,7 +87,7 @@ class Post extends WP_REST_Controller {
 	/**
 	 * Save row columns.
 	 *
-	 * @param int    $post_id Post ID.
+	 * @param int    $post_id Post id.
 	 * @param string $column  Column name.
 	 * @param string $value   Column value.
 	 */

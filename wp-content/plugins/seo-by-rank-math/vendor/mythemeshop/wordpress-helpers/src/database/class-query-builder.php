@@ -18,10 +18,8 @@ class Query_Builder {
 	use Escape;
 	use Select;
 	use Where;
-	use Joins;
 	use GroupBy;
 	use OrderBy;
-	use Clauses;
 	use Translate;
 
 	/**
@@ -53,21 +51,26 @@ class Query_Builder {
 	protected $found_rows = false;
 
 	/**
-	 * Data store context used to pass to filters.
+	 * The query statements.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	protected $context;
+	protected $statements = [];
+
+	/**
+	 * The query limit
+	 *
+	 * @var int
+	 */
+	protected $limit = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @param string $table   The table name.
-	 * @param string $context Optional context passed to filters. Default empty string.
+	 * @param string $table The table name.
 	 */
-	public function __construct( $table, $context = '' ) {
-		$this->table   = $table;
-		$this->context = $context;
+	public function __construct( $table ) {
+		$this->table = $table;
 		$this->reset();
 	}
 
@@ -217,8 +220,7 @@ class Query_Builder {
 		$limit  = \absint( $limit );
 		$offset = \absint( $offset );
 
-		$this->clear_sql_clause( 'limit' );
-		$this->add_sql_clause( 'limit', $wpdb->prepare( 'LIMIT %d, %d', $offset, $limit ) );
+		$this->limit = $wpdb->prepare( 'limit %d, %d', $offset, $limit );
 
 		return $this;
 	}
@@ -250,12 +252,12 @@ class Query_Builder {
 	 */
 	public function set( $name, $value = null ) {
 		if ( is_array( $name ) ) {
-			$this->sql_clauses['values'] = $this->sql_clauses['values'] + $name;
+			$this->statements['values'] = $this->statements['values'] + $name;
 
 			return $this;
 		}
 
-		$this->sql_clauses['values'][ $name ] = $value;
+		$this->statements['values'][ $name ] = $value;
 
 		return $this;
 	}
@@ -266,22 +268,17 @@ class Query_Builder {
 	 * @return self The current query builder.
 	 */
 	private function reset() {
-		$this->distinct    = false;
-		$this->found_rows  = false;
-		$this->sql_clauses = array(
-			'select'     => array(),
-			'from'       => array(),
-			'left_join'  => array(),
-			'join'       => array(),
-			'right_join' => array(),
-			'where'      => array(),
-			'where_time' => array(),
-			'group_by'   => array(),
-			'having'     => array(),
-			'limit'      => array(),
-			'order_by'   => array(),
-			'values'     => array(),
-		);
+		$this->distinct   = false;
+		$this->found_rows = false;
+		$this->limit      = null;
+		$this->statements = [
+			'select' => [],
+			'wheres' => [],
+			'orders' => [],
+			'values' => [],
+			'groups' => [],
+			'having' => '',
+		];
 
 		return $this;
 	}

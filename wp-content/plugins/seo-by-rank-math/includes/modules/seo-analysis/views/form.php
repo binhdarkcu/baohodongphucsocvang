@@ -2,7 +2,7 @@
 /**
  * SEO Analysis form.
  *
- * @package   RANK_MATH
+ * @package   MTS_SEO
  * @author    Rank Math <support@rankmath.com>
  * @license   GPL-2.0+
  * @link      https://rankmath.com/wordpress/plugin/seo-suite/
@@ -10,12 +10,9 @@
  */
 
 use RankMath\Helper;
-
-defined( 'ABSPATH' ) || exit;
-
 $analyzer = Helper::get_module( 'seo-analysis' )->admin->analyzer;
 ?>
-<div class="rank-math-seo-analysis-header <?php echo empty( $analyzer->results ) || count( $analyzer->results ) < 30 ? '' : ' hidden'; ?>">
+<div class="rank-math-seo-analysis-header rank-math-ui<?php echo empty( $analyzer->results ) || count( $analyzer->results ) < 30 ? '' : ' hidden'; ?>">
 
 	<?php if ( $analyzer->analyse_subpage ) { ?>
 		<p class="page-analysis-selected">
@@ -37,7 +34,7 @@ $analyzer = Helper::get_module( 'seo-analysis' )->admin->analyzer;
 
 	<div class="progress-bar">
 		<div class="progress"></div>
-		<div class="progress-text"><span>0%</span> <?php esc_html_e( 'Complete', 'rank-math' ); ?></div>
+		<label><span>0%</span> <?php esc_html_e( 'Complete', 'rank-math' ); ?></label>
 	</div>
 
 </div>
