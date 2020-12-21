@@ -2,7 +2,7 @@
 /**
  * Template part for displaying posts
  *
- * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
+ * @link https://codex.wordpress.org/Template_Hierarchy
  *
  * @package WordPress
  * @subpackage Twenty_Seventeen
@@ -51,9 +51,9 @@
 
 	<div class="entry-content">
 		<?php
+		/* translators: %s: Name of current post */
 		the_content(
 			sprintf(
-				/* translators: %s: Post title. */
 				__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
 				get_the_title()
 			)
@@ -76,4 +76,4 @@
 	}
 	?>
 
-</article><!-- #post-<?php the_ID(); ?> -->
+</article><!-- #post-## -->

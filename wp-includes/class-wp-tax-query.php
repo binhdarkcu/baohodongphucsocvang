@@ -388,8 +388,7 @@ class WP_Tax_Query {
 			'join'  => array(),
 		);
 
-		$join  = '';
-		$where = '';
+		$join = $where = '';
 
 		$this->clean_query( $clause );
 
@@ -471,8 +470,7 @@ class WP_Tax_Query {
 				ON $wpdb->term_taxonomy.term_taxonomy_id = $wpdb->term_relationships.term_taxonomy_id
 				WHERE $wpdb->term_taxonomy.taxonomy = %s
 				AND $wpdb->term_relationships.object_id = $this->primary_table.$this->primary_id_column
-			)",
-				$clause['taxonomy']
+			)", $clause['taxonomy']
 			);
 
 		}

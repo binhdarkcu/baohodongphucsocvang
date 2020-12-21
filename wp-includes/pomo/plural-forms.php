@@ -207,7 +207,7 @@ class Plural_Forms {
 						$span     = strspn( $str, self::NUM_CHARS, $pos );
 						$output[] = array( 'value', intval( substr( $str, $pos, $span ) ) );
 						$pos     += $span;
-						break;
+						continue;
 					}
 
 					throw new Exception( sprintf( 'Unknown symbol "%s"', $next ) );
@@ -240,8 +240,7 @@ class Plural_Forms {
 		if ( isset( $this->cache[ $num ] ) ) {
 			return $this->cache[ $num ];
 		}
-		$this->cache[ $num ] = $this->execute( $num );
-		return $this->cache[ $num ];
+		return $this->cache[ $num ] = $this->execute( $num );
 	}
 
 	/**

@@ -26,33 +26,30 @@ get_current_screen()->add_help_tab(
 		'id'      => 'overview',
 		'title'   => __( 'Overview' ),
 		'content' =>
-				'<p>' . __( 'You can use the theme editor to edit the individual CSS and PHP files which make up your theme.' ) . '</p>' .
-				'<p>' . __( 'Begin by choosing a theme to edit from the dropdown menu and clicking the Select button. A list then appears of the theme&#8217;s template files. Clicking once on any file name causes the file to appear in the large Editor box.' ) . '</p>' .
-				'<p>' . __( 'For PHP files, you can use the Documentation dropdown to select from functions recognized in that file. Look Up takes you to a web page with reference material about that particular function.' ) . '</p>' .
-				'<p id="editor-keyboard-trap-help-1">' . __( 'When using a keyboard to navigate:' ) . '</p>' .
-				'<ul>' .
-				'<li id="editor-keyboard-trap-help-2">' . __( 'In the editing area, the Tab key enters a tab character.' ) . '</li>' .
-				'<li id="editor-keyboard-trap-help-3">' . __( 'To move away from this area, press the Esc key followed by the Tab key.' ) . '</li>' .
-				'<li id="editor-keyboard-trap-help-4">' . __( 'Screen reader users: when in forms mode, you may need to press the Esc key twice.' ) . '</li>' .
-				'</ul>' .
-				'<p>' . __( 'After typing in your edits, click Update File.' ) . '</p>' .
-				'<p>' . __( '<strong>Advice:</strong> Think very carefully about your site crashing if you are live-editing the theme currently in use.' ) . '</p>' .
-				'<p>' . sprintf(
-					/* translators: %s: Link to documentation on child themes. */
-					__( 'Upgrading to a newer version of the same theme will override changes made here. To avoid this, consider creating a <a href="%s">child theme</a> instead.' ),
-					__( 'https://developer.wordpress.org/themes/advanced-topics/child-themes/' )
-				) . '</p>' .
-				( is_network_admin() ? '<p>' . __( 'Any edits to files from this screen will be reflected on all sites in the network.' ) . '</p>' : '' ),
+				 '<p>' . __( 'You can use the theme editor to edit the individual CSS and PHP files which make up your theme.' ) . '</p>' .
+				 '<p>' . __( 'Begin by choosing a theme to edit from the dropdown menu and clicking the Select button. A list then appears of the theme&#8217;s template files. Clicking once on any file name causes the file to appear in the large Editor box.' ) . '</p>' .
+				 '<p>' . __( 'For PHP files, you can use the Documentation dropdown to select from functions recognized in that file. Look Up takes you to a web page with reference material about that particular function.' ) . '</p>' .
+				 '<p id="editor-keyboard-trap-help-1">' . __( 'When using a keyboard to navigate:' ) . '</p>' .
+				 '<ul>' .
+				 '<li id="editor-keyboard-trap-help-2">' . __( 'In the editing area, the Tab key enters a tab character.' ) . '</li>' .
+				 '<li id="editor-keyboard-trap-help-3">' . __( 'To move away from this area, press the Esc key followed by the Tab key.' ) . '</li>' .
+				 '<li id="editor-keyboard-trap-help-4">' . __( 'Screen reader users: when in forms mode, you may need to press the Esc key twice.' ) . '</li>' .
+				 '</ul>' .
+				 '<p>' . __( 'After typing in your edits, click Update File.' ) . '</p>' .
+				 '<p>' . __( '<strong>Advice:</strong> think very carefully about your site crashing if you are live-editing the theme currently in use.' ) . '</p>' .
+				 /* translators: %s: link to codex article about child themes */
+				 '<p>' . sprintf( __( 'Upgrading to a newer version of the same theme will override changes made here. To avoid this, consider creating a <a href="%s">child theme</a> instead.' ), __( 'https://codex.wordpress.org/Child_Themes' ) ) . '</p>' .
+				 ( is_network_admin() ? '<p>' . __( 'Any edits to files from this screen will be reflected on all sites in the network.' ) . '</p>' : '' ),
 	)
 );
 
 get_current_screen()->set_help_sidebar(
 	'<p><strong>' . __( 'For more information:' ) . '</strong></p>' .
-	'<p>' . __( '<a href="https://developer.wordpress.org/themes/">Documentation on Theme Development</a>' ) . '</p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/article/using-themes/">Documentation on Using Themes</a>' ) . '</p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/article/editing-files/">Documentation on Editing Files</a>' ) . '</p>' .
-	'<p>' . __( '<a href="https://developer.wordpress.org/themes/basics/template-tags/">Documentation on Template Tags</a>' ) . '</p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/">Support</a>' ) . '</p>'
+	'<p>' . __( '<a href="https://codex.wordpress.org/Theme_Development">Documentation on Theme Development</a>' ) . '</p>' .
+	'<p>' . __( '<a href="https://codex.wordpress.org/Using_Themes">Documentation on Using Themes</a>' ) . '</p>' .
+	'<p>' . __( '<a href="https://codex.wordpress.org/Editing_Files">Documentation on Editing Files</a>' ) . '</p>' .
+	'<p>' . __( '<a href="https://codex.wordpress.org/Template_Tags">Documentation on Template Tags</a>' ) . '</p>' .
+	'<p>' . __( '<a href="https://wordpress.org/support/">Support Forums</a>' ) . '</p>'
 );
 
 wp_reset_vars( array( 'action', 'error', 'file', 'theme' ) );
@@ -73,8 +70,7 @@ if ( $theme->errors() && 'theme_no_stylesheet' == $theme->errors()->get_error_co
 	wp_die( __( 'The requested theme does not exist.' ) . ' ' . $theme->errors()->get_error_message() );
 }
 
-$allowed_files = array();
-$style_files   = array();
+$allowed_files = $style_files = array();
 $has_templates = false;
 
 $file_types = wp_get_theme_file_editable_extensions( $theme );
@@ -181,7 +177,7 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 	if ( $file_description != $file_show ) {
 		$description .= ' <span>(' . esc_html( $file_show ) . ')</span>';
 	}
-	?>
+?>
 <div class="wrap">
 <h1><?php echo esc_html( $title ); ?></h1>
 
@@ -201,7 +197,7 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 		<p>
 			<?php
 			echo sprintf(
-				/* translators: %s: Link to Custom CSS section in the Customizer. */
+				/* translators: %s: link to Custom CSS section in the Customizer */
 				__( 'There&#8217;s no need to change your CSS here &mdash; you can edit and live preview CSS changes in the <a href="%s">built-in CSS editor</a>.' ),
 				esc_url( add_query_arg( 'autofocus[section]', 'custom_css', admin_url( 'customize.php' ) ) )
 			);
@@ -251,8 +247,8 @@ if ( $theme->errors() ) {
 		<?php if ( ( $has_templates || $theme->parent() ) && $theme->parent() ) : ?>
 			<li class="howto">
 				<?php
-				printf(
-					/* translators: %s: Link to edit parent theme. */
+				/* translators: %s: link to edit parent theme */
+				echo sprintf(
 					__( 'This child theme inherits templates from a parent theme, %s.' ),
 					sprintf(
 						'<a href="%s">%s</a>',
@@ -273,9 +269,9 @@ if ( $theme->errors() ) {
 
 <?php
 if ( $error ) :
-	echo '<div class="error"><p>' . __( 'File does not exist! Please double check the name and try again.' ) . '</p></div>';
+	echo '<div class="error"><p>' . __( 'Oops, no such file exists! Double check the name and try again, merci.' ) . '</p></div>';
 else :
-	?>
+?>
 	<form name="template" id="template" action="theme-editor.php" method="post">
 		<?php wp_nonce_field( 'edit-theme_' . $stylesheet . '_' . $relative_file, 'nonce' ); ?>
 		<div>
@@ -289,7 +285,7 @@ else :
 		<div id="documentation" class="hide-if-no-js">
 		<label for="docs-list"><?php _e( 'Documentation:' ); ?></label>
 		<?php echo $docs_select; ?>
-		<input disabled id="docs-lookup" type="button" class="button" value="<?php esc_attr_e( 'Look Up' ); ?>" onclick="if ( '' != jQuery('#docs-list').val() ) { window.open( 'https://api.wordpress.org/core/handbook/1.0/?function=' + escape( jQuery( '#docs-list' ).val() ) + '&amp;locale=<?php echo urlencode( get_user_locale() ); ?>&amp;version=<?php echo urlencode( get_bloginfo( 'version' ) ); ?>&amp;redirect=true'); }" />
+		<input type="button" class="button" value="<?php esc_attr_e( 'Look Up' ); ?>" onclick="if ( '' != jQuery('#docs-list').val() ) { window.open( 'https://api.wordpress.org/core/handbook/1.0/?function=' + escape( jQuery( '#docs-list' ).val() ) + '&amp;locale=<?php echo urlencode( get_user_locale() ); ?>&amp;version=<?php echo urlencode( get_bloginfo( 'version' ) ); ?>&amp;redirect=true'); }" />
 		</div>
 	<?php endif; ?>
 
@@ -300,8 +296,8 @@ else :
 					<p>
 						<?php
 						if ( is_writeable( $file ) ) {
-							?>
-						<strong><?php _e( 'Caution:' ); ?></strong><?php } ?>
+?>
+<strong><?php _e( 'Caution:' ); ?></strong><?php } ?>
 						<?php _e( 'This is a file in your current parent theme.' ); ?>
 					</p>
 				</div>
@@ -313,20 +309,12 @@ else :
 			<span class="spinner"></span>
 		</p>
 	<?php else : ?>
-		<p><em>
-			<?php
-			printf(
-				/* translators: %s: Documentation URL. */
-				__( 'You need to make this file writable before you can save your changes. See <a href="%s">Changing File Permissions</a> for more information.' ),
-				__( 'https://wordpress.org/support/article/changing-file-permissions/' )
-			);
-			?>
-		</em></p>
+		<p><em><?php _e( 'You need to make this file writable before you can save your changes. See <a href="https://codex.wordpress.org/Changing_File_Permissions">the Codex</a> for more information.' ); ?></em></p>
 	<?php endif; ?>
 	</div>
 	<?php wp_print_file_editor_templates(); ?>
 	</form>
-	<?php
+<?php
 endif; // $error
 ?>
 <br class="clear" />
@@ -343,7 +331,7 @@ if ( ! in_array( 'theme_editor_notice', $dismissed_pointers, true ) ) :
 	} else {
 		$return_url = admin_url( '/' );
 	}
-	?>
+?>
 <div id="file-editor-warning" class="notification-dialog-wrap file-editor-warning hide-if-no-js hidden">
 	<div class="notification-dialog-background"></div>
 	<div class="notification-dialog">
@@ -352,20 +340,13 @@ if ( ! in_array( 'theme_editor_notice', $dismissed_pointers, true ) ) :
 				<h1><?php _e( 'Heads up!' ); ?></h1>
 				<p>
 					<?php
-					_e( 'You appear to be making direct edits to your theme in the WordPress dashboard. We recommend that you don&#8217;t! Editing your theme directly could break your site and your changes may be lost in future updates.' );
+					echo sprintf(
+						/* translators: %s: Codex URL */
+						__( 'You appear to be making direct edits to your theme in the WordPress dashboard. We recommend that you don&#8217;t! Editing your theme directly could break your site and your changes may be lost in future updates. If you need to tweak more than your theme&#8217;s CSS, you might want to try <a href="%s">making a child theme</a>.' ),
+						esc_url( __( 'https://codex.wordpress.org/Child_Themes' ) )
+					);
 					?>
 				</p>
-					<?php
-					if ( ! $theme->parent() ) {
-						echo '<p>';
-						echo sprintf(
-							/* translators: %s: Link to documentation on child themes. */
-							__( 'If you need to tweak more than your theme&#8217;s CSS, you might want to try <a href="%s">making a child theme</a>.' ),
-							esc_url( __( 'https://developer.wordpress.org/themes/advanced-topics/child-themes/' ) )
-						);
-						echo '</p>';
-					}
-					?>
 				<p><?php _e( 'If you decide to go ahead with direct edits anyway, use a file manager to create a copy with a new name and hang on to the original. That way, you can re-enable a functional version if something goes wrong.' ); ?></p>
 			</div>
 			<p>
@@ -375,7 +356,7 @@ if ( ! in_array( 'theme_editor_notice', $dismissed_pointers, true ) ) :
 		</div>
 	</div>
 </div>
-	<?php
+<?php
 endif; // editor warning notice
 
 include( ABSPATH . 'wp-admin/admin-footer.php' );

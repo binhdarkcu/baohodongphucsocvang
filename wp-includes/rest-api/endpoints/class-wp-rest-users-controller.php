@@ -46,9 +46,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	public function register_routes() {
 
 		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
+			$this->namespace, '/' . $this->rest_base, array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
@@ -66,9 +64,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 		);
 
 		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
-			array(
+			$this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)', array(
 				'args'   => array(
 					'id' => array(
 						'description' => __( 'Unique identifier for the user.' ),
@@ -112,9 +108,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 		);
 
 		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/me',
-			array(
+			$this->namespace, '/' . $this->rest_base . '/me', array(
 				array(
 					'methods'  => WP_REST_Server::READABLE,
 					'callback' => array( $this, 'get_current_item' ),
@@ -200,7 +194,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 
 		if ( 'authors' === $request['who'] ) {
 			$can_view = false;
-			$types    = get_post_types( array( 'show_in_rest' => true ), 'objects' );
+			$types = get_post_types( array( 'show_in_rest' => true ), 'objects' );
 			foreach ( $types as $type ) {
 				if ( post_type_supports( $type->name, 'author' )
 					&& current_user_can( $type->cap->edit_posts ) ) {
@@ -329,7 +323,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 
 		$response->header( 'X-WP-TotalPages', (int) $max_pages );
 
-		$base = add_query_arg( urlencode_deep( $request->get_query_params() ), rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ) );
+		$base = add_query_arg( $request->get_query_params(), rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ) );
 		if ( $page > 1 ) {
 			$prev_page = $page - 1;
 
@@ -498,8 +492,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 					foreach ( $messages as $message ) {
 						$error->add( $code, $message );
 					}
-					$error_data = $error->get_error_data( $code );
-					if ( $error_data ) {
+					if ( $error_data = $error->get_error_data( $code ) ) {
 						$error->add_data( $error_data, $code );
 					}
 				}
@@ -567,17 +560,6 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 
 		$request->set_param( 'context', 'edit' );
 
-		/**
-		 * Fires after a user is completely created or updated via the REST API.
-		 *
-		 * @since 5.0.0
-		 *
-		 * @param WP_User         $user     Inserted or updated user object.
-		 * @param WP_REST_Request $request  Request object.
-		 * @param bool            $creating True when creating a user, false when updating.
-		 */
-		do_action( 'rest_after_insert_user', $user, $request, true );
-
 		$response = $this->prepare_item_for_response( $user, $request );
 		$response = rest_ensure_response( $response );
 
@@ -642,9 +624,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_user_invalid_id', __( 'Invalid user ID.' ), array( 'status' => 404 ) );
 		}
 
-		$owner_id = email_exists( $request['email'] );
-
-		if ( $owner_id && $owner_id !== $id ) {
+		if ( email_exists( $request['email'] ) && $request['email'] !== $user->user_email ) {
 			return new WP_Error( 'rest_user_invalid_email', __( 'Invalid email address.' ), array( 'status' => 400 ) );
 		}
 
@@ -703,9 +683,6 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 
 		$request->set_param( 'context', 'edit' );
 
-		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-users-controller.php */
-		do_action( 'rest_after_insert_user', $user, $request, false );
-
 		$response = $this->prepare_item_for_response( $user, $request );
 		$response = rest_ensure_response( $response );
 
@@ -734,7 +711,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function update_current_item( $request ) {
+	function update_current_item( $request ) {
 		$request['id'] = get_current_user_id();
 
 		return $this->update_item( $request );
@@ -852,7 +829,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function delete_current_item( $request ) {
+	function delete_current_item( $request ) {
 		$request['id'] = get_current_user_id();
 
 		return $this->delete_item( $request );
@@ -926,7 +903,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 		}
 
 		if ( in_array( 'registered_date', $fields, true ) ) {
-			$data['registered_date'] = gmdate( 'c', strtotime( $user->user_registered ) );
+			$data['registered_date'] = date( 'c', strtotime( $user->user_registered ) );
 		}
 
 		if ( in_array( 'capabilities', $fields, true ) ) {
@@ -938,7 +915,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 		}
 
 		if ( in_array( 'avatar_urls', $fields, true ) ) {
-			$data['avatar_urls'] = rest_get_avatar_urls( $user );
+			$data['avatar_urls'] = rest_get_avatar_urls( $user->user_email );
 		}
 
 		if ( in_array( 'meta', $fields, true ) ) {
@@ -1083,7 +1060,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 		foreach ( $roles as $role ) {
 
 			if ( ! isset( $wp_roles->role_objects[ $role ] ) ) {
-				/* translators: %s: Role key. */
+				/* translators: %s: role key */
 				return new WP_Error( 'rest_user_invalid_role', sprintf( __( 'The role %s does not exist.' ), $role ), array( 'status' => 400 ) );
 			}
 
@@ -1122,9 +1099,9 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	 *
 	 * @since 4.7.0
 	 *
-	 * @param mixed           $value   The username submitted in the request.
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @param string          $param   The parameter name.
+	 * @param  mixed            $value   The username submitted in the request.
+	 * @param  WP_REST_Request  $request Full details about the request.
+	 * @param  string           $param   The parameter name.
 	 * @return WP_Error|string The sanitized username, if valid, otherwise an error.
 	 */
 	public function check_username( $value, $request, $param ) {
@@ -1151,9 +1128,9 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	 *
 	 * @since 4.7.0
 	 *
-	 * @param mixed           $value   The password submitted in the request.
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @param string          $param   The parameter name.
+	 * @param  mixed            $value   The password submitted in the request.
+	 * @param  WP_REST_Request  $request Full details about the request.
+	 * @param  string           $param   The parameter name.
 	 * @return WP_Error|string The sanitized password, if valid, otherwise an error.
 	 */
 	public function check_user_password( $value, $request, $param ) {
@@ -1178,10 +1155,6 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
-		if ( $this->schema ) {
-			return $this->add_additional_fields_schema( $this->schema );
-		}
-
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'user',
@@ -1319,7 +1292,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 
 			foreach ( $avatar_sizes as $size ) {
 				$avatar_properties[ $size ] = array(
-					/* translators: %d: Avatar image size in pixels. */
+					/* translators: %d: avatar image size in pixels */
 					'description' => sprintf( __( 'Avatar URL with image size of %d pixels.' ), $size ),
 					'type'        => 'string',
 					'format'      => 'uri',
@@ -1338,8 +1311,7 @@ class WP_REST_Users_Controller extends WP_REST_Controller {
 
 		$schema['properties']['meta'] = $this->meta->get_field_schema();
 
-		$this->schema = $schema;
-		return $this->add_additional_fields_schema( $this->schema );
+		return $this->add_additional_fields_schema( $schema );
 	}
 
 	/**

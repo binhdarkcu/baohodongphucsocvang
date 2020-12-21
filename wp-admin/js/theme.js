@@ -2,7 +2,7 @@
  * @output wp-admin/js/theme.js
  */
 
-/* global _wpThemeSettings, confirm, tb_position */
+/* global _wpThemeSettings, confirm */
 window.wp = window.wp || {};
 
 ( function($) {
@@ -179,9 +179,6 @@ themes.Collection = Backbone.Collection.extend({
 
 		// Start with a full collection
 		this.reset( themes.data.themes, { silent: true } );
-
-		// Trim the term
-		term = term.trim();
 
 		// Escape the term string for RegExp meta characters
 		term = term.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' );
@@ -2044,8 +2041,9 @@ $( document ).ready(function() {
 })( jQuery );
 
 // Align theme browser thickbox
+var tb_position;
 jQuery(document).ready( function($) {
-	window.tb_position = function() {
+	tb_position = function() {
 		var tbWindow = $('#TB_window'),
 			width = $(window).width(),
 			H = $(window).height(),

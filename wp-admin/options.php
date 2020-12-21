@@ -47,7 +47,7 @@ if ( empty( $option_page ) ) {
 if ( ! current_user_can( $capability ) ) {
 	wp_die(
 		'<h1>' . __( 'You need a higher level of permission.' ) . '</h1>' .
-		'<p>' . __( 'Sorry, you are not allowed to manage options for this site.' ) . '</p>',
+		'<p>' . __( 'Sorry, you are not allowed to manage these options.' ) . '</p>',
 		403
 	);
 }
@@ -80,75 +80,14 @@ if ( is_multisite() && ! current_user_can( 'manage_network_options' ) && 'update
 	);
 }
 
-$whitelist_options            = array(
-	'general'    => array(
-		'blogname',
-		'blogdescription',
-		'gmt_offset',
-		'date_format',
-		'time_format',
-		'start_of_week',
-		'timezone_string',
-		'WPLANG',
-		'new_admin_email',
-	),
-	'discussion' => array(
-		'default_pingback_flag',
-		'default_ping_status',
-		'default_comment_status',
-		'comments_notify',
-		'moderation_notify',
-		'comment_moderation',
-		'require_name_email',
-		'comment_whitelist',
-		'comment_max_links',
-		'moderation_keys',
-		'blacklist_keys',
-		'show_avatars',
-		'avatar_rating',
-		'avatar_default',
-		'close_comments_for_old_posts',
-		'close_comments_days_old',
-		'thread_comments',
-		'thread_comments_depth',
-		'page_comments',
-		'comments_per_page',
-		'default_comments_page',
-		'comment_order',
-		'comment_registration',
-		'show_comments_cookies_opt_in',
-	),
-	'media'      => array(
-		'thumbnail_size_w',
-		'thumbnail_size_h',
-		'thumbnail_crop',
-		'medium_size_w',
-		'medium_size_h',
-		'large_size_w',
-		'large_size_h',
-		'image_default_size',
-		'image_default_align',
-		'image_default_link_type',
-	),
-	'reading'    => array(
-		'posts_per_page',
-		'posts_per_rss',
-		'rss_use_excerpt',
-		'show_on_front',
-		'page_on_front',
-		'page_for_posts',
-		'blog_public',
-	),
-	'writing'    => array(
-		'default_category',
-		'default_email_category',
-		'default_link_category',
-		'default_post_format',
-	),
+$whitelist_options         = array(
+	'general'    => array( 'blogname', 'blogdescription', 'gmt_offset', 'date_format', 'time_format', 'start_of_week', 'timezone_string', 'WPLANG', 'new_admin_email' ),
+	'discussion' => array( 'default_pingback_flag', 'default_ping_status', 'default_comment_status', 'comments_notify', 'moderation_notify', 'comment_moderation', 'require_name_email', 'comment_whitelist', 'comment_max_links', 'moderation_keys', 'blacklist_keys', 'show_avatars', 'avatar_rating', 'avatar_default', 'close_comments_for_old_posts', 'close_comments_days_old', 'thread_comments', 'thread_comments_depth', 'page_comments', 'comments_per_page', 'default_comments_page', 'comment_order', 'comment_registration' ),
+	'media'      => array( 'thumbnail_size_w', 'thumbnail_size_h', 'thumbnail_crop', 'medium_size_w', 'medium_size_h', 'large_size_w', 'large_size_h', 'image_default_size', 'image_default_align', 'image_default_link_type' ),
+	'reading'    => array( 'posts_per_page', 'posts_per_rss', 'rss_use_excerpt', 'show_on_front', 'page_on_front', 'page_for_posts', 'blog_public' ),
+	'writing'    => array( 'default_category', 'default_email_category', 'default_link_category', 'default_post_format' ),
 );
-$whitelist_options['misc']    = array();
-$whitelist_options['options'] = array();
-$whitelist_options['privacy'] = array();
+$whitelist_options['misc'] = $whitelist_options['options'] = $whitelist_options['privacy'] = array();
 
 $mail_options = array( 'mailserver_url', 'mailserver_port', 'mailserver_login', 'mailserver_pass' );
 
@@ -263,11 +202,10 @@ if ( 'update' == $action ) {
 		foreach ( $options as $option ) {
 			if ( $unregistered ) {
 				_deprecated_argument(
-					'options.php',
-					'2.7.0',
+					'options.php', '2.7.0',
 					sprintf(
-						/* translators: %s: The option/setting. */
-						__( 'The %s setting is unregistered. Unregistered settings are deprecated. See https://developer.wordpress.org/plugins/settings/settings-api/' ),
+						/* translators: %s: the option/setting */
+						__( 'The %s setting is unregistered. Unregistered settings are deprecated. See https://codex.wordpress.org/Settings_API' ),
 						'<code>' . $option . '</code>'
 					)
 				);
@@ -302,7 +240,7 @@ if ( 'update' == $action ) {
 	 */
 	// If no settings errors were registered add a general 'updated' message.
 	if ( ! count( get_settings_errors() ) ) {
-		add_settings_error( 'general', 'settings_updated', __( 'Settings saved.' ), 'success' );
+		add_settings_error( 'general', 'settings_updated', __( 'Settings saved.' ), 'updated' );
 	}
 	set_transient( 'settings_errors', get_settings_errors(), 30 );
 
@@ -318,16 +256,11 @@ include( ABSPATH . 'wp-admin/admin-header.php' ); ?>
 
 <div class="wrap">
 	<h1><?php esc_html_e( 'All Settings' ); ?></h1>
-
-	<div class="notice notice-warning">
-		<p><strong><?php _e( 'WARNING!' ); ?></strong> <?php _e( 'This page allows direct access to your site settings. You can break things here. Please be cautious!' ); ?></p>
-	</div>
-
 	<form name="form" action="options.php" method="post" id="all-options">
 		<?php wp_nonce_field( 'options-options' ); ?>
 		<input type="hidden" name="action" value="update" />
 		<input type="hidden" name="option_page" value="options" />
-		<table class="form-table" role="presentation">
+		<table class="form-table">
 <?php
 $options = $wpdb->get_results( "SELECT * FROM $wpdb->options ORDER BY option_name" );
 

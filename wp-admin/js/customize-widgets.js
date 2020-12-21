@@ -144,6 +144,7 @@
 
 		events: {
 			'input #widgets-search': 'search',
+			'keyup #widgets-search': 'search',
 			'focus .widget-tpl' : 'focus',
 			'click .widget-tpl' : '_submit',
 			'keypress .widget-tpl' : '_submit',
@@ -191,10 +192,9 @@
 				}
 			} );
 
-			// Clear the search results and trigger a new search.
+			// Clear the search results and trigger a `keyup` event to fire a new search.
 			this.$clearResults.on( 'click', function() {
-				self.$search.val( '' ).focus();
-				self.collection.doSearch( '' );
+				self.$search.val( '' ).focus().trigger( 'keyup' );
 			} );
 
 			// Close the panel if the URL in the preview changes
@@ -204,7 +204,7 @@
 		/**
 		 * Performs a search and handles selected widget.
 		 */
-		search: _.debounce( function( event ) {
+		search: function( event ) {
 			var firstVisible;
 
 			this.collection.doSearch( event.target.value );
@@ -246,7 +246,7 @@
 			} else {
 				this.$el.removeClass( 'no-widgets-found' );
 			}
-		}, 500 ),
+		},
 
 		/**
 		 * Updates the count of the available widgets that have the `search_matched` attribute.
@@ -258,7 +258,7 @@
 		/**
 		 * Sends a message to the aria-live region to announce how many search results.
 		 */
-		announceSearchMatches: function() {
+		announceSearchMatches: _.debounce( function() {
 			var message = l10n.widgetsFound.replace( '%d', this.searchMatchesCount ) ;
 
 			if ( ! this.searchMatchesCount ) {
@@ -266,7 +266,7 @@
 			}
 
 			wp.a11y.speak( message );
-		},
+		}, 500 ),
 
 		/**
 		 * Changes visibility of available widgets.
@@ -709,7 +709,8 @@
 			} );
 
 			$closeBtn = this.container.find( '.widget-control-close' );
-			$closeBtn.on( 'click', function() {
+			$closeBtn.on( 'click', function( e ) {
+				e.preventDefault();
 				self.collapse();
 				self.container.find( '.widget-top .widget-action:first' ).focus(); // keyboard accessibility
 			} );
@@ -987,7 +988,9 @@
 
 			// Configure remove button
 			$removeBtn = this.container.find( '.widget-control-remove' );
-			$removeBtn.on( 'click', function() {
+			$removeBtn.on( 'click', function( e ) {
+				e.preventDefault();
+
 				// Find an adjacent element to add focus to when this widget goes away
 				var $adjacentFocusTarget;
 				if ( self.container.next().is( '.customize-control-widget_form' ) ) {
@@ -1631,7 +1634,7 @@
 				 */
 				getActiveSectionCount = function() {
 					return _.filter( panel.sections(), function( section ) {
-						return 'sidebar' === section.params.type && section.active();
+						return section.active();
 					} ).length;
 				};
 

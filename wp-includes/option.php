@@ -164,13 +164,7 @@ function get_option( $option, $default = false ) {
  */
 function wp_protect_special_option( $option ) {
 	if ( 'alloptions' === $option || 'notoptions' === $option ) {
-		wp_die(
-			sprintf(
-				/* translators: %s: Option name. */
-				__( '%s is a protected WP option and may not be modified' ),
-				esc_html( $option )
-			)
-		);
+		wp_die( sprintf( __( '%s is a protected WP option and may not be modified' ), esc_html( $option ) ) );
 	}
 }
 
@@ -204,9 +198,8 @@ function wp_load_alloptions() {
 	}
 
 	if ( ! $alloptions ) {
-		$suppress      = $wpdb->suppress_errors();
-		$alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options WHERE autoload = 'yes'" );
-		if ( ! $alloptions_db ) {
+		$suppress = $wpdb->suppress_errors();
+		if ( ! $alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options WHERE autoload = 'yes'" ) ) {
 			$alloptions_db = $wpdb->get_results( "SELECT option_name, option_value FROM $wpdb->options" );
 		}
 		$wpdb->suppress_errors( $suppress );
@@ -282,9 +275,6 @@ function wp_load_core_site_options( $network_id = null ) {
  *
  * If the option does not exist, then the option will be added with the option value,
  * with an `$autoload` value of 'yes'.
-
- * This function is designed to work with or without a logged-in user. In terms of security,
- * plugin developers should check the current user's capabilities before updating any options.
  *
  * @since 1.0.0
  * @since 4.2.0 The `$autoload` parameter was added.
@@ -923,8 +913,7 @@ function wp_user_settings() {
 		return;
 	}
 
-	$user_id = get_current_user_id();
-	if ( ! $user_id ) {
+	if ( ! $user_id = get_current_user_id() ) {
 		return;
 	}
 
@@ -978,7 +967,7 @@ function get_user_setting( $name, $default = false ) {
 /**
  * Add or update user interface setting.
  *
- * Both $name and $value can contain only ASCII letters, numbers, hyphens, and underscores.
+ * Both $name and $value can contain only ASCII letters, numbers and underscores.
  *
  * This function has to be used before any output has started as it calls setcookie().
  *
@@ -1046,8 +1035,7 @@ function delete_user_setting( $names ) {
 function get_all_user_settings() {
 	global $_updated_user_settings;
 
-	$user_id = get_current_user_id();
-	if ( ! $user_id ) {
+	if ( ! $user_id = get_current_user_id() ) {
 		return array();
 	}
 
@@ -1090,8 +1078,7 @@ function get_all_user_settings() {
 function wp_set_all_user_settings( $user_settings ) {
 	global $_updated_user_settings;
 
-	$user_id = get_current_user_id();
-	if ( ! $user_id ) {
+	if ( ! $user_id = get_current_user_id() ) {
 		return false;
 	}
 
@@ -1124,8 +1111,7 @@ function wp_set_all_user_settings( $user_settings ) {
  * @since 2.7.0
  */
 function delete_all_user_settings() {
-	$user_id = get_current_user_id();
-	if ( ! $user_id ) {
+	if ( ! $user_id = get_current_user_id() ) {
 		return;
 	}
 
@@ -1207,7 +1193,7 @@ function update_site_option( $option, $value ) {
  *
  * @see get_option()
  *
- * @global wpdb $wpdb WordPress database abstraction object.
+ * @global wpdb $wpdb
  *
  * @param int      $network_id ID of the network. Can be null to default to the current network ID.
  * @param string   $option     Name of option to retrieve. Expected to not be SQL-escaped.
@@ -1340,7 +1326,7 @@ function get_network_option( $network_id, $option, $default = false ) {
  *
  * @see add_option()
  *
- * @global wpdb $wpdb WordPress database abstraction object.
+ * @global wpdb $wpdb
  *
  * @param int    $network_id ID of the network. Can be null to default to the current network ID.
  * @param string $option     Name of option to add. Expected to not be SQL-escaped.
@@ -1398,8 +1384,7 @@ function add_network_option( $network_id, $option, $value ) {
 
 		$serialized_value = maybe_serialize( $value );
 		$result           = $wpdb->insert(
-			$wpdb->sitemeta,
-			array(
+			$wpdb->sitemeta, array(
 				'site_id'    => $network_id,
 				'meta_key'   => $option,
 				'meta_value' => $serialized_value,
@@ -1462,7 +1447,7 @@ function add_network_option( $network_id, $option, $value ) {
  *
  * @see delete_option()
  *
- * @global wpdb $wpdb WordPress database abstraction object.
+ * @global wpdb $wpdb
  *
  * @param int    $network_id ID of the network. Can be null to default to the current network ID.
  * @param string $option     Name of option to remove. Expected to not be SQL-escaped.
@@ -1507,8 +1492,7 @@ function delete_network_option( $network_id, $option ) {
 		wp_cache_delete( $cache_key, 'site-options' );
 
 		$result = $wpdb->delete(
-			$wpdb->sitemeta,
-			array(
+			$wpdb->sitemeta, array(
 				'meta_key' => $option,
 				'site_id'  => $network_id,
 			)
@@ -1555,7 +1539,7 @@ function delete_network_option( $network_id, $option ) {
  *
  * @see update_option()
  *
- * @global wpdb $wpdb WordPress database abstraction object.
+ * @global wpdb $wpdb
  *
  * @param int      $network_id ID of the network. Can be null to default to the current network ID.
  * @param string   $option     Name of option. Expected to not be SQL-escaped.
@@ -1597,16 +1581,7 @@ function update_network_option( $network_id, $option, $value ) {
 	 */
 	$value = apply_filters( "pre_update_site_option_{$option}", $value, $old_value, $option, $network_id );
 
-	/*
-	 * If the new and old values are the same, no need to update.
-	 *
-	 * Unserialized values will be adequate in most cases. If the unserialized
-	 * data differs, the (maybe) serialized data is checked to avoid
-	 * unnecessary database calls for otherwise identical object instances.
-	 *
-	 * See https://core.trac.wordpress.org/ticket/44956
-	 */
-	if ( $value === $old_value || maybe_serialize( $value ) === maybe_serialize( $old_value ) ) {
+	if ( $value === $old_value ) {
 		return false;
 	}
 
@@ -1628,9 +1603,7 @@ function update_network_option( $network_id, $option, $value ) {
 
 		$serialized_value = maybe_serialize( $value );
 		$result           = $wpdb->update(
-			$wpdb->sitemeta,
-			array( 'meta_value' => $serialized_value ),
-			array(
+			$wpdb->sitemeta, array( 'meta_value' => $serialized_value ), array(
 				'site_id'  => $network_id,
 				'meta_key' => $option,
 			)
@@ -1900,9 +1873,7 @@ function set_site_transient( $transient, $value, $expiration = 0 ) {
  */
 function register_initial_settings() {
 	register_setting(
-		'general',
-		'blogname',
-		array(
+		'general', 'blogname', array(
 			'show_in_rest' => array(
 				'name' => 'title',
 			),
@@ -1912,9 +1883,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'general',
-		'blogdescription',
-		array(
+		'general', 'blogdescription', array(
 			'show_in_rest' => array(
 				'name' => 'description',
 			),
@@ -1925,9 +1894,7 @@ function register_initial_settings() {
 
 	if ( ! is_multisite() ) {
 		register_setting(
-			'general',
-			'siteurl',
-			array(
+			'general', 'siteurl', array(
 				'show_in_rest' => array(
 					'name'   => 'url',
 					'schema' => array(
@@ -1942,9 +1909,7 @@ function register_initial_settings() {
 
 	if ( ! is_multisite() ) {
 		register_setting(
-			'general',
-			'admin_email',
-			array(
+			'general', 'admin_email', array(
 				'show_in_rest' => array(
 					'name'   => 'email',
 					'schema' => array(
@@ -1958,9 +1923,7 @@ function register_initial_settings() {
 	}
 
 	register_setting(
-		'general',
-		'timezone_string',
-		array(
+		'general', 'timezone_string', array(
 			'show_in_rest' => array(
 				'name' => 'timezone',
 			),
@@ -1970,9 +1933,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'general',
-		'date_format',
-		array(
+		'general', 'date_format', array(
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'A date format for all date strings.' ),
@@ -1980,9 +1941,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'general',
-		'time_format',
-		array(
+		'general', 'time_format', array(
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'A time format for all time strings.' ),
@@ -1990,9 +1949,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'general',
-		'start_of_week',
-		array(
+		'general', 'start_of_week', array(
 			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'A day number of the week that the week should start on.' ),
@@ -2000,9 +1957,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'general',
-		'WPLANG',
-		array(
+		'general', 'WPLANG', array(
 			'show_in_rest' => array(
 				'name' => 'language',
 			),
@@ -2013,9 +1968,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'writing',
-		'use_smilies',
-		array(
+		'writing', 'use_smilies', array(
 			'show_in_rest' => true,
 			'type'         => 'boolean',
 			'description'  => __( 'Convert emoticons like :-) and :-P to graphics on display.' ),
@@ -2024,9 +1977,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'writing',
-		'default_category',
-		array(
+		'writing', 'default_category', array(
 			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'Default post category.' ),
@@ -2034,9 +1985,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'writing',
-		'default_post_format',
-		array(
+		'writing', 'default_post_format', array(
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'Default post format.' ),
@@ -2044,9 +1993,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'reading',
-		'posts_per_page',
-		array(
+		'reading', 'posts_per_page', array(
 			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'Blog pages show at most.' ),
@@ -2055,9 +2002,7 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'discussion',
-		'default_ping_status',
-		array(
+		'discussion', 'default_ping_status', array(
 			'show_in_rest' => array(
 				'schema' => array(
 					'enum' => array( 'open', 'closed' ),
@@ -2069,18 +2014,22 @@ function register_initial_settings() {
 	);
 
 	register_setting(
-		'discussion',
-		'default_comment_status',
-		array(
+		'discussion', 'default_comment_status', array(
 			'show_in_rest' => array(
 				'schema' => array(
 					'enum' => array( 'open', 'closed' ),
 				),
 			),
 			'type'         => 'string',
-			'description'  => __( 'Allow people to submit comments on new posts.' ),
+			'description'  => __( 'Allow people to post comments on new articles.' ),
 		)
 	);
+
+	register_setting( 'permalink', 'permalink_structure', array(
+		'show_in_rest' => true,
+		'type'         => 'string',
+		'description'  => __( 'Custom URL structure for permalinks and archives.' ),
+	) );
 }
 
 /**
@@ -2143,10 +2092,9 @@ function register_setting( $option_group, $option_name, $args = array() ) {
 
 	if ( 'misc' == $option_group ) {
 		_deprecated_argument(
-			__FUNCTION__,
-			'3.0.0',
+			__FUNCTION__, '3.0.0',
+			/* translators: %s: misc */
 			sprintf(
-				/* translators: %s: misc */
 				__( 'The "%s" options group has been removed. Use another settings group.' ),
 				'misc'
 			)
@@ -2156,10 +2104,9 @@ function register_setting( $option_group, $option_name, $args = array() ) {
 
 	if ( 'privacy' == $option_group ) {
 		_deprecated_argument(
-			__FUNCTION__,
-			'3.5.0',
+			__FUNCTION__, '3.5.0',
+			/* translators: %s: privacy */
 			sprintf(
-				/* translators: %s: privacy */
 				__( 'The "%s" options group has been removed. Use another settings group.' ),
 				'privacy'
 			)
@@ -2185,7 +2132,6 @@ function register_setting( $option_group, $option_name, $args = array() ) {
  * @since 4.7.0 `$sanitize_callback` was deprecated. The callback from `register_setting()` is now used instead.
  *
  * @global array $new_whitelist_options
- * @global array $wp_registered_settings
  *
  * @param string   $option_group      The settings group name used during registration.
  * @param string   $option_name       The name of the option to unregister.
@@ -2196,10 +2142,9 @@ function unregister_setting( $option_group, $option_name, $deprecated = '' ) {
 
 	if ( 'misc' == $option_group ) {
 		_deprecated_argument(
-			__FUNCTION__,
-			'3.0.0',
+			__FUNCTION__, '3.0.0',
+			/* translators: %s: misc */
 			sprintf(
-				/* translators: %s: misc */
 				__( 'The "%s" options group has been removed. Use another settings group.' ),
 				'misc'
 			)
@@ -2209,10 +2154,9 @@ function unregister_setting( $option_group, $option_name, $deprecated = '' ) {
 
 	if ( 'privacy' == $option_group ) {
 		_deprecated_argument(
-			__FUNCTION__,
-			'3.5.0',
+			__FUNCTION__, '3.5.0',
+			/* translators: %s: privacy */
 			sprintf(
-				/* translators: %s: privacy */
 				__( 'The "%s" options group has been removed. Use another settings group.' ),
 				'privacy'
 			)
@@ -2226,10 +2170,9 @@ function unregister_setting( $option_group, $option_name, $deprecated = '' ) {
 	}
 	if ( '' !== $deprecated ) {
 		_deprecated_argument(
-			__FUNCTION__,
-			'4.7.0',
+			__FUNCTION__, '4.7.0',
+			/* translators: 1: $sanitize_callback, 2: register_setting() */
 			sprintf(
-				/* translators: 1: $sanitize_callback, 2: register_setting() */
 				__( '%1$s is deprecated. The callback from %2$s is used instead.' ),
 				'<code>$sanitize_callback</code>',
 				'<code>register_setting()</code>'
@@ -2257,8 +2200,6 @@ function unregister_setting( $option_group, $option_name, $deprecated = '' ) {
  * Retrieves an array of registered settings.
  *
  * @since 4.7.0
- *
- * @global array $wp_registered_settings
  *
  * @return array List of registered settings, keyed by option name.
  */

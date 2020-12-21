@@ -5,7 +5,7 @@
 /* global setPostThumbnailL10n, ajaxurl, post_id, alert */
 /* exported WPSetAsThumbnail */
 
-window.WPSetAsThumbnail = function( id, nonce ) {
+function WPSetAsThumbnail( id, nonce ) {
 	var $link = jQuery('a#wp-post-thumbnail-' + id);
 
 	$link.text( setPostThumbnailL10n.saving );
@@ -25,4 +25,4 @@ window.WPSetAsThumbnail = function( id, nonce ) {
 		}
 	}
 	);
-};
+}

@@ -23,23 +23,23 @@ $title = __( 'Export' );
  * @since 3.5.0
  */
 function export_add_js() {
-	?>
+?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
-		var form = $('#export-filters'),
-			filters = form.find('.export-filters');
-		filters.hide();
-		form.find('input:radio').change(function() {
+		 var form = $('#export-filters'),
+			 filters = form.find('.export-filters');
+		 filters.hide();
+		 form.find('input:radio').change(function() {
 			filters.slideUp('fast');
 			switch ( $(this).val() ) {
 				case 'attachment': $('#attachment-filters').slideDown(); break;
 				case 'posts': $('#post-filters').slideDown(); break;
 				case 'pages': $('#page-filters').slideDown(); break;
 			}
-		});
+		 });
 	});
 </script>
-	<?php
+<?php
 }
 add_action( 'admin_head', 'export_add_js' );
 
@@ -54,8 +54,8 @@ get_current_screen()->add_help_tab(
 
 get_current_screen()->set_help_sidebar(
 	'<p><strong>' . __( 'For more information:' ) . '</strong></p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/article/tools-export-screen/">Documentation on Export</a>' ) . '</p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/">Support</a>' ) . '</p>'
+	'<p>' . __( '<a href="https://codex.wordpress.org/Tools_Export_Screen">Documentation on Export</a>' ) . '</p>' .
+	'<p>' . __( '<a href="https://wordpress.org/support/">Support Forums</a>' ) . '</p>'
 );
 
 // If the 'download' URL parameter is set, a WXR export file is baked and returned.
@@ -128,7 +128,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
  * Create the date options fields for exporting a given post type.
  *
  * @global wpdb      $wpdb      WordPress database abstraction object.
- * @global WP_Locale $wp_locale WordPress date and time locale object.
+ * @global WP_Locale $wp_locale Date and Time Locale object.
  *
  * @since 3.1.0
  *
@@ -144,8 +144,7 @@ function export_date_options( $post_type = 'post' ) {
 		FROM $wpdb->posts
 		WHERE post_type = %s AND post_status != 'auto-draft'
 		ORDER BY post_date DESC
-	",
-			$post_type
+	", $post_type
 		)
 	);
 
@@ -225,7 +224,7 @@ function export_date_options( $post_type = 'post' ) {
 			<?php
 			$post_stati = get_post_stati( array( 'internal' => false ), 'objects' );
 			foreach ( $post_stati as $status ) :
-				?>
+			?>
 			<option value="<?php echo esc_attr( $status->name ); ?>"><?php echo esc_html( $status->label ); ?></option>
 			<?php endforeach; ?>
 		</select>
@@ -281,10 +280,9 @@ foreach ( get_post_types(
 	array(
 		'_builtin'   => false,
 		'can_export' => true,
-	),
-	'objects'
+	), 'objects'
 ) as $post_type ) :
-	?>
+?>
 <p><label><input type="radio" name="content" value="<?php echo esc_attr( $post_type->name ); ?>" /> <?php echo esc_html( $post_type->label ); ?></label></p>
 <?php endforeach; ?>
 

@@ -31,8 +31,8 @@ include( dirname( __FILE__ ) . '/wp-load.php' );
 
 if ( isset( $_GET['rsd'] ) ) { // http://cyber.law.harvard.edu/blogs/gems/tech/rsd.html
 	header( 'Content-Type: text/xml; charset=' . get_option( 'blog_charset' ), true );
-	echo '<?xml version="1.0" encoding="' . get_option( 'blog_charset' ) . '"?' . '>';
-	?>
+?>
+<?php echo '<?xml version="1.0" encoding="' . get_option( 'blog_charset' ) . '"?' . '>'; ?>
 <rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">
 	<service>
 		<engineName>WordPress</engineName>
@@ -56,8 +56,8 @@ if ( isset( $_GET['rsd'] ) ) { // http://cyber.law.harvard.edu/blogs/gems/tech/r
 		</apis>
 	</service>
 </rsd>
-	<?php
-	exit;
+<?php
+exit;
 }
 
 include_once( ABSPATH . 'wp-admin/includes/admin.php' );
@@ -96,7 +96,7 @@ exit;
  * @param string $io Whether input or output
  * @param string $msg Information describing logging reason.
  */
-function logIO( $io, $msg ) { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
+function logIO( $io, $msg ) {
 	_deprecated_function( __FUNCTION__, '3.4.0', 'error_log()' );
 	if ( ! empty( $GLOBALS['xmlrpc_logging'] ) ) {
 		error_log( $io . ' - ' . $msg );

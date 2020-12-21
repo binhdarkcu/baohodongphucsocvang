@@ -8,7 +8,8 @@
  */
 $baiviet = '/tin-tuc/';
 $url = get_home_url();
-$sub_header_top_color = get_field('sub_header_top_color', 'option');
+$eto_options = get_option('eto_settings');
+$sub_header_top_color = '#'.$eto_options['sub_header_top_color'];
 ?>
 
 <div data-vc-full-width="true" data-vc-full-width-init="true" data-vc-stretch-content="true" class="vc_row wpb_row vc_row-fluid vc_row-no-padding">

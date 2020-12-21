@@ -29,11 +29,6 @@
 
 	window.wp.receiveEmbedMessage = function( e ) {
 		var data = e.data;
-
-		if ( ! data ) {
-			return;
-		}
-
 		if ( ! ( data.secret || data.message || data.value ) ) {
 			return;
 		}

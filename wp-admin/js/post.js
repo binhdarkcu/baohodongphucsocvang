@@ -5,11 +5,11 @@
  */
 
  /* global postL10n, ajaxurl, wpAjax, setPostThumbnailL10n, postboxes, pagenow, tinymce, alert, deleteUserSetting */
- /* global theList:true, theExtraList:true, getUserSetting, setUserSetting, commentReply, commentsBox */
- /* global WPSetThumbnailHTML, wptitlehint */
+ /* global theList:true, theExtraList:true, getUserSetting, setUserSetting, commentReply */
 
+var commentsBox, WPSetThumbnailHTML, WPSetThumbnailID, WPRemoveThumbnail, wptitlehint, makeSlugeditClickable, editPermalink;
 // Backwards compatibility: prevent fatal errors.
-window.makeSlugeditClickable = window.editPermalink = function(){};
+makeSlugeditClickable = editPermalink = function(){};
 
 // Make sure the wp object exists.
 window.wp = window.wp || {};
@@ -24,7 +24,7 @@ window.wp = window.wp || {};
 	 *
 	 * @namespace commentsBox
 	 */
-	window.commentsBox = {
+	commentsBox = {
 		// Comment offset to use when fetching new comments.
 		st : 0,
 
@@ -108,7 +108,7 @@ window.wp = window.wp || {};
 	 *
 	 * @global
 	 */
-	window.WPSetThumbnailHTML = function(html){
+	WPSetThumbnailHTML = function(html){
 		$('.inside', '#postimagediv').html(html);
 	};
 
@@ -119,7 +119,7 @@ window.wp = window.wp || {};
 	 *
 	 * @global
 	 */
-	window.WPSetThumbnailID = function(id){
+	WPSetThumbnailID = function(id){
 		var field = $('input[value="_thumbnail_id"]', '#list-table');
 		if ( field.length > 0 ) {
 			$('#meta\\[' + field.attr('id').match(/[0-9]+/) + '\\]\\[value\\]').text(id);
@@ -133,7 +133,7 @@ window.wp = window.wp || {};
 	 *
 	 * @global
 	 */
-	window.WPRemoveThumbnail = function(nonce){
+	WPRemoveThumbnail = function(nonce){
 		$.post(ajaxurl, {
 			action: 'set-post-thumbnail', post_id: $( '#post_ID' ).val(), thumbnail_id: -1, _ajax_nonce: nonce, cookie: encodeURIComponent( document.cookie )
 		},
@@ -795,9 +795,7 @@ jQuery(document).ready( function($) {
 			}
 
 			// Update "Status:" to currently selected status.
-			$('#post-status-display').text(
-				wp.sanitize.stripTagsAndEncodeText( $('option:selected', postStatus).text() ) // Remove any potential tags from post status text.
-			);
+			$('#post-status-display').html($('option:selected', postStatus).text());
 
 			// Show or hide the "Save Draft" button.
 			if ( $('option:selected', postStatus).val() == 'private' || $('option:selected', postStatus).val() == 'publish' ) {
@@ -1042,10 +1040,7 @@ jQuery(document).ready( function($) {
 	});
 
 	/**
-	 * Adds screen reader text to the title label when needed.
-	 *
-	 * Use the 'screen-reader-text' class to emulate a placeholder attribute
-	 * and hide the label when entering a value.
+	 * Adds screen reader text to the title prompt when needed.
 	 *
 	 * @param {string} id Optional. HTML ID to add the screen reader helper text to.
 	 *
@@ -1053,23 +1048,28 @@ jQuery(document).ready( function($) {
 	 *
 	 * @returns void
 	 */
-	window.wptitlehint = function( id ) {
+	wptitlehint = function(id) {
 		id = id || 'title';
 
-		var title = $( '#' + id ), titleprompt = $( '#' + id + '-prompt-text' );
+		var title = $('#' + id), titleprompt = $('#' + id + '-prompt-text');
 
-		if ( '' === title.val() ) {
-			titleprompt.removeClass( 'screen-reader-text' );
-		}
+		if ( '' === title.val() )
+			titleprompt.removeClass('screen-reader-text');
 
-		title.on( 'input', function() {
-			if ( '' === this.value ) {
-				titleprompt.removeClass( 'screen-reader-text' );
-				return;
-			}
+		titleprompt.click(function(){
+			$(this).addClass('screen-reader-text');
+			title.focus();
+		});
 
-			titleprompt.addClass( 'screen-reader-text' );
-		} );
+		title.blur(function(){
+			if ( '' === this.value )
+				titleprompt.removeClass('screen-reader-text');
+		}).focus(function(){
+			titleprompt.addClass('screen-reader-text');
+		}).keydown(function(e){
+			titleprompt.addClass('screen-reader-text');
+			$(this).unbind(e);
+		});
 	};
 
 	wptitlehint();

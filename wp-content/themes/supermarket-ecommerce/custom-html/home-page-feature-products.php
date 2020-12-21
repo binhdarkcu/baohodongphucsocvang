@@ -11,7 +11,9 @@
 <?php
   $sanPham = '/product-category/san-pham/';
   $url = get_home_url();
-  $sub_header_top_color = get_field('sub_header_top_color', 'option');
+  $eto_options = get_option('eto_settings');
+  $sub_header_top_color = '#'.$eto_options['sub_header_top_color'];
+  $amount_product_home_new = $eto_options['amount_product_home_new'];
 ?>
 <div data-vc-full-width="true" data-vc-full-width-init="true" data-vc-stretch-content="true" class="vc_row wpb_row vc_row-fluid vc_row-no-padding">
   <div class="wpb_column vc_column_container vc_col-sm-12">
@@ -32,7 +34,7 @@
             <div class="section-content bg-none list-posts-inner">
               <div class="layout-grid grid-style-1 columns-5 product-section">
                 <?php
-                $amountProduct = get_field('amount_product_home_new', 'option');
+                $amountProduct = $amount_product_home_new;
                 $args = array(
                   'category' => array( 'Sản phẩm' ),
                   'orderby'  => 'modified',

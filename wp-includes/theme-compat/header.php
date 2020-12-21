@@ -7,11 +7,11 @@
  * This file is here for backward compatibility with old themes and will be removed in a future version.
  */
 _deprecated_file(
-	/* translators: %s: Template name. */
+	/* translators: %s: template name */
 	sprintf( __( 'Theme without %s' ), basename( __FILE__ ) ),
 	'3.0.0',
 	null,
-	/* translators: %s: Template name. */
+	/* translators: %s: template name */
 	sprintf( __( 'Please include a %s template in your theme.' ), basename( __FILE__ ) )
 );
 ?>
@@ -29,10 +29,10 @@ _deprecated_file(
 <?php if ( file_exists( get_stylesheet_directory() . '/images/kubrickbgwide.jpg' ) ) { ?>
 <style type="text/css" media="screen">
 
-	<?php
-	// Checks to see whether it needs a sidebar
-	if ( empty( $withcomments ) && ! is_single() ) {
-		?>
+<?php
+// Checks to see whether it needs a sidebar
+if ( empty( $withcomments ) && ! is_single() ) {
+?>
 	#page { background: url("<?php bloginfo( 'stylesheet_directory' ); ?>/images/kubrickbg-<?php bloginfo( 'text_direction' ); ?>.jpg") repeat-y top; border: none; }
 <?php } else { // No sidebar ?>
 	#page { background: url("<?php bloginfo( 'stylesheet_directory' ); ?>/images/kubrickbgwide.jpg") repeat-y top; border: none; }

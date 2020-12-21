@@ -103,25 +103,23 @@ function show_blog_form( $blogname = '', $blog_title = '', $errors = '' ) {
 	}
 
 	$current_network = get_network();
-	// Blog name.
+	// Blog name
 	if ( ! is_subdomain_install() ) {
 		echo '<label for="blogname">' . __( 'Site Name:' ) . '</label>';
 	} else {
 		echo '<label for="blogname">' . __( 'Site Domain:' ) . '</label>';
 	}
 
-	$errmsg = $errors->get_error_message( 'blogname' );
-	if ( $errmsg ) {
-		?>
+	if ( $errmsg = $errors->get_error_message( 'blogname' ) ) {
+	?>
 		<p class="error"><?php echo $errmsg; ?></p>
-		<?php
+	<?php
 	}
 
 	if ( ! is_subdomain_install() ) {
 		echo '<span class="prefix_address">' . $current_network->domain . $current_network->path . '</span><input name="blogname" type="text" id="blogname" value="' . esc_attr( $blogname ) . '" maxlength="60" /><br />';
 	} else {
-		$site_domain = preg_replace( '|^www\.|', '', $current_network->domain );
-		echo '<input name="blogname" type="text" id="blogname" value="' . esc_attr( $blogname ) . '" maxlength="60" /><span class="suffix_address">.' . esc_html( $site_domain ) . '</span><br />';
+		echo '<input name="blogname" type="text" id="blogname" value="' . esc_attr( $blogname ) . '" maxlength="60" /><span class="suffix_address">.' . ( $site_domain = preg_replace( '|^www\.|', '', $current_network->domain ) ) . '</span><br />';
 	}
 
 	if ( ! is_user_logged_in() ) {
@@ -131,24 +129,17 @@ function show_blog_form( $blogname = '', $blog_title = '', $errors = '' ) {
 			$site = __( 'domain' ) . '.' . $site_domain . $current_network->path;
 		}
 
-		printf(
-			'<p>(<strong>%s</strong>) %s</p>',
-			/* translators: %s: Site address. */
-			sprintf( __( 'Your address will be %s.' ), $site ),
-			__( 'Must be at least 4 characters, letters and numbers only. It cannot be changed, so choose carefully!' )
-		);
+		/* translators: %s: site address */
+		echo '<p>(<strong>' . sprintf( __( 'Your address will be %s.' ), $site ) . '</strong>) ' . __( 'Must be at least 4 characters, letters and numbers only. It cannot be changed, so choose carefully!' ) . '</p>';
 	}
 
 	// Blog Title
 	?>
 	<label for="blog_title"><?php _e( 'Site Title:' ); ?></label>
-	<?php
-	$errmsg = $errors->get_error_message( 'blog_title' );
-	if ( $errmsg ) {
-		?>
+	<?php if ( $errmsg = $errors->get_error_message( 'blog_title' ) ) { ?>
 		<p class="error"><?php echo $errmsg; ?></p>
-		<?php
-	}
+	<?php
+}
 	echo '<input name="blog_title" type="text" id="blog_title" value="' . esc_attr( $blog_title ) . '" />';
 	?>
 
@@ -184,11 +175,10 @@ function show_blog_form( $blogname = '', $blog_title = '', $errors = '' ) {
 			);
 			?>
 		</p>
-		<?php
+	<?php
 		endif; // Languages.
 
-		$blog_public_on_checked  = '';
-		$blog_public_off_checked = '';
+		$blog_public_on_checked = $blog_public_off_checked = '';
 	if ( isset( $_POST['blog_public'] ) && '0' == $_POST['blog_public'] ) {
 		$blog_public_off_checked = 'checked="checked"';
 	} else {
@@ -255,8 +245,7 @@ function show_user_form( $user_name = '', $user_email = '', $errors = '' ) {
 
 	// User name
 	echo '<label for="user_name">' . __( 'Username:' ) . '</label>';
-	$errmsg = $errors->get_error_message( 'user_name' );
-	if ( $errmsg ) {
+	if ( $errmsg = $errors->get_error_message( 'user_name' ) ) {
 		echo '<p class="error">' . $errmsg . '</p>';
 	}
 	echo '<input name="user_name" type="text" id="user_name" value="' . esc_attr( $user_name ) . '" autocapitalize="none" autocorrect="off" maxlength="60" /><br />';
@@ -264,16 +253,12 @@ function show_user_form( $user_name = '', $user_email = '', $errors = '' ) {
 	?>
 
 	<label for="user_email"><?php _e( 'Email&nbsp;Address:' ); ?></label>
-	<?php
-	$errmsg = $errors->get_error_message( 'user_email' );
-	if ( $errmsg ) {
-		?>
+	<?php if ( $errmsg = $errors->get_error_message( 'user_email' ) ) { ?>
 		<p class="error"><?php echo $errmsg; ?></p>
 	<?php } ?>
 	<input name="user_email" type="email" id="user_email" value="<?php echo esc_attr( $user_email ); ?>" maxlength="200" /><br /><?php _e( 'We send your registration email to this address. (Double-check your email address before continuing.)' ); ?>
 	<?php
-	$errmsg = $errors->get_error_message( 'generic' );
-	if ( $errmsg ) {
+	if ( $errmsg = $errors->get_error_message( 'generic' ) ) {
 		echo '<p class="error">' . $errmsg . '</p>';
 	}
 	/**
@@ -338,27 +323,18 @@ function signup_another_blog( $blogname = '', $blog_title = '', $errors = '' ) {
 	$blog_title = $filtered_results['blog_title'];
 	$errors     = $filtered_results['errors'];
 
-	/* translators: %s: Network title. */
 	echo '<h2>' . sprintf( __( 'Get <em>another</em> %s site in seconds' ), get_network()->site_name ) . '</h2>';
 
 	if ( $errors->has_errors() ) {
 		echo '<p>' . __( 'There was a problem, please correct the form below and try again.' ) . '</p>';
 	}
 	?>
-	<p>
-		<?php
-		printf(
-			/* translators: %s: Current user's display name. */
-			__( 'Welcome back, %s. By filling out the form below, you can <strong>add another site to your account</strong>. There is no limit to the number of sites you can have, so create to your heart&#8217;s content, but write responsibly!' ),
-			$current_user->display_name
-		);
-		?>
-	</p>
+	<p><?php printf( __( 'Welcome back, %s. By filling out the form below, you can <strong>add another site to your account</strong>. There is no limit to the number of sites you can have, so create to your heart&#8217;s content, but write responsibly!' ), $current_user->display_name ); ?></p>
 
 	<?php
 	$blogs = get_blogs_of_user( $current_user->ID );
 	if ( ! empty( $blogs ) ) {
-		?>
+	?>
 
 			<p><?php _e( 'Sites you are already a member of:' ); ?></p>
 			<ul>
@@ -518,14 +494,14 @@ function confirm_another_blog_signup( $domain, $path, $blog_title, $user_name, $
 	?>
 	<h2>
 	<?php
-		/* translators: %s: Site title. */
+		/* translators: %s: site name */
 		printf( __( 'The site %s is yours.' ), $site );
 	?>
 	</h2>
 	<p>
 		<?php
 		printf(
-			/* translators: 1: Link to new site, 2: Login URL, 3: Username. */
+			/* translators: 1: link to new site, 2: login URL, 3: username */
 			__( '%1$s is your new site. <a href="%2$s">Log in</a> as &#8220;%3$s&#8221; using your existing password.' ),
 			sprintf(
 				'<a href="%s">%s</a>',
@@ -592,7 +568,7 @@ function signup_user( $user_name = '', $user_email = '', $errors = '' ) {
 
 	<h2>
 	<?php
-		/* translators: %s: Name of the network. */
+		/* translators: %s: name of the network */
 		printf( __( 'Get your own %s account in seconds' ), get_network()->site_name );
 	?>
 	</h2>
@@ -605,9 +581,9 @@ function signup_user( $user_name = '', $user_email = '', $errors = '' ) {
 		<?php show_user_form( $user_name, $user_email, $errors ); ?>
 
 		<p>
-		<?php if ( 'blog' === $active_signup ) { ?>
+		<?php if ( $active_signup == 'blog' ) { ?>
 			<input id="signupblog" type="hidden" name="signup_for" value="blog" />
-		<?php } elseif ( 'user' === $active_signup ) { ?>
+		<?php } elseif ( $active_signup == 'user' ) { ?>
 			<input id="signupblog" type="hidden" name="signup_for" value="user" />
 		<?php } else { ?>
 			<input id="signupblog" type="radio" name="signup_for" value="blog" <?php checked( $signup_for, 'blog' ); ?> />
@@ -665,14 +641,14 @@ function confirm_user_signup( $user_name, $user_email ) {
 	?>
 	<h2>
 	<?php
-	/* translators: %s: Username. */
+	/* translators: %s: username */
 	printf( __( '%s is your new username' ), $user_name )
 	?>
 	</h2>
 	<p><?php _e( 'But, before you can start using your new username, <strong>you must activate it</strong>.' ); ?></p>
 	<p>
 	<?php
-	/* translators: %s: Email address. */
+	/* translators: %s: email address */
 	printf( __( 'Check your inbox at %s and click the link given.' ), '<strong>' . $user_email . '</strong>' );
 	?>
 	</p>
@@ -822,7 +798,7 @@ function confirm_blog_signup( $domain, $path, $blog_title, $user_name = '', $use
 	?>
 	<h2>
 	<?php
-	/* translators: %s: Site address. */
+	/* translators: %s: site address */
 	printf( __( 'Congratulations! Your new site, %s, is almost ready.' ), "<a href='http://{$domain}{$path}'>{$blog_title}</a>" )
 	?>
 	</h2>
@@ -830,7 +806,7 @@ function confirm_blog_signup( $domain, $path, $blog_title, $user_name = '', $use
 	<p><?php _e( 'But, before you can start using your site, <strong>you must activate it</strong>.' ); ?></p>
 	<p>
 	<?php
-	/* translators: %s: Email address. */
+	/* translators: %s: email address */
 	printf( __( 'Check your inbox at %s and click the link given.' ), '<strong>' . $user_email . '</strong>' );
 	?>
 	</p>
@@ -843,7 +819,7 @@ function confirm_blog_signup( $domain, $path, $blog_title, $user_name = '', $use
 			<li><p><?php _e( 'Check the junk or spam folder of your email client. Sometime emails wind up there by mistake.' ); ?></p></li>
 			<li>
 			<?php
-				/* translators: %s: Email address. */
+				/* translators: %s: email address */
 				printf( __( 'Have you entered your email correctly? You have entered %s, if it&#8217;s incorrect, you will not receive your email.' ), $user_email );
 			?>
 			</li>
@@ -922,7 +898,7 @@ if ( current_user_can( 'manage_network' ) ) {
 
 	echo ' ';
 
-	/* translators: %s: URL to Network Settings screen. */
+	/* translators: %s: network settings URL */
 	printf( __( 'To change or disable registration go to your <a href="%s">Options page</a>.' ), esc_url( network_admin_url( 'settings.php' ) ) );
 	echo '</div>';
 }
@@ -930,27 +906,24 @@ if ( current_user_can( 'manage_network' ) ) {
 $newblogname = isset( $_GET['new'] ) ? strtolower( preg_replace( '/^-|-$|[^-a-zA-Z0-9]/', '', $_GET['new'] ) ) : null;
 
 $current_user = wp_get_current_user();
-if ( 'none' === $active_signup ) {
+if ( $active_signup == 'none' ) {
 	_e( 'Registration has been disabled.' );
-} elseif ( 'blog' === $active_signup && ! is_user_logged_in() ) {
+} elseif ( $active_signup == 'blog' && ! is_user_logged_in() ) {
 	$login_url = wp_login_url( network_site_url( 'wp-signup.php' ) );
-	/* translators: %s: Login URL. */
+	/* translators: %s: login URL */
 	printf( __( 'You must first <a href="%s">log in</a>, and then you can create a new site.' ), $login_url );
 } else {
 	$stage = isset( $_POST['stage'] ) ? $_POST['stage'] : 'default';
 	switch ( $stage ) {
 		case 'validate-user-signup':
-			if ( 'all' === $active_signup
-				|| ( 'blog' === $_POST['signup_for'] && 'blog' === $active_signup )
-				|| ( 'user' === $_POST['signup_for'] && 'user' === $active_signup )
-			) {
+			if ( $active_signup == 'all' || $_POST['signup_for'] == 'blog' && $active_signup == 'blog' || $_POST['signup_for'] == 'user' && $active_signup == 'user' ) {
 				validate_user_signup();
 			} else {
 				_e( 'User registration has been disabled.' );
 			}
 			break;
 		case 'validate-blog-signup':
-			if ( 'all' === $active_signup || 'blog' === $active_signup ) {
+			if ( $active_signup == 'all' || $active_signup == 'blog' ) {
 				validate_blog_signup();
 			} else {
 				_e( 'Site registration has been disabled.' );
@@ -968,11 +941,11 @@ if ( 'none' === $active_signup ) {
 			 * @since 3.0.0
 			 */
 			do_action( 'preprocess_signup_form' );
-			if ( is_user_logged_in() && ( 'all' === $active_signup || 'blog' === $active_signup ) ) {
+			if ( is_user_logged_in() && ( $active_signup == 'all' || $active_signup == 'blog' ) ) {
 				signup_another_blog( $newblogname );
-			} elseif ( ! is_user_logged_in() && ( 'all' === $active_signup || 'user' === $active_signup ) ) {
+			} elseif ( ! is_user_logged_in() && ( $active_signup == 'all' || $active_signup == 'user' ) ) {
 				signup_user( $newblogname, $user_email );
-			} elseif ( ! is_user_logged_in() && ( 'blog' === $active_signup ) ) {
+			} elseif ( ! is_user_logged_in() && ( $active_signup == 'blog' ) ) {
 				_e( 'Sorry, new registrations are not allowed at this time.' );
 			} else {
 				_e( 'You are logged in already. No need to register again!' );
@@ -981,15 +954,14 @@ if ( 'none' === $active_signup ) {
 			if ( $newblogname ) {
 				$newblog = get_blogaddress_by_name( $newblogname );
 
-				if ( 'blog' === $active_signup || 'all' === $active_signup ) {
+				if ( $active_signup == 'blog' || $active_signup == 'all' ) {
+					/* translators: %s: site address */
 					printf(
-						/* translators: %s: Site address. */
 						'<p><em>' . __( 'The site you were looking for, %s, does not exist, but you can create it now!' ) . '</em></p>',
 						'<strong>' . $newblog . '</strong>'
 					);
-				} else {
+				} else {                  /* translators: %s: site address */
 					printf(
-						/* translators: %s: Site address. */
 						'<p><em>' . __( 'The site you were looking for, %s, does not exist.' ) . '</em></p>',
 						'<strong>' . $newblog . '</strong>'
 					);

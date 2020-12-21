@@ -188,7 +188,7 @@ window.wp = window.wp || {};
 		}
 
 		/**
-		 * Checks if a cursor is inside an HTML tag or comment.
+		 * Checks if a cursor is inside an HTML tag.
 		 *
 		 * In order to prevent breaking HTML tags when selecting text, the cursor
 		 * must be moved to either the start or end of the tag.
@@ -211,7 +211,7 @@ window.wp = window.wp || {};
 			if ( lastLtPos > lastGtPos || content.substr( cursorPosition, 1 ) === '>' ) {
 				// find what the tag is
 				var tagContent = content.substr( lastLtPos ),
-					tagMatch = tagContent.match( /<\s*(\/)?(\w+|\!-{2}.*-{2})/ );
+					tagMatch = tagContent.match( /<\s*(\/)?(\w+)/ );
 
 				if ( ! tagMatch ) {
 					return null;
@@ -382,7 +382,7 @@ window.wp = window.wp || {};
 		}
 
 		/**
-		 * Gets adjusted selection cursor positions according to HTML tags, comments, and shortcodes.
+		 * Gets adjusted selection cursor positions according to HTML tags/shortcodes
 		 *
 		 * Shortcodes and HTML codes are a bit of a special case when selecting, since they may render
 		 * content in Visual mode. If we insert selection markers somewhere inside them, it's really possible

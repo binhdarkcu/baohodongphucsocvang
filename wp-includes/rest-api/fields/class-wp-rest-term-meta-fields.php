@@ -49,7 +49,7 @@ class WP_REST_Term_Meta_Fields extends WP_REST_Meta_Fields {
 	/**
 	 * Retrieves the object meta subtype.
 	 *
-	 * @since 4.9.8
+	 * @since 5.0.0
 	 *
 	 * @return string Subtype for the meta type, or empty string if no specific subtype.
 	 */

@@ -80,8 +80,7 @@ class WP_User {
 	 * All capabilities the user has, including individual and role based.
 	 *
 	 * @since 2.0.0
-	 * @var bool[] Array of key/value pairs where keys represent a capability name and boolean values
-	 *             represent whether the user has that capability.
+	 * @var array
 	 */
 	public $allcaps = array();
 
@@ -233,19 +232,16 @@ class WP_User {
 		}
 
 		if ( false !== $user_id ) {
-			$user = wp_cache_get( $user_id, 'users' );
-			if ( $user ) {
+			if ( $user = wp_cache_get( $user_id, 'users' ) ) {
 				return $user;
 			}
 		}
 
-		$user = $wpdb->get_row(
+		if ( ! $user = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM $wpdb->users WHERE $db_field = %s LIMIT 1",
-				$value
+				"SELECT * FROM $wpdb->users WHERE $db_field = %s", $value
 			)
-		);
-		if ( ! $user ) {
+		) ) {
 			return false;
 		}
 
@@ -265,8 +261,7 @@ class WP_User {
 	public function __isset( $key ) {
 		if ( 'id' == $key ) {
 			_deprecated_argument(
-				'WP_User->id',
-				'2.1.0',
+				'WP_User->id', '2.1.0',
 				sprintf(
 					/* translators: %s: WP_User->ID */
 					__( 'Use %s instead.' ),
@@ -298,8 +293,7 @@ class WP_User {
 	public function __get( $key ) {
 		if ( 'id' == $key ) {
 			_deprecated_argument(
-				'WP_User->id',
-				'2.1.0',
+				'WP_User->id', '2.1.0',
 				sprintf(
 					/* translators: %s: WP_User->ID */
 					__( 'Use %s instead.' ),
@@ -339,8 +333,7 @@ class WP_User {
 	public function __set( $key, $value ) {
 		if ( 'id' == $key ) {
 			_deprecated_argument(
-				'WP_User->id',
-				'2.1.0',
+				'WP_User->id', '2.1.0',
 				sprintf(
 					/* translators: %s: WP_User->ID */
 					__( 'Use %s instead.' ),
@@ -364,8 +357,7 @@ class WP_User {
 	public function __unset( $key ) {
 		if ( 'id' == $key ) {
 			_deprecated_argument(
-				'WP_User->id',
-				'2.1.0',
+				'WP_User->id', '2.1.0',
 				sprintf(
 					/* translators: %s: WP_User->ID */
 					__( 'Use %s instead.' ),
@@ -444,7 +436,7 @@ class WP_User {
 	 */
 	public function __call( $name, $arguments ) {
 		if ( '_init_caps' === $name ) {
-			return $this->_init_caps( ...$arguments );
+			return call_user_func_array( array( $this, $name ), $arguments );
 		}
 		return false;
 	}
@@ -481,15 +473,16 @@ class WP_User {
 	}
 
 	/**
-	 * Retrieves all of the capabilities of the roles of the user, and merges them with individual user capabilities.
+	 * Retrieve all of the role capabilities and merge with individual capabilities.
 	 *
-	 * All of the capabilities of the roles of the user are merged with the user's individual capabilities. This means
-	 * that the user can be denied specific capabilities that their role might have, but the user is specifically denied.
+	 * All of the capabilities of the roles the user belongs to are merged with
+	 * user's individual capabilities. This also means that the user can be denied
+	 * specific capabilities that their role might have, but the user isn't granted
+	 * permission to.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @return bool[] Array of key/value pairs where keys represent a capability name and boolean values
-	 *                represent whether the user has that capability.
+	 * @return array List of all capabilities for the user.
 	 */
 	public function get_role_caps() {
 		$switch_site = false;
@@ -714,39 +707,32 @@ class WP_User {
 	}
 
 	/**
-	 * Returns whether the user has the specified capability.
-	 *
-	 * This function also accepts an ID of an object to check against if the capability is a meta capability. Meta
-	 * capabilities such as `edit_post` and `edit_user` are capabilities used by the `map_meta_cap()` function to
-	 * map to primitive capabilities that a user or role has, such as `edit_posts` and `edit_others_posts`.
-	 *
-	 * Example usage:
-	 *
-	 *     $user->has_cap( 'edit_posts' );
-	 *     $user->has_cap( 'edit_post', $post->ID );
-	 *     $user->has_cap( 'edit_post_meta', $post->ID, $meta_key );
+	 * Whether the user has a specific capability.
 	 *
 	 * While checking against a role in place of a capability is supported in part, this practice is discouraged as it
 	 * may produce unreliable results.
 	 *
 	 * @since 2.0.0
-	 * @since 5.3.0 Formalized the existing and already documented `...$args` parameter
-	 *              by adding it to the function signature.
 	 *
 	 * @see map_meta_cap()
 	 *
-	 * @param string $cap     Capability name.
-	 * @param mixed  ...$args Optional further parameters, typically starting with an object ID.
-	 * @return bool Whether the user has the given capability, or, if an object ID is passed, whether the user has
+	 * @param string $cap           Capability name.
+	 * @param int    $object_id,... Optional. ID of a specific object to check against if `$cap` is a "meta" capability.
+	 *                              Meta capabilities such as `edit_post` and `edit_user` are capabilities used by
+	 *                              by the `map_meta_cap()` function to map to primitive capabilities that a user or
+	 *                              role has, such as `edit_posts` and `edit_others_posts`.
+	 * @return bool Whether the user has the given capability, or, if `$object_id` is passed, whether the user has
 	 *              the given capability for that object.
 	 */
-	public function has_cap( $cap, ...$args ) {
+	public function has_cap( $cap ) {
 		if ( is_numeric( $cap ) ) {
 			_deprecated_argument( __FUNCTION__, '2.0.0', __( 'Usage of user levels is deprecated. Use capabilities instead.' ) );
 			$cap = $this->translate_level_to_cap( $cap );
 		}
 
-		$caps = map_meta_cap( $cap, $this->ID, ...$args );
+		$args = array_slice( func_get_args(), 1 );
+		$args = array_merge( array( $cap, $this->ID ), $args );
+		$caps = call_user_func_array( 'map_meta_cap', $args );
 
 		// Multisite super admin has all caps by definition, Unless specifically denied.
 		if ( is_multisite() && is_super_admin( $this->ID ) ) {
@@ -756,25 +742,15 @@ class WP_User {
 			return true;
 		}
 
-		// Maintain BC for the argument passed to the "user_has_cap" filter.
-		$args = array_merge( array( $cap, $this->ID ), $args );
-
 		/**
 		 * Dynamically filter a user's capabilities.
 		 *
 		 * @since 2.0.0
-		 * @since 3.7.0 Added the `$user` parameter.
+		 * @since 3.7.0 Added the user object.
 		 *
-		 * @param bool[]   $allcaps Array of key/value pairs where keys represent a capability name and boolean values
-		 *                          represent whether the user has that capability.
-		 * @param string[] $caps    Required primitive capabilities for the requested capability.
-		 * @param array    $args {
-		 *     Arguments that accompany the requested capability check.
-		 *
-		 *     @type string    $0 Requested capability.
-		 *     @type int       $1 Concerned user ID.
-		 *     @type mixed  ...$2 Optional second and further parameters, typically object ID.
-		 * }
+		 * @param bool[]   $allcaps An array of all the user's capabilities.
+		 * @param string[] $caps    Actual capabilities for meta capability.
+		 * @param array    $args    Optional parameters passed to has_cap(), typically object ID.
 		 * @param WP_User  $user    The user object.
 		 */
 		$capabilities = apply_filters( 'user_has_cap', $this->allcaps, $caps, $args, $this );

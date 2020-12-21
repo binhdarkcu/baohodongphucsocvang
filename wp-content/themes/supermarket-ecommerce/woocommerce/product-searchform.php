@@ -18,7 +18,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$sub_header_top_color = get_field('sub_header_top_color', 'option');
+$eto_options = get_option('eto_settings');
+$sub_header_top_color = '#'.$eto_options['sub_header_top_color'];
 
 ?>
 <form role="search" method="get" class="woocommerce-product-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">

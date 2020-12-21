@@ -36,9 +36,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 	public function register_routes() {
 
 		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
+			$this->namespace, '/' . $this->rest_base, array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
@@ -50,9 +48,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 		);
 
 		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<taxonomy>[\w-]+)',
-			array(
+			$this->namespace, '/' . $this->rest_base . '/(?P<taxonomy>[\w-]+)', array(
 				'args'   => array(
 					'taxonomy' => array(
 						'description' => __( 'An alphanumeric identifier for the taxonomy.' ),
@@ -88,7 +84,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 				$taxonomies = get_taxonomies( '', 'objects' );
 			}
 			foreach ( $taxonomies as $taxonomy ) {
-				if ( ! empty( $taxonomy->show_in_rest ) && current_user_can( $taxonomy->cap->assign_terms ) ) {
+				if ( ! empty( $taxonomy->show_in_rest ) && current_user_can( $taxonomy->cap->manage_terms ) ) {
 					return true;
 				}
 			}
@@ -117,7 +113,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 		}
 		$data = array();
 		foreach ( $taxonomies as $tax_type => $value ) {
-			if ( empty( $value->show_in_rest ) || ( 'edit' === $request['context'] && ! current_user_can( $value->cap->assign_terms ) ) ) {
+			if ( empty( $value->show_in_rest ) || ( 'edit' === $request['context'] && ! current_user_can( $value->cap->manage_terms ) ) ) {
 				continue;
 			}
 			$tax               = $this->prepare_item_for_response( $value, $request );
@@ -138,7 +134,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 	 *
 	 * @since 4.7.0
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
+	 * @param  WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, otherwise false or WP_Error object.
 	 */
 	public function get_item_permissions_check( $request ) {
@@ -149,7 +145,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 			if ( empty( $tax_obj->show_in_rest ) ) {
 				return false;
 			}
-			if ( 'edit' === $request['context'] && ! current_user_can( $tax_obj->cap->assign_terms ) ) {
+			if ( 'edit' === $request['context'] && ! current_user_can( $tax_obj->cap->manage_terms ) ) {
 				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to manage terms in this taxonomy.' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
@@ -210,7 +206,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 		}
 
 		if ( in_array( 'types', $fields, true ) ) {
-			$data['types'] = array_values( $taxonomy->object_type );
+			$data['types'] = $taxonomy->object_type;
 		}
 
 		if ( in_array( 'show_cloud', $fields, true ) ) {
@@ -276,10 +272,6 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
-		if ( $this->schema ) {
-			return $this->add_additional_fields_schema( $this->schema );
-		}
-
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'taxonomy',
@@ -377,9 +369,7 @@ class WP_REST_Taxonomies_Controller extends WP_REST_Controller {
 				),
 			),
 		);
-
-		$this->schema = $schema;
-		return $this->add_additional_fields_schema( $this->schema );
+		return $this->add_additional_fields_schema( $schema );
 	}
 
 	/**

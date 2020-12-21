@@ -137,8 +137,7 @@ class WP_List_Table {
 	 */
 	public function __construct( $args = array() ) {
 		$args = wp_parse_args(
-			$args,
-			array(
+			$args, array(
 				'plural'   => '',
 				'singular' => '',
 				'ajax'     => false,
@@ -239,7 +238,7 @@ class WP_List_Table {
 	 */
 	public function __call( $name, $arguments ) {
 		if ( in_array( $name, $this->compat_methods ) ) {
-			return $this->$name( ...$arguments );
+			return call_user_func_array( array( $this, $name ), $arguments );
 		}
 		return false;
 	}
@@ -275,8 +274,7 @@ class WP_List_Table {
 	 */
 	protected function set_pagination_args( $args ) {
 		$args = wp_parse_args(
-			$args,
-			array(
+			$args, array(
 				'total_items' => 0,
 				'total_pages' => 0,
 				'per_page'    => 0,
@@ -362,13 +360,13 @@ class WP_List_Table {
 		if ( ! empty( $_REQUEST['detached'] ) ) {
 			echo '<input type="hidden" name="detached" value="' . esc_attr( $_REQUEST['detached'] ) . '" />';
 		}
-		?>
+?>
 <p class="search-box">
 	<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo $text; ?>:</label>
 	<input type="search" id="<?php echo esc_attr( $input_id ); ?>" name="s" value="<?php _admin_search_query(); ?>" />
-		<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
+	<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 </p>
-		<?php
+<?php
 	}
 
 	/**
@@ -451,7 +449,7 @@ class WP_List_Table {
 			 *
 			 * @param string[] $actions An array of the available bulk actions.
 			 */
-			$this->_actions = apply_filters( "bulk_actions-{$this->screen->id}", $this->_actions );  // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+			$this->_actions = apply_filters( "bulk_actions-{$this->screen->id}", $this->_actions );
 			$two            = '';
 		} else {
 			$two = '2';
@@ -535,8 +533,8 @@ class WP_List_Table {
 	 *
 	 * @since 3.1.0
 	 *
-	 * @global wpdb      $wpdb      WordPress database abstraction object.
-	 * @global WP_Locale $wp_locale WordPress date and time locale object.
+	 * @global wpdb      $wpdb
+	 * @global WP_Locale $wp_locale
 	 *
 	 * @param string $post_type
 	 */
@@ -570,8 +568,7 @@ class WP_List_Table {
 			WHERE post_type = %s
 			$extra_checks
 			ORDER BY post_date DESC
-		",
-				$post_type
+		", $post_type
 			)
 		);
 
@@ -592,30 +589,30 @@ class WP_List_Table {
 		}
 
 		$m = isset( $_GET['m'] ) ? (int) $_GET['m'] : 0;
-		?>
+?>
 		<label for="filter-by-date" class="screen-reader-text"><?php _e( 'Filter by date' ); ?></label>
 		<select name="m" id="filter-by-date">
 			<option<?php selected( $m, 0 ); ?> value="0"><?php _e( 'All dates' ); ?></option>
-		<?php
-		foreach ( $months as $arc_row ) {
-			if ( 0 == $arc_row->year ) {
-				continue;
-			}
+<?php
+foreach ( $months as $arc_row ) {
+	if ( 0 == $arc_row->year ) {
+		continue;
+	}
 
-			$month = zeroise( $arc_row->month, 2 );
-			$year  = $arc_row->year;
+	$month = zeroise( $arc_row->month, 2 );
+	$year  = $arc_row->year;
 
-			printf(
-				"<option %s value='%s'>%s</option>\n",
-				selected( $m, $year . $month, false ),
-				esc_attr( $arc_row->year . $month ),
-				/* translators: 1: Month name, 2: 4-digit year. */
-				sprintf( __( '%1$s %2$d' ), $wp_locale->get_month( $month ), $year )
-			);
-		}
-		?>
+	printf(
+		"<option %s value='%s'>%s</option>\n",
+		selected( $m, $year . $month, false ),
+		esc_attr( $arc_row->year . $month ),
+		/* translators: 1: month name, 2: 4-digit year */
+		sprintf( __( '%1$s %2$d' ), $wp_locale->get_month( $month ), $year )
+	);
+}
+?>
 		</select>
-		<?php
+<?php
 	}
 
 	/**
@@ -626,25 +623,25 @@ class WP_List_Table {
 	 * @param string $current_mode
 	 */
 	protected function view_switcher( $current_mode ) {
-		?>
+?>
 		<input type="hidden" name="mode" value="<?php echo esc_attr( $current_mode ); ?>" />
 		<div class="view-switch">
-		<?php
-		foreach ( $this->modes as $mode => $title ) {
-			$classes = array( 'view-' . $mode );
-			if ( $current_mode === $mode ) {
-				$classes[] = 'current';
-			}
-			printf(
-				"<a href='%s' class='%s' id='view-switch-$mode'><span class='screen-reader-text'>%s</span></a>\n",
-				esc_url( add_query_arg( 'mode', $mode ) ),
-				implode( ' ', $classes ),
-				$title
-			);
-		}
+<?php
+foreach ( $this->modes as $mode => $title ) {
+	$classes = array( 'view-' . $mode );
+	if ( $current_mode === $mode ) {
+		$classes[] = 'current';
+	}
+	printf(
+		"<a href='%s' class='%s' id='view-switch-$mode'><span class='screen-reader-text'>%s</span></a>\n",
+		esc_url( add_query_arg( 'mode', $mode ) ),
+		implode( ' ', $classes ),
+		$title
+	);
+}
 		?>
 		</div>
-		<?php
+<?php
 	}
 
 	/**
@@ -661,23 +658,9 @@ class WP_List_Table {
 		$approved_comments_number = number_format_i18n( $approved_comments );
 		$pending_comments_number  = number_format_i18n( $pending_comments );
 
-		$approved_only_phrase = sprintf(
-			/* translators: %s: Number of comments. */
-			_n( '%s comment', '%s comments', $approved_comments ),
-			$approved_comments_number
-		);
-
-		$approved_phrase = sprintf(
-			/* translators: %s: Number of comments. */
-			_n( '%s approved comment', '%s approved comments', $approved_comments ),
-			$approved_comments_number
-		);
-
-		$pending_phrase = sprintf(
-			/* translators: %s: Number of comments. */
-			_n( '%s pending comment', '%s pending comments', $pending_comments ),
-			$pending_comments_number
-		);
+		$approved_only_phrase = sprintf( _n( '%s comment', '%s comments', $approved_comments ), $approved_comments_number );
+		$approved_phrase      = sprintf( _n( '%s approved comment', '%s approved comments', $approved_comments ), $approved_comments_number );
+		$pending_phrase       = sprintf( _n( '%s pending comment', '%s pending comments', $pending_comments ), $pending_comments_number );
 
 		// No comments at all.
 		if ( ! $approved_comments && ! $pending_comments ) {
@@ -694,8 +677,7 @@ class WP_List_Table {
 						array(
 							'p'              => $post_id,
 							'comment_status' => 'approved',
-						),
-						admin_url( 'edit-comments.php' )
+						), admin_url( 'edit-comments.php' )
 					)
 				),
 				$approved_comments_number,
@@ -717,8 +699,7 @@ class WP_List_Table {
 						array(
 							'p'              => $post_id,
 							'comment_status' => 'moderated',
-						),
-						admin_url( 'edit-comments.php' )
+						), admin_url( 'edit-comments.php' )
 					)
 				),
 				$pending_comments_number,
@@ -804,11 +785,7 @@ class WP_List_Table {
 			$this->screen->render_screen_reader_content( 'heading_pagination' );
 		}
 
-		$output = '<span class="displaying-num">' . sprintf(
-			/* translators: %s: Number of items. */
-			_n( '%s item', '%s items', $total_items ),
-			number_format_i18n( $total_items )
-		) . '</span>';
+		$output = '<span class="displaying-num">' . sprintf( _n( '%s item', '%s items', $total_items ), number_format_i18n( $total_items ) ) . '</span>';
 
 		$current              = $this->get_pagenum();
 		$removable_query_args = wp_removable_query_args();
@@ -822,10 +799,7 @@ class WP_List_Table {
 		$total_pages_before = '<span class="paging-input">';
 		$total_pages_after  = '</span></span>';
 
-		$disable_first = false;
-		$disable_last  = false;
-		$disable_prev  = false;
-		$disable_next  = false;
+		$disable_first = $disable_last = $disable_prev = $disable_next = false;
 
 		if ( $current == 1 ) {
 			$disable_first = true;
@@ -876,12 +850,7 @@ class WP_List_Table {
 			);
 		}
 		$html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
-		$page_links[]     = $total_pages_before . sprintf(
-			/* translators: 1: Current page, 2: Total pages. */
-			_x( '%1$s of %2$s', 'paging' ),
-			$html_current_page,
-			$html_total_pages
-		) . $total_pages_after;
+		$page_links[]     = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . $total_pages_after;
 
 		if ( $disable_next ) {
 			$page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
@@ -1173,7 +1142,7 @@ class WP_List_Table {
 	}
 
 	/**
-	 * Displays the table.
+	 * Display the table
 	 *
 	 * @since 3.1.0
 	 */
@@ -1183,7 +1152,7 @@ class WP_List_Table {
 		$this->display_tablenav( 'top' );
 
 		$this->screen->render_screen_reader_content( 'heading_list' );
-		?>
+?>
 <table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
 	<thead>
 	<tr>
@@ -1192,10 +1161,10 @@ class WP_List_Table {
 	</thead>
 
 	<tbody id="the-list"
-		<?php
-		if ( $singular ) {
-			echo " data-wp-lists='list:$singular'";
-		}
+	<?php
+	if ( $singular ) {
+		echo " data-wp-lists='list:$singular'";
+	}
 		?>
 		>
 		<?php $this->display_rows_or_placeholder(); ?>
@@ -1208,7 +1177,7 @@ class WP_List_Table {
 	</tfoot>
 
 </table>
-		<?php
+<?php
 		$this->display_tablenav( 'bottom' );
 	}
 
@@ -1240,15 +1209,15 @@ class WP_List_Table {
 		<div class="alignleft actions bulkactions">
 			<?php $this->bulk_actions( $which ); ?>
 		</div>
-			<?php
+		<?php
 		endif;
 		$this->extra_tablenav( $which );
 		$this->pagination( $which );
-		?>
+?>
 
 		<br class="clear" />
 	</div>
-		<?php
+<?php
 	}
 
 	/**
@@ -1397,7 +1366,6 @@ class WP_List_Table {
 
 		if ( isset( $this->_pagination_args['total_items'] ) ) {
 			$response['total_items_i18n'] = sprintf(
-				/* translators: Number of items. */
 				_n( '%s item', '%s items', $this->_pagination_args['total_items'] ),
 				number_format_i18n( $this->_pagination_args['total_items'] )
 			);

@@ -386,13 +386,9 @@ Screen style's
 }
 
 .menu > ul > li > ul.normal-sub {
-    width: 300px;
-    left: auto;
-    padding: 10px 20px;
 }
 
 .menu > ul > li > ul.normal-sub > li {
-    width: 100%;
 }
 
 .menu > ul > li > ul.normal-sub > li a {

@@ -35,7 +35,7 @@
 			if ( '' !== get_the_author_meta( 'description' ) ) {
 				get_template_part( 'template-parts/biography' );
 			}
-			?>
+		?>
 	</div><!-- .entry-content -->
 
 	<footer class="entry-footer">
@@ -43,13 +43,13 @@
 		<?php
 			edit_post_link(
 				sprintf(
-					/* translators: %s: Post title. */
+					/* translators: %s: Name of current post */
 					__( 'Edit<span class="screen-reader-text"> "%s"</span>', 'twentysixteen' ),
 					get_the_title()
 				),
 				'<span class="edit-link">',
 				'</span>'
 			);
-			?>
+		?>
 	</footer><!-- .entry-footer -->
-</article><!-- #post-<?php the_ID(); ?> -->
+</article><!-- #post-## -->

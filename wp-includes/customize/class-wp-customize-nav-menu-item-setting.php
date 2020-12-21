@@ -84,7 +84,7 @@ class WP_Customize_Nav_Menu_Item_Setting extends WP_Customize_Setting {
 	 * Storage of pre-setup menu item to prevent wasted calls to wp_setup_nav_menu_item().
 	 *
 	 * @since 4.3.0
-	 * @var array|null
+	 * @var array
 	 */
 	protected $value;
 
@@ -274,7 +274,7 @@ class WP_Customize_Nav_Menu_Item_Setting extends WP_Customize_Setting {
 				$original_title = apply_filters( 'the_title', $original_object->post_title, $original_object->ID );
 
 				if ( '' === $original_title ) {
-					/* translators: %d: ID of a post. */
+					/* translators: %d: ID of a post */
 					$original_title = sprintf( __( '#%d (no title)' ), $original_object->ID );
 				}
 			}
@@ -353,9 +353,7 @@ class WP_Customize_Nav_Menu_Item_Setting extends WP_Customize_Setting {
 
 		if ( ! isset( $this->value['nav_menu_term_id'] ) && $this->post_id > 0 ) {
 			$menus = wp_get_post_terms(
-				$this->post_id,
-				WP_Customize_Nav_Menu_Setting::TAXONOMY,
-				array(
+				$this->post_id, WP_Customize_Nav_Menu_Setting::TAXONOMY, array(
 					'fields' => 'ids',
 				)
 			);
@@ -477,11 +475,8 @@ class WP_Customize_Nav_Menu_Item_Setting extends WP_Customize_Setting {
 	 */
 	public function filter_wp_get_nav_menu_items( $items, $menu, $args ) {
 		$this_item                = $this->value();
-		$current_nav_menu_term_id = null;
-		if ( isset( $this_item['nav_menu_term_id'] ) ) {
-			$current_nav_menu_term_id = $this_item['nav_menu_term_id'];
-			unset( $this_item['nav_menu_term_id'] );
-		}
+		$current_nav_menu_term_id = $this_item['nav_menu_term_id'];
+		unset( $this_item['nav_menu_term_id'] );
 
 		$should_filter = (
 			$menu->term_id === $this->original_nav_menu_term_id
@@ -496,7 +491,7 @@ class WP_Customize_Nav_Menu_Item_Setting extends WP_Customize_Setting {
 		$should_remove = (
 			false === $this_item
 			||
-			( isset( $this_item['_invalid'] ) && true === $this_item['_invalid'] )
+			true === $this_item['_invalid']
 			||
 			(
 				$this->original_nav_menu_term_id === $menu->term_id
@@ -562,8 +557,7 @@ class WP_Customize_Nav_Menu_Item_Setting extends WP_Customize_Setting {
 
 		if ( ARRAY_A === $args['output'] ) {
 			$items = wp_list_sort(
-				$items,
-				array(
+				$items, array(
 					$args['output_key'] => 'ASC',
 				)
 			);

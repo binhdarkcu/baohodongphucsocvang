@@ -15,9 +15,7 @@
  * @return string|false The format if successful. False otherwise.
  */
 function get_post_format( $post = null ) {
-	$post = get_post( $post );
-
-	if ( ! $post ) {
+	if ( ! $post = get_post( $post ) ) {
 		return false;
 	}
 
@@ -69,7 +67,7 @@ function has_post_format( $format = array(), $post = null ) {
 function set_post_format( $post, $format ) {
 	$post = get_post( $post );
 
-	if ( ! $post ) {
+	if ( empty( $post ) ) {
 		return new WP_Error( 'invalid_post', __( 'Invalid post.' ) );
 	}
 
@@ -183,7 +181,7 @@ function _post_format_request( $qvs ) {
  * @access private
  * @since 3.1.0
  *
- * @global WP_Rewrite $wp_rewrite WordPress rewrite component.
+ * @global WP_Rewrite $wp_rewrite
  *
  * @param string $link
  * @param object $term

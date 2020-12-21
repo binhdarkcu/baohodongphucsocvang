@@ -12,7 +12,9 @@
  * @requires jQuery
  */
 
-/* global tinymce, QTags, wpActiveEditor, tb_position */
+/* global tinymce, QTags */
+
+var wpActiveEditor, send_to_editor;
 
 /**
  * Sends the HTML passed in the parameters to TinyMCE.
@@ -26,7 +28,7 @@
  *                         are unavailable. This means that the HTML was not
  *                         sent to the editor.
  */
-window.send_to_editor = function( html ) {
+send_to_editor = function( html ) {
 	var editor,
 		hasTinymce = typeof tinymce !== 'undefined',
 		hasQuicktags = typeof QTags !== 'undefined';
@@ -35,7 +37,7 @@ window.send_to_editor = function( html ) {
 	if ( ! wpActiveEditor ) {
 		if ( hasTinymce && tinymce.activeEditor ) {
 			editor = tinymce.activeEditor;
-			window.wpActiveEditor = editor.id;
+			wpActiveEditor = editor.id;
 		} else if ( ! hasQuicktags ) {
 			return false;
 		}
@@ -62,6 +64,7 @@ window.send_to_editor = function( html ) {
 	}
 };
 
+var tb_position;
 (function($) {
 	/**
 	 * Recalculates and applies the new ThickBox position based on the current
@@ -74,7 +77,7 @@ window.send_to_editor = function( html ) {
 	 * @returns {Object[]} Array containing jQuery objects for all the found
 	 *                     ThickBox anchors.
 	 */
-	window.tb_position = function() {
+	tb_position = function() {
 		var tbWindow = $('#TB_window'),
 			width = $(window).width(),
 			H = $(window).height(),

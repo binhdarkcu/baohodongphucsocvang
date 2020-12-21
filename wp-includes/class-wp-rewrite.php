@@ -1183,8 +1183,7 @@ class WP_Rewrite {
 					if ( ! $page ) {
 						// Require <permalink>/attachment/stuff form for pages because of confusion with subpages.
 						$rewrite = array_merge(
-							$rewrite,
-							array(
+							$rewrite, array(
 								$sub1        => $subquery,
 								$sub1tb      => $subtbquery,
 								$sub1feed    => $subfeedquery,
@@ -1203,8 +1202,7 @@ class WP_Rewrite {
 							$sub2feed2   => $subfeedquery,
 							$sub2comment => $subcommentquery,
 							$sub2embed   => $subembedquery,
-						),
-						$rewrite
+						), $rewrite
 					);
 				}
 			}
@@ -1672,7 +1670,7 @@ class WP_Rewrite {
 	 * @since 4.3.0 Added support for skipping query var registration by passing `false` to `$query_var`.
 	 *
 	 * @see add_rewrite_endpoint() for full documentation.
-	 * @global WP $wp Current WordPress environment instance.
+	 * @global WP $wp
 	 *
 	 * @param string      $name      Name of the endpoint.
 	 * @param int         $places    Endpoint mask describing the places the endpoint should be added.
@@ -1684,7 +1682,7 @@ class WP_Rewrite {
 		global $wp;
 
 		// For backward compatibility, if null has explicitly been passed as `$query_var`, assume `true`.
-		if ( true === $query_var || null === $query_var ) {
+		if ( true === $query_var || null === func_get_arg( 2 ) ) {
 			$query_var = $name;
 		}
 		$this->endpoints[] = array( $places, $name, $query_var );
@@ -1834,9 +1832,7 @@ class WP_Rewrite {
 	 * @since 1.5.0
 	 */
 	public function init() {
-		$this->extra_rules         = array();
-		$this->non_wp_rules        = array();
-		$this->endpoints           = array();
+		$this->extra_rules         = $this->non_wp_rules = $this->endpoints = array();
 		$this->permalink_structure = get_option( 'permalink_structure' );
 		$this->front               = substr( $this->permalink_structure, 0, strpos( $this->permalink_structure, '%' ) );
 		$this->root                = '';

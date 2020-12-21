@@ -29,7 +29,7 @@ class Core_Upgrader extends WP_Upgrader {
 		$this->strings['up_to_date'] = __( 'WordPress is at the latest version.' );
 		$this->strings['locked']     = __( 'Another update is currently in progress.' );
 		$this->strings['no_package'] = __( 'Update package not available.' );
-		/* translators: %s: Package URL. */
+		/* translators: %s: package URL */
 		$this->strings['downloading_package']   = sprintf( __( 'Downloading update from %s&#8230;' ), '<span class="code">%s</span>' );
 		$this->strings['unpack_package']        = __( 'Unpacking the update&#8230;' );
 		$this->strings['copy_failed']           = __( 'Could not copy files.' );
@@ -121,26 +121,7 @@ class Core_Upgrader extends WP_Upgrader {
 			return new WP_Error( 'locked', $this->strings['locked'] );
 		}
 
-		$download = $this->download_package( $current->packages->$to_download, true );
-
-		// Allow for signature soft-fail.
-		// WARNING: This may be removed in the future.
-		if ( is_wp_error( $download ) && $download->get_error_data( 'softfail-filename' ) ) {
-			// Outout the failure error as a normal feedback, and not as an error:
-			apply_filters( 'update_feedback', $download->get_error_message() );
-
-			// Report this failure back to WordPress.org for debugging purposes.
-			wp_version_check(
-				array(
-					'signature_failure_code' => $download->get_error_code(),
-					'signature_failure_data' => $download->get_error_data(),
-				)
-			);
-
-			// Pretend this error didn't happen.
-			$download = $download->get_error_data( 'softfail-filename' );
-		}
-
+		$download = $this->download_package( $current->packages->$to_download );
 		if ( is_wp_error( $download ) ) {
 			WP_Upgrader::release_lock( 'core_updater' );
 			return $download;
@@ -199,9 +180,7 @@ class Core_Upgrader extends WP_Upgrader {
 
 				$original_result = $result;
 				$result          = new WP_Error(
-					'rollback_was_required',
-					$this->strings['rollback_was_required'],
-					(object) array(
+					'rollback_was_required', $this->strings['rollback_was_required'], (object) array(
 						'update'   => $original_result,
 						'rollback' => $rollback_result,
 					)
@@ -210,14 +189,10 @@ class Core_Upgrader extends WP_Upgrader {
 		}
 
 		/** This action is documented in wp-admin/includes/class-wp-upgrader.php */
-		do_action(
-			'upgrader_process_complete',
-			$this,
-			array(
-				'action' => 'update',
-				'type'   => 'core',
-			)
-		);
+		do_action( 'upgrader_process_complete', $this, array(
+			'action' => 'update',
+			'type'   => 'core',
+		) );
 
 		// Clear the current updates
 		delete_site_transient( 'update_core' );
@@ -284,19 +259,14 @@ class Core_Upgrader extends WP_Upgrader {
 		if ( defined( 'WP_AUTO_UPDATE_CORE' ) ) {
 			if ( false === WP_AUTO_UPDATE_CORE ) {
 				// Defaults to turned off, unless a filter allows it
-				$upgrade_dev   = false;
-				$upgrade_minor = false;
-				$upgrade_major = false;
+				$upgrade_dev = $upgrade_minor = $upgrade_major = false;
 			} elseif ( true === WP_AUTO_UPDATE_CORE ) {
 				// ALL updates for core
-				$upgrade_dev   = true;
-				$upgrade_minor = true;
-				$upgrade_major = true;
+				$upgrade_dev = $upgrade_minor = $upgrade_major = true;
 			} elseif ( 'minor' === WP_AUTO_UPDATE_CORE ) {
 				// Only minor updates for core
-				$upgrade_dev   = false;
+				$upgrade_dev   = $upgrade_major = false;
 				$upgrade_minor = true;
-				$upgrade_major = false;
 			}
 		}
 

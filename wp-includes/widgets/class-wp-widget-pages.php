@@ -56,7 +56,7 @@ class WP_Widget_Pages extends WP_Widget {
 		$sortby  = empty( $instance['sortby'] ) ? 'menu_order' : $instance['sortby'];
 		$exclude = empty( $instance['exclude'] ) ? '' : $instance['exclude'];
 
-		if ( 'menu_order' === $sortby ) {
+		if ( $sortby == 'menu_order' ) {
 			$sortby = 'menu_order, post_title';
 		}
 
@@ -73,14 +73,12 @@ class WP_Widget_Pages extends WP_Widget {
 		 */
 		$out = wp_list_pages(
 			apply_filters(
-				'widget_pages_args',
-				array(
+				'widget_pages_args', array(
 					'title_li'    => '',
 					'echo'        => 0,
 					'sort_column' => $sortby,
 					'exclude'     => $exclude,
-				),
-				$instance
+				), $instance
 			)
 		);
 
@@ -89,11 +87,11 @@ class WP_Widget_Pages extends WP_Widget {
 			if ( $title ) {
 				echo $args['before_title'] . $title . $args['after_title'];
 			}
-			?>
+		?>
 		<ul>
 			<?php echo $out; ?>
 		</ul>
-			<?php
+		<?php
 			echo $args['after_widget'];
 		}
 	}
@@ -132,8 +130,7 @@ class WP_Widget_Pages extends WP_Widget {
 	public function form( $instance ) {
 		//Defaults
 		$instance = wp_parse_args(
-			(array) $instance,
-			array(
+			(array) $instance, array(
 				'sortby'  => 'post_title',
 				'title'   => '',
 				'exclude' => '',

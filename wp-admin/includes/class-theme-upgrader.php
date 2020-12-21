@@ -45,7 +45,7 @@ class Theme_Upgrader extends WP_Upgrader {
 	public function upgrade_strings() {
 		$this->strings['up_to_date'] = __( 'The theme is at the latest version.' );
 		$this->strings['no_package'] = __( 'Update package not available.' );
-		/* translators: %s: Package URL. */
+		/* translators: %s: package URL */
 		$this->strings['downloading_package'] = sprintf( __( 'Downloading update from %s&#8230;' ), '<span class="code">%s</span>' );
 		$this->strings['unpack_package']      = __( 'Unpacking the update&#8230;' );
 		$this->strings['remove_old']          = __( 'Removing the old version of the theme&#8230;' );
@@ -61,23 +61,23 @@ class Theme_Upgrader extends WP_Upgrader {
 	 */
 	public function install_strings() {
 		$this->strings['no_package'] = __( 'Installation package not available.' );
-		/* translators: %s: Package URL. */
+		/* translators: %s: package URL */
 		$this->strings['downloading_package'] = sprintf( __( 'Downloading installation package from %s&#8230;' ), '<span class="code">%s</span>' );
 		$this->strings['unpack_package']      = __( 'Unpacking the package&#8230;' );
 		$this->strings['installing_package']  = __( 'Installing the theme&#8230;' );
 		$this->strings['no_files']            = __( 'The theme contains no files.' );
 		$this->strings['process_failed']      = __( 'Theme installation failed.' );
 		$this->strings['process_success']     = __( 'Theme installed successfully.' );
-		/* translators: 1: Theme name, 2: Theme version. */
+		/* translators: 1: theme name, 2: version */
 		$this->strings['process_success_specific'] = __( 'Successfully installed the theme <strong>%1$s %2$s</strong>.' );
 		$this->strings['parent_theme_search']      = __( 'This theme requires a parent theme. Checking if it is installed&#8230;' );
-		/* translators: 1: Theme name, 2: Theme version. */
+		/* translators: 1: theme name, 2: version */
 		$this->strings['parent_theme_prepare_install'] = __( 'Preparing to install <strong>%1$s %2$s</strong>&#8230;' );
-		/* translators: 1: Theme name, 2: Theme version. */
+		/* translators: 1: theme name, 2: version */
 		$this->strings['parent_theme_currently_installed'] = __( 'The parent theme, <strong>%1$s %2$s</strong>, is currently installed.' );
-		/* translators: 1: Theme name, 2: Theme version. */
+		/* translators: 1: theme name, 2: version */
 		$this->strings['parent_theme_install_success'] = __( 'Successfully installed the parent theme, <strong>%1$s %2$s</strong>.' );
-		/* translators: %s: Theme name. */
+		/* translators: %s: theme name */
 		$this->strings['parent_theme_not_found'] = sprintf( __( '<strong>The parent theme could not be found.</strong> You will need to install the parent theme, %s, before you can use this child theme.' ), '<strong>%s</strong>' );
 	}
 
@@ -111,8 +111,7 @@ class Theme_Upgrader extends WP_Upgrader {
 
 		// We don't have the parent theme, let's install it.
 		$api = themes_api(
-			'theme_information',
-			array(
+			'theme_information', array(
 				'slug'   => $theme_info->get( 'Template' ),
 				'fields' => array(
 					'sections' => false,
@@ -419,9 +418,7 @@ class Theme_Upgrader extends WP_Upgrader {
 
 		/** This action is documented in wp-admin/includes/class-wp-upgrader.php */
 		do_action(
-			'upgrader_process_complete',
-			$this,
-			array(
+			'upgrader_process_complete', $this, array(
 				'action' => 'update',
 				'type'   => 'theme',
 				'bulk'   => true,
@@ -471,10 +468,9 @@ class Theme_Upgrader extends WP_Upgrader {
 		// A proper archive should have a style.css file in the single subdirectory
 		if ( ! file_exists( $working_directory . 'style.css' ) ) {
 			return new WP_Error(
-				'incompatible_archive_theme_no_style',
-				$this->strings['incompatible_archive'],
+				'incompatible_archive_theme_no_style', $this->strings['incompatible_archive'],
+				/* translators: %s: style.css */
 				sprintf(
-					/* translators: %s: style.css */
 					__( 'The theme is missing the %s stylesheet.' ),
 					'<code>style.css</code>'
 				)
@@ -482,8 +478,7 @@ class Theme_Upgrader extends WP_Upgrader {
 		}
 
 		$info = get_file_data(
-			$working_directory . 'style.css',
-			array(
+			$working_directory . 'style.css', array(
 				'Name'     => 'Theme Name',
 				'Template' => 'Template',
 			)
@@ -491,10 +486,9 @@ class Theme_Upgrader extends WP_Upgrader {
 
 		if ( empty( $info['Name'] ) ) {
 			return new WP_Error(
-				'incompatible_archive_theme_no_name',
-				$this->strings['incompatible_archive'],
+				'incompatible_archive_theme_no_name', $this->strings['incompatible_archive'],
+				/* translators: %s: style.css */
 				sprintf(
-					/* translators: %s: style.css */
 					__( 'The %s stylesheet doesn&#8217;t contain a valid theme header.' ),
 					'<code>style.css</code>'
 				)
@@ -504,10 +498,9 @@ class Theme_Upgrader extends WP_Upgrader {
 		// If it's not a child theme, it must have at least an index.php to be legit.
 		if ( empty( $info['Template'] ) && ! file_exists( $working_directory . 'index.php' ) ) {
 			return new WP_Error(
-				'incompatible_archive_theme_no_index',
-				$this->strings['incompatible_archive'],
+				'incompatible_archive_theme_no_index', $this->strings['incompatible_archive'],
+				/* translators: %s: index.php */
 				sprintf(
-					/* translators: %s: index.php */
 					__( 'The theme is missing the %s file.' ),
 					'<code>index.php</code>'
 				)

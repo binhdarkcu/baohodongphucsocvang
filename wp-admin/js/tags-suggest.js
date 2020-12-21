@@ -8,7 +8,6 @@
 		return;
 	}
 
-	var tempID = 0;
 	var separator = window.tagsSuggestL10n.tagDelimiter || ',';
 
 	function split( val ) {
@@ -55,33 +54,15 @@
 
 				term = getLast( request.term );
 
-				$.get( window.ajaxurl, {
-					action: 'ajax-tag-search',
-					tax: taxonomy,
-					q: term
+				$.get( window.tagsSuggestL10n.restURL, {
+					_fields: [ 'id', 'name' ],
+					taxonomy: taxonomy,
+					search: term
 				} ).always( function() {
 					$element.removeClass( 'ui-autocomplete-loading' ); // UI fails to remove this sometimes?
 				} ).done( function( data ) {
-					var tagName;
-					var tags = [];
-
-					if ( data ) {
-						data = data.split( '\n' );
-
-						for ( tagName in data ) {
-							var id = ++tempID;
-
-							tags.push({
-								id: id,
-								name: data[tagName]
-							});
-						}
-
-						cache = tags;
-						response( tags );
-					} else {
-						response( tags );
-					}
+					cache = data;
+					response( data );
 				} );
 
 				last = request.term;
@@ -107,12 +88,6 @@
 					window.wp.a11y.speak( window.tagsSuggestL10n.termSelected, 'assertive' );
 					event.preventDefault();
 				} else if ( $.ui.keyCode.ENTER === event.keyCode ) {
-					// If we're in the edit post Tags meta box, add the tag.
-					if ( window.tagBox ) {
-						window.tagBox.userAction = 'add';
-						window.tagBox.flushTags( $( this ).closest( '.tagsdiv' ) );
-					}
-
 					// Do not close Quick Edit / Bulk Edit
 					event.preventDefault();
 					event.stopPropagation();
@@ -126,7 +101,7 @@
 			close: function() {
 				$element.attr( 'aria-expanded', 'false' );
 			},
-			minLength: 2,
+			minLength: window.tagsSuggestL10n.minChars,
 			position: {
 				my: 'left top+2',
 				at: 'left bottom',

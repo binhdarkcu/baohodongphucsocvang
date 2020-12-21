@@ -10,8 +10,10 @@
 ?>
 <?php
   $url = get_home_url();
+  $eto_options = get_option('eto_settings');
+  $sub_header_top_color = '#'.$eto_options['sub_header_top_color'];
+  $amount_product_categories = $eto_options['amount_product_categories'];
   $urlProductCategory = '/product-category/danh-muc/';
-  $sub_header_top_color = get_field('sub_header_top_color', 'option');
   $urlProduct = 'ao-thun/';
   $arrayCategoriesName = array('Áo thun', 'Quần áo bảo hộ lao động', 'An Toàn Khác');
   foreach ($arrayCategoriesName as $categoryName) {
@@ -42,7 +44,7 @@
             <div class="section-content bg-none list-posts-inner">
               <div class="layout-grid grid-style-1 columns-5 product-section">
                 <?php
-                    $amountProduct = get_field('amount_product_categories', 'option');
+                    $amountProduct = $amount_product_categories;
                     $args = array(
                       'category' => array( $categoryName ),
                       'orderby'  => 'name',

@@ -428,17 +428,17 @@ $nav_menus_l10n = array(
 	'moveUp'                  => __( 'Move up one' ),
 	'moveDown'                => __( 'Move down one' ),
 	'moveToTop'               => __( 'Move to the top' ),
-	/* translators: %s: Previous item name. */
+	/* translators: %s: previous item name */
 	'moveUnder'               => __( 'Move under %s' ),
-	/* translators: %s: Previous item name. */
+	/* translators: %s: previous item name */
 	'moveOutFrom'             => __( 'Move out from under %s' ),
-	/* translators: %s: Previous item name. */
+	/* translators: %s: previous item name */
 	'under'                   => __( 'Under %s' ),
-	/* translators: %s: Previous item name. */
+	/* translators: %s: previous item name */
 	'outFrom'                 => __( 'Out from under %s' ),
-	/* translators: 1: Item name, 2: Item position, 3: Total number of items. */
+	/* translators: 1: item name, 2: item position, 3: total number of items */
 	'menuFocus'               => __( '%1$s. Menu item %2$d of %3$d.' ),
-	/* translators: 1: Item name, 2: Item position, 3: Parent item name. */
+	/* translators: 1: item name, 2: item position, 3: parent item name */
 	'subMenuFocus'            => __( '%1$s. Sub item number %2$d under %3$s.' ),
 );
 wp_localize_script( 'nav-menu', 'menus', $nav_menus_l10n );
@@ -529,22 +529,13 @@ wp_nav_menu_setup();
 wp_initial_nav_menu_meta_boxes();
 
 if ( ! current_theme_supports( 'menus' ) && ! $num_locations ) {
-	$messages[] = '<div id="message" class="updated"><p>' . sprintf(
-		/* translators: URL to Widgets screen. */
-		__( 'Your theme does not natively support menus, but you can use them in sidebars by adding a &#8220;Navigation Menu&#8221; widget on the <a href="%s">Widgets</a> screen.' ),
-		admin_url( 'widgets.php' )
-	) . '</p></div>';
+	$messages[] = '<div id="message" class="updated"><p>' . sprintf( __( 'Your theme does not natively support menus, but you can use them in sidebars by adding a &#8220;Navigation Menu&#8221; widget on the <a href="%s">Widgets</a> screen.' ), admin_url( 'widgets.php' ) ) . '</p></div>';
 }
 
 if ( ! $locations_screen ) : // Main tab
-	$overview  = '<p>' . __( 'This screen is used for managing your navigation menus.' ) . '</p>';
-	$overview .= '<p>' . sprintf(
-		/* translators: 1: URL to Widgets screen, 2 and 3: The names of the default themes. */
-			__( 'Menus can be displayed in locations defined by your theme, even used in sidebars by adding a &#8220;Navigation Menu&#8221; widget on the <a href="%1$s">Widgets</a> screen. If your theme does not support the navigation menus feature (the default themes, %2$s and %3$s, do), you can learn about adding this support by following the Documentation link to the side.' ),
-		admin_url( 'widgets.php' ),
-		'Twenty Nineteen',
-		'Twenty Twenty'
-	) . '</p>';
+	$overview = '<p>' . __( 'This screen is used for managing your navigation menus.' ) . '</p>';
+	/* translators: 1: Widgets admin screen URL, 2 and 3: The name of the default themes */
+	$overview .= '<p>' . sprintf( __( 'Menus can be displayed in locations defined by your theme, even used in sidebars by adding a &#8220;Navigation Menu&#8221; widget on the <a href="%1$s">Widgets</a> screen. If your theme does not support the navigation menus feature (the default themes, %2$s and %3$s, do), you can learn about adding this support by following the Documentation link to the side.' ), admin_url( 'widgets.php' ), 'Twenty Sixteen', 'Twenty Seventeen' ) . '</p>';
 	$overview .= '<p>' . __( 'From this screen you can:' ) . '</p>';
 	$overview .= '<ul><li>' . __( 'Create, edit, and delete menus' ) . '</li>';
 	$overview .= '<li>' . __( 'Add, organize, and modify individual menu items' ) . '</li></ul>';
@@ -601,8 +592,8 @@ endif;
 
 get_current_screen()->set_help_sidebar(
 	'<p><strong>' . __( 'For more information:' ) . '</strong></p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/article/appearance-menus-screen/">Documentation on Menus</a>' ) . '</p>' .
-	'<p>' . __( '<a href="https://wordpress.org/support/">Support</a>' ) . '</p>'
+	'<p>' . __( '<a href="https://codex.wordpress.org/Appearance_Menus_Screen">Documentation on Menus</a>' ) . '</p>' .
+	'<p>' . __( '<a href="https://wordpress.org/support/">Support Forums</a>' ) . '</p>'
 );
 
 // Get the admin header.
@@ -620,8 +611,7 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 					array(
 						array( 'autofocus' => $focus ),
 						'return' => urlencode( remove_query_arg( wp_removable_query_args(), wp_unslash( $_SERVER['REQUEST_URI'] ) ) ),
-					),
-					admin_url( 'customize.php' )
+					), admin_url( 'customize.php' )
 				)
 			),
 			__( 'Manage with Live Preview' )
@@ -629,31 +619,26 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 	endif;
 
 	$nav_tab_active_class = '';
-	$nav_aria_current     = '';
 	if ( ! isset( $_GET['action'] ) || isset( $_GET['action'] ) && 'locations' != $_GET['action'] ) {
 		$nav_tab_active_class = ' nav-tab-active';
-		$nav_aria_current     = ' aria-current="page"';
 	}
 	?>
 
 	<hr class="wp-header-end">
 
-	<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Secondary menu' ); ?>">
-		<a href="<?php echo admin_url( 'nav-menus.php' ); ?>" class="nav-tab<?php echo $nav_tab_active_class; ?>"<?php echo $nav_aria_current; ?>><?php esc_html_e( 'Edit Menus' ); ?></a>
+	<h2 class="nav-tab-wrapper wp-clearfix">
+		<a href="<?php echo admin_url( 'nav-menus.php' ); ?>" class="nav-tab<?php echo $nav_tab_active_class; ?>"><?php esc_html_e( 'Edit Menus' ); ?></a>
+		<?php if ( $num_locations && $menu_count ) : ?>
+			<a href="<?php echo esc_url( add_query_arg( array( 'action' => 'locations' ), admin_url( 'nav-menus.php' ) ) ); ?>" class="nav-tab
+								<?php
+								if ( $locations_screen ) {
+									echo ' nav-tab-active';}
+?>
+"><?php esc_html_e( 'Manage Locations' ); ?></a>
 		<?php
-		if ( $num_locations && $menu_count ) {
-			$active_tab_class = '';
-			$aria_current     = '';
-			if ( $locations_screen ) {
-				$active_tab_class = ' nav-tab-active';
-				$aria_current     = ' aria-current="page"';
-			}
-			?>
-			<a href="<?php echo esc_url( add_query_arg( array( 'action' => 'locations' ), admin_url( 'nav-menus.php' ) ) ); ?>" class="nav-tab<?php echo $active_tab_class; ?>"<?php echo $aria_current; ?>><?php esc_html_e( 'Manage Locations' ); ?></a>
-			<?php
-		}
+			endif;
 		?>
-	</nav>
+	</h2>
 	<?php
 	foreach ( $messages as $message ) :
 		echo $message . "\n";
@@ -664,17 +649,9 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 		if ( 1 == $num_locations ) {
 			echo '<p>' . __( 'Your theme supports one menu. Select which menu you would like to use.' ) . '</p>';
 		} else {
-			echo '<p>' . sprintf(
-				/* translators: %s: Number of menus. */
-				_n(
-					'Your theme supports %s menu. Select which menu appears in each location.',
-					'Your theme supports %s menus. Select which menu appears in each location.',
-					$num_locations
-				),
-				number_format_i18n( $num_locations )
-			) . '</p>';
+			echo '<p>' . sprintf( _n( 'Your theme supports %s menu. Select which menu appears in each location.', 'Your theme supports %s menus. Select which menu appears in each location.', $num_locations ), number_format_i18n( $num_locations ) ) . '</p>';
 		}
-		?>
+	?>
 	<div id="menu-locations-wrap">
 		<form method="post" action="<?php echo esc_url( add_query_arg( array( 'action' => 'locations' ), admin_url( 'nav-menus.php' ) ) ); ?>">
 			<table class="widefat fixed" id="menu-locations-table">
@@ -714,12 +691,11 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 											array(
 												'action' => 'edit',
 												'menu'   => $menu_locations[ $_location ],
-											),
-											admin_url( 'nav-menus.php' )
+											), admin_url( 'nav-menus.php' )
 										)
 									);
-									?>
-									">
+?>
+">
 										<span aria-hidden="true"><?php _ex( 'Edit', 'menu' ); ?></span><span class="screen-reader-text"><?php _e( 'Edit selected menu' ); ?></span>
 									</a>
 								</span>
@@ -733,12 +709,11 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 												'action' => 'edit',
 												'menu'   => 0,
 												'use-location' => $_location,
-											),
-											admin_url( 'nav-menus.php' )
+											), admin_url( 'nav-menus.php' )
 										)
 									);
-									?>
-									">
+?>
+">
 										<?php _ex( 'Use new menu', 'menu' ); ?>
 									</a>
 								</span>
@@ -753,38 +728,30 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 			<input type="hidden" name="menu" id="nav-menu-meta-object-id" value="<?php echo esc_attr( $nav_menu_selected_id ); ?>" />
 		</form>
 	</div><!-- #menu-locations-wrap -->
-		<?php
-		/**
-		 * Fires after the menu locations table is displayed.
-		 *
-		 * @since 3.6.0
-		 */
-		do_action( 'after_menu_locations_table' );
-		?>
+	<?php
+	/**
+	 * Fires after the menu locations table is displayed.
+	 *
+	 * @since 3.6.0
+	 */
+	do_action( 'after_menu_locations_table' );
+	?>
 	<?php else : ?>
 	<div class="manage-menus">
-		<?php if ( $menu_count < 1 ) : ?>
-		<span class="first-menu-message">
-			<?php _e( 'Create your first menu below.' ); ?>
-			<span class="screen-reader-text"><?php _e( 'Fill in the Menu Name and click the Create Menu button to create your first menu.' ); ?></span>
-		</span><!-- /first-menu-message -->
-		<?php elseif ( $menu_count < 2 ) : ?>
+		<?php if ( $menu_count < 2 ) : ?>
 		<span class="add-edit-menu-action">
 			<?php
 			printf(
-				/* translators: %s: URL to create a new menu. */
-				__( 'Edit your menu below, or <a href="%s">create a new menu</a>. Don&#8217;t forget to save your changes!' ),
-				esc_url(
+				__( 'Edit your menu below, or <a href="%s">create a new menu</a>. Don&#8217;t forget to save your changes!' ), esc_url(
 					add_query_arg(
 						array(
 							'action' => 'edit',
 							'menu'   => 0,
-						),
-						admin_url( 'nav-menus.php' )
+						), admin_url( 'nav-menus.php' )
 					)
 				)
 			);
-			?>
+?>
 			<span class="screen-reader-text"><?php _e( 'Click the Save Menu button to save your changes.' ); ?></span>
 		</span><!-- /add-edit-menu-action -->
 		<?php else : ?>
@@ -834,30 +801,27 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 			<span class="add-new-menu-action">
 				<?php
 				printf(
-					/* translators: %s: URL to create a new menu. */
-					__( 'or <a href="%s">create a new menu</a>. Don&#8217;t forget to save your changes!' ),
-					esc_url(
+					__( 'or <a href="%s">create a new menu</a>. Don&#8217;t forget to save your changes!' ), esc_url(
 						add_query_arg(
 							array(
 								'action' => 'edit',
 								'menu'   => 0,
-							),
-							admin_url( 'nav-menus.php' )
+							), admin_url( 'nav-menus.php' )
 						)
 					)
 				);
-				?>
+?>
 				<span class="screen-reader-text"><?php _e( 'Click the Save Menu button to save your changes.' ); ?></span>
 			</span><!-- /add-new-menu-action -->
 		</form>
-			<?php
+	<?php
 		endif;
 
 		$metabox_holder_disabled_class = '';
-		if ( isset( $_GET['menu'] ) && '0' == $_GET['menu'] ) {
-			$metabox_holder_disabled_class = ' metabox-holder-disabled';
-		}
-		?>
+if ( isset( $_GET['menu'] ) && '0' == $_GET['menu'] ) {
+	$metabox_holder_disabled_class = ' metabox-holder-disabled';
+}
+	?>
 	</div><!-- /manage-menus -->
 	<div id="nav-menus-frame" class="wp-clearfix">
 	<div id="menu-settings-column" class="metabox-holder<?php echo $metabox_holder_disabled_class; ?>">
@@ -894,14 +858,14 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
 					if ( $one_theme_location_no_menus ) {
 						$menu_name_val = 'value="' . esc_attr( 'Menu 1' ) . '"';
-						?>
+					?>
 						<input type="hidden" name="zero-menu-state" value="true" />
-						<?php
+					<?php
 					} else {
 						$menu_name_val = 'value="' . esc_attr( $nav_menu_selected_title ) . '"';
 					}
 					?>
-					<input type="hidden" name="action" value="update" />
+					 <input type="hidden" name="action" value="update" />
 					<input type="hidden" name="menu" id="menu" value="<?php echo esc_attr( $nav_menu_selected_id ); ?>" />
 					<div id="nav-menu-header">
 						<div class="major-publishing-actions wp-clearfix">
@@ -915,36 +879,36 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 					<div id="post-body">
 						<div id="post-body-content" class="wp-clearfix">
 							<?php if ( ! $add_new_screen ) : ?>
-								<?php
+							<?php
 								$hide_style = '';
-								if ( isset( $menu_items ) && 0 == count( $menu_items ) ) {
-									$hide_style = 'style="display: none;"';
-								}
+							if ( isset( $menu_items ) && 0 == count( $menu_items ) ) {
+								$hide_style = 'style="display: none;"';
+							}
 								$starter_copy = ( $one_theme_location_no_menus ) ? __( 'Edit your default menu by adding or removing items. Drag each item into the order you prefer. Click Create Menu to save your changes.' ) : __( 'Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.' );
-								?>
+							?>
 							<div class="drag-instructions post-body-plain" <?php echo $hide_style; ?>>
 								<p><?php echo $starter_copy; ?></p>
 							</div>
-								<?php
-								if ( isset( $edit_markup ) && ! is_wp_error( $edit_markup ) ) {
-									echo $edit_markup;
-								} else {
-									?>
+							<?php
+							if ( isset( $edit_markup ) && ! is_wp_error( $edit_markup ) ) {
+								echo $edit_markup;
+							} else {
+							?>
 							<ul class="menu" id="menu-to-edit"></ul>
-								<?php } ?>
+							<?php } ?>
 							<?php endif; ?>
 							<?php if ( $add_new_screen ) : ?>
 								<p class="post-body-plain" id="menu-name-desc"><?php _e( 'Give your menu a name, then click Create Menu.' ); ?></p>
 								<?php if ( isset( $_GET['use-location'] ) ) : ?>
 									<input type="hidden" name="use-location" value="<?php echo esc_attr( $_GET['use-location'] ); ?>" />
 								<?php endif; ?>
-								<?php
+							<?php
 								endif;
 
 								$no_menus_style = '';
-							if ( $one_theme_location_no_menus ) {
-								$no_menus_style = 'style="display: none;"';
-							}
+if ( $one_theme_location_no_menus ) {
+	$no_menus_style = 'style="display: none;"';
+}
 							?>
 							<div class="menu-settings" <?php echo $no_menus_style; ?>>
 								<h3><?php _e( 'Menu Settings' ); ?></h3>
@@ -979,8 +943,8 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 											<?php if ( ! empty( $menu_locations[ $location ] ) && $menu_locations[ $location ] != $nav_menu_selected_id ) : ?>
 												<span class="theme-location-set">
 												<?php
+													/* translators: %s: menu name */
 													printf(
-														/* translators: %s: Menu name. */
 														_x( '(Currently set to: %s)', 'menu location' ),
 														wp_get_nav_menu_object( $menu_locations[ $location ] )->name
 													);
@@ -1008,14 +972,12 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 											array(
 												'action' => 'delete',
 												'menu'   => $nav_menu_selected_id,
-											),
-											admin_url( 'nav-menus.php' )
-										),
-										'delete-nav_menu-' . $nav_menu_selected_id
+											), admin_url( 'nav-menus.php' )
+										), 'delete-nav_menu-' . $nav_menu_selected_id
 									)
 								);
-								?>
-								"><?php _e( 'Delete Menu' ); ?></a>
+?>
+"><?php _e( 'Delete Menu' ); ?></a>
 							</span><!-- END .delete-action -->
 							<?php endif; ?>
 							<div class="publishing-action">

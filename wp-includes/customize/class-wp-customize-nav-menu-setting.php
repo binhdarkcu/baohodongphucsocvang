@@ -269,8 +269,7 @@ class WP_Customize_Nav_Menu_Setting extends WP_Customize_Setting {
 					'term_group'       => 0,
 					'taxonomy'         => self::TAXONOMY,
 					'filter'           => 'raw',
-				),
-				$setting_value
+				), $setting_value
 			);
 
 			array_splice( $menus, $index, ( -1 === $index ? 0 : 1 ), array( $menu_obj ) );
@@ -279,8 +278,7 @@ class WP_Customize_Nav_Menu_Setting extends WP_Customize_Setting {
 		// Make sure the menu objects get re-sorted after an update/insert.
 		if ( ! $is_delete && ! empty( $args['orderby'] ) ) {
 			$menus = wp_list_sort(
-				$menus,
-				array(
+				$menus, array(
 					$args['orderby'] => 'ASC',
 				)
 			);
@@ -368,8 +366,7 @@ class WP_Customize_Nav_Menu_Setting extends WP_Customize_Setting {
 				'term_group'       => 0,
 				'taxonomy'         => self::TAXONOMY,
 				'filter'           => 'raw',
-			),
-			$setting_value
+			), $setting_value
 		);
 
 		return $menu_obj;
@@ -517,7 +514,7 @@ class WP_Customize_Nav_Menu_Setting extends WP_Customize_Setting {
 			$name_conflict_suffix = 1;
 			while ( is_wp_error( $r ) && 'menu_exists' === $r->get_error_code() ) {
 				$name_conflict_suffix += 1;
-				/* translators: 1: Original menu name, 2: Duplicate count. */
+				/* translators: 1: original menu name, 2: duplicate count */
 				$menu_data['menu-name'] = sprintf( __( '%1$s (%2$d)' ), $original_name, $name_conflict_suffix );
 				$r                      = wp_update_nav_menu_object( $menu_id, wp_slash( $menu_data ) );
 			}

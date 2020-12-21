@@ -3,7 +3,9 @@
  */
 
 /* jshint curly: false, eqeqeq: false */
-/* global ajaxurl, tagBox, array_unique_noempty */
+/* global ajaxurl */
+
+var tagBox, array_unique_noempty;
 
 ( function( $ ) {
 	var tagDelimiter = ( window.tagsSuggestL10n && window.tagsSuggestL10n.tagDelimiter ) || ',';
@@ -22,7 +24,7 @@
 	 *
 	 * @return {Array} A new array containing only the unique items.
 	 */
-	window.array_unique_noempty = function( array ) {
+	array_unique_noempty = function( array ) {
 		var out = [];
 
 		// Trim the values and ensure they are unique.
@@ -47,7 +49,7 @@
 	 *
 	 * @global
 	 */
-	window.tagBox = {
+	tagBox = {
 		/**
 		 * Cleans up tags by removing redundant characters.
 		 *
@@ -369,8 +371,7 @@
 			/**
 			 * Handles pressing enter on the new tag input field.
 			 *
-			 * Prevents submitting the post edit form. Uses `keypress` to take
-			 * into account Input Method Editor (IME) converters.
+			 * Prevents submitting the post edit form.
 			 *
 			 * @since 2.9.0
 			 *
@@ -382,6 +383,11 @@
 				if ( 13 == event.which ) {
 					tagBox.userAction = 'add';
 					tagBox.flushTags( $( this ).closest( '.tagsdiv' ) );
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			}).keypress( function( event ) {
+				if ( 13 == event.which ) {
 					event.preventDefault();
 					event.stopPropagation();
 				}

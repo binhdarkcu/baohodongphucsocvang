@@ -89,11 +89,9 @@ class WP_Widget_Categories extends WP_Widget {
 			wp_dropdown_categories( apply_filters( 'widget_categories_dropdown_args', $cat_args, $instance ) );
 
 			echo '</form>';
-
-			$type_attr = current_theme_supports( 'html5', 'script' ) ? '' : ' type="text/javascript"';
 			?>
 
-<script<?php echo $type_attr; ?>>
+<script type='text/javascript'>
 /* <![CDATA[ */
 (function() {
 	var dropdown = document.getElementById( "<?php echo esc_js( $dropdown_id ); ?>" );
@@ -107,26 +105,26 @@ class WP_Widget_Categories extends WP_Widget {
 /* ]]> */
 </script>
 
-			<?php
+<?php
 		} else {
-			?>
+?>
 		<ul>
-			<?php
-			$cat_args['title_li'] = '';
+<?php
+		$cat_args['title_li'] = '';
 
-			/**
-			 * Filters the arguments for the Categories widget.
-			 *
-			 * @since 2.8.0
-			 * @since 4.9.0 Added the `$instance` parameter.
-			 *
-			 * @param array $cat_args An array of Categories widget options.
-			 * @param array $instance Array of settings for the current widget.
-			 */
-			wp_list_categories( apply_filters( 'widget_categories_args', $cat_args, $instance ) );
-			?>
+		/**
+		 * Filters the arguments for the Categories widget.
+		 *
+		 * @since 2.8.0
+		 * @since 4.9.0 Added the `$instance` parameter.
+		 *
+		 * @param array $cat_args An array of Categories widget options.
+		 * @param array $instance Array of settings for the current widget.
+		 */
+		wp_list_categories( apply_filters( 'widget_categories_args', $cat_args, $instance ) );
+?>
 		</ul>
-			<?php
+<?php
 		}
 
 		echo $args['after_widget'];
@@ -162,12 +160,13 @@ class WP_Widget_Categories extends WP_Widget {
 	public function form( $instance ) {
 		//Defaults
 		$instance     = wp_parse_args( (array) $instance, array( 'title' => '' ) );
+		$title        = sanitize_text_field( $instance['title'] );
 		$count        = isset( $instance['count'] ) ? (bool) $instance['count'] : false;
 		$hierarchical = isset( $instance['hierarchical'] ) ? (bool) $instance['hierarchical'] : false;
 		$dropdown     = isset( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : false;
 		?>
 		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
-		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $instance['title'] ); ?>" /></p>
+		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></p>
 
 		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'dropdown' ); ?>" name="<?php echo $this->get_field_name( 'dropdown' ); ?>"<?php checked( $dropdown ); ?> />
 		<label for="<?php echo $this->get_field_id( 'dropdown' ); ?>"><?php _e( 'Display as dropdown' ); ?></label><br />

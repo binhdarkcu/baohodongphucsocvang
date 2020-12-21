@@ -1,10 +1,5 @@
 <?php
 /**
- * Not used in core since 5.1.
- * This is a back-compat for plugins that may be using this method of loading directly.
- */
-
-/**
  * Disable error reporting
  *
  * Set this to error_reporting( -1 ) for debugging.
@@ -33,11 +28,13 @@ header( 'Vary: Accept-Encoding' ); // Handle proxies
 header( 'Expires: ' . gmdate( 'D, d M Y H:i:s', time() + $expires_offset ) . ' GMT' );
 header( "Cache-Control: public, max-age=$expires_offset" );
 
-$file = get_file( $basepath . '/wp-tinymce.js' );
-if ( isset( $_GET['c'] ) && $file ) {
+if ( isset( $_GET['c'] ) && 1 == $_GET['c'] && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
+	&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' ) && ( $file = get_file( $basepath . '/wp-tinymce.js.gz' ) ) ) {
+
+	header( 'Content-Encoding: gzip' );
 	echo $file;
 } else {
-	// Even further back compat.
+	// Back compat. This file shouldn't be used if this condition can occur (as in, if gzip isn't accepted).
 	echo get_file( $basepath . '/tinymce.min.js' );
 	echo get_file( $basepath . '/plugins/compat3x/plugin.min.js' );
 }

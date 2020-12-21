@@ -159,9 +159,8 @@ class WP_User_Query {
 	 *     @type string       $search              Search keyword. Searches for possible string matches on columns.
 	 *                                             When `$search_columns` is left empty, it tries to determine which
 	 *                                             column to search in based on search string. Default empty.
-	 *     @type array        $search_columns      Array of column names to be searched. Accepts 'ID', 'user_login',
-	 *                                             'user_email', 'user_url', 'user_nicename', 'display_name'.
-	 *                                             Default empty array.
+	 *     @type array        $search_columns      Array of column names to be searched. Accepts 'ID', 'login',
+	 *                                             'nicename', 'email', 'url'. Default empty array.
 	 *     @type string|array $orderby             Field(s) to sort the retrieved users by. May be a single value,
 	 *                                             an array of values, or a multi-dimensional array with fields as
 	 *                                             keys and orders ('ASC' or 'DESC') as values. Accepted values are
@@ -180,7 +179,7 @@ class WP_User_Query {
 	 *     @type int          $number              Number of users to limit the query for. Can be used in
 	 *                                             conjunction with pagination. Value -1 (all) is supported, but
 	 *                                             should be used with caution on larger sites.
-	 *                                             Default -1 (all users).
+	 *                                             Default empty (all users).
 	 *     @type int          $paged               When used with number, defines the page of results to return.
 	 *                                             Default 1.
 	 *     @type bool         $count_total         Whether to count the total number of users found. If pagination
@@ -328,8 +327,7 @@ class WP_User_Query {
 			);
 
 			// Prevent extra meta query.
-			$qv['blog_id'] = 0;
-			$blog_id       = 0;
+			$qv['blog_id'] = $blog_id = 0;
 
 			if ( empty( $this->meta_query->queries ) ) {
 				$this->meta_query->queries = array( $who_query );
@@ -538,8 +536,8 @@ class WP_User_Query {
 			/**
 			 * Filters the columns to search in a WP_User_Query search.
 			 *
-			 * The default columns depend on the search term, and include 'ID', 'user_login',
-			 * 'user_email', 'user_url', 'user_nicename', and 'display_name'.
+			 * The default columns depend on the search term, and include 'user_email',
+			 * 'user_login', 'ID', 'user_url', 'display_name', and 'user_nicename'.
 			 *
 			 * @since 3.6.0
 			 *
@@ -594,48 +592,25 @@ class WP_User_Query {
 
 		$qv =& $this->query_vars;
 
+		$this->request = "SELECT $this->query_fields $this->query_from $this->query_where $this->query_orderby $this->query_limit";
+
+		if ( is_array( $qv['fields'] ) || 'all' == $qv['fields'] ) {
+			$this->results = $wpdb->get_results( $this->request );
+		} else {
+			$this->results = $wpdb->get_col( $this->request );
+		}
+
 		/**
-		 * Filters the users array before the query takes place.
+		 * Filters SELECT FOUND_ROWS() query for the current WP_User_Query instance.
 		 *
-		 * Return a non-null value to bypass WordPress's default user queries.
-		 * Filtering functions that require pagination information are encouraged to set
-		 * the `total_users` property of the WP_User_Query object, passed to the filter
-		 * by reference. If WP_User_Query does not perform a database query, it will not
-		 * have enough information to generate these values itself.
+		 * @since 3.2.0
 		 *
-		 * @since 5.1.0
+		 * @global wpdb $wpdb WordPress database abstraction object.
 		 *
-		 * @param array|null $results Return an array of user data to short-circuit WP's user query
-		 *                            or null to allow WP to run its normal queries.
-		 * @param WP_User_Query $this The WP_User_Query instance (passed by reference).
+		 * @param string $sql The SELECT FOUND_ROWS() query for the current WP_User_Query.
 		 */
-		$this->results = apply_filters_ref_array( 'users_pre_query', array( null, &$this ) );
-
-		if ( null === $this->results ) {
-			$this->request = "SELECT $this->query_fields $this->query_from $this->query_where $this->query_orderby $this->query_limit";
-
-			if ( is_array( $qv['fields'] ) || 'all' == $qv['fields'] ) {
-				$this->results = $wpdb->get_results( $this->request );
-			} else {
-				$this->results = $wpdb->get_col( $this->request );
-			}
-
-			if ( isset( $qv['count_total'] ) && $qv['count_total'] ) {
-				/**
-				 * Filters SELECT FOUND_ROWS() query for the current WP_User_Query instance.
-				 *
-				 * @since 3.2.0
-				 * @since 5.1.0 Added the `$this` parameter.
-				 *
-				 * @global wpdb $wpdb WordPress database abstraction object.
-				 *
-				 * @param string $sql         The SELECT FOUND_ROWS() query for the current WP_User_Query.
-				 * @param WP_User_Query $this The current WP_User_Query instance.
-				 */
-				$found_users_query = apply_filters( 'found_users_query', 'SELECT FOUND_ROWS()', $this );
-
-				$this->total_users = (int) $wpdb->get_var( $found_users_query );
-			}
+		if ( isset( $qv['count_total'] ) && $qv['count_total'] ) {
+			$this->total_users = (int) $wpdb->get_var( apply_filters( 'found_users_query', 'SELECT FOUND_ROWS()' ) );
 		}
 
 		if ( ! $this->results ) {
@@ -886,7 +861,7 @@ class WP_User_Query {
 	 */
 	public function __call( $name, $arguments ) {
 		if ( 'get_search_sql' === $name ) {
-			return $this->get_search_sql( ...$arguments );
+			return call_user_func_array( array( $this, $name ), $arguments );
 		}
 		return false;
 	}

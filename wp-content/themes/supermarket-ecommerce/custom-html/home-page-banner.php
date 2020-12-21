@@ -18,7 +18,7 @@
             <div class="container">
               <div class="home-banners">
                 <div class="main-banner light-background" style="width: 100%">
-                  <?php echo do_shortcode('[metaslider id="662"]'); ?>
+                  <?php echo do_shortcode('[smartslider3 slider="1"]'); ?>
                 </div>
               </div>
             </div>

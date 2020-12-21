@@ -13,9 +13,11 @@
 <html <?php language_attributes(); ?> class="no-js no-svg">
 
 <?php
-  $bg_color = get_field('color_of_page', 'option');
-  $header_top_color = get_field('header_top_color', 'option');
-  $sub_header_top_color = get_field('sub_header_top_color', 'option');
+  $eto_options = get_option('eto_settings');
+  $bg_color = '#'.$eto_options['color_of_page'];
+  $header_top_color = '#'.$eto_options['header_top_color'];
+  $sub_header_top_color = '#'.$eto_options['sub_header_top_color'];
+  $logo_header = eto_get_image('logo_header');
 ?>
 <head>
 	<meta name="google-site-verification" content="RGyGUCc51dk3blNo1ZEHWFVjwLtUC-HrFKv0Y0kL_rE" />
@@ -85,7 +87,7 @@ $slugName = $getQuery -> name;
         <div class="container">
           <nav class="navbar navbar-expand-lg navbar-dark">
             <a class="navbar-brand d-block d-md-none mr-auto" href="<?php echo HOME_URL;?>">
-              <img src="<?php echo get_field('logo_header', 'option'); ?>" class="logo-header-desktop"
+              <img src="<?php echo $logo_header; ?>" width="72" class="logo-header-desktop"
                     alt="Đồng phục sóc vàng" data-no-lazy="1"> </a>
             <div class="profile-top order-lg-last">
               <div class="dropdown">
@@ -93,8 +95,8 @@ $slugName = $getQuery -> name;
                 <!--Check loggedin or not-->
                 <a class="profile-url" href="<?php echo esc_url( get_permalink( get_option('woocommerce_myaccount_page_id') ) ); ?>">
                   <div class="avatar-border">
-                    <img class="avatar user-avatar ls-is-cached lazyloaded" src="<?php echo get_field('no_avatar', 'option'); ?>"
-                      data-src="<?php echo get_field('no_avatar', 'option'); ?>" alt="Guest">
+                    <img class="avatar user-avatar ls-is-cached lazyloaded" src="<?php echo eto_get_image('no_avatar'); ?>"
+                      data-src="<?php echo $eto_options['no_avatar']; ?>" alt="Guest">
                   </div>
                   <?php if ( is_user_logged_in() ) { ?>
                   <span>
@@ -115,13 +117,13 @@ $slugName = $getQuery -> name;
               <ul class="navbar-nav has-separator mr-auto">
                 <li class="menu-item social-top">
                   <span class="label">Kết nối</span>
-                  <a href="<?php echo get_field('url_facebook', 'option'); ?>" target="_blank">
+                  <a href="<?php echo $eto_options['url_facebook']; ?>" target="_blank">
                     <i class="fa fa-facebook-official" aria-hidden="true"></i>
                   </a>
-                  <a href="<?php echo get_field('url_youtube', 'option'); ?>" target="_blank">
+                  <a href="<?php echo $eto_options['url_youtube']; ?>" target="_blank">
                     <i class="fa fa-youtube-play" aria-hidden="true"></i>
                   </a>
-                  <a href="<?php echo get_field('url_google', 'option'); ?>" target="_blank">
+                  <a href="<?php echo $eto_options['url_google']; ?>" target="_blank">
                     <i class="fa fa-google-plus-official" aria-hidden="true"></i>
                   </a>
                 </li>
@@ -143,7 +145,7 @@ $slugName = $getQuery -> name;
               <div class="header-logo">
                 <h1 class="headline"><?php echo SLOGAN?></h1>
                 <a href="<?php echo HOME_URL;?>" title="Đồng phục sóc vàng">
-                  <img src="<?php echo get_field('logo_header', 'option'); ?>" class="logo-header-desktop"
+                  <img src="<?php echo $logo_header; ?>" width="72" class="logo-header-desktop"
                     alt="Đồng phục sóc vàng" data-no-lazy="1"> </a>
               </div>
             </div>

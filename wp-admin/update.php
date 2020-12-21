@@ -91,7 +91,7 @@ if ( isset( $_GET['action'] ) ) {
 			echo '<p>' . __( 'Plugin failed to reactivate due to a fatal error.' ) . '</p>';
 
 			error_reporting( E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_ERROR | E_WARNING | E_PARSE | E_USER_ERROR | E_USER_WARNING | E_RECOVERABLE_ERROR );
-			ini_set( 'display_errors', true ); //Ensure that Fatal errors are displayed.
+			@ini_set( 'display_errors', true ); //Ensure that Fatal errors are displayed.
 			wp_register_plugin_realpath( WP_PLUGIN_DIR . '/' . $plugin );
 			include( WP_PLUGIN_DIR . '/' . $plugin );
 		}
@@ -106,8 +106,7 @@ if ( isset( $_GET['action'] ) ) {
 
 		check_admin_referer( 'install-plugin_' . $plugin );
 		$api = plugins_api(
-			'plugin_information',
-			array(
+			'plugin_information', array(
 				'slug'   => $plugin,
 				'fields' => array(
 					'sections' => false,
@@ -124,7 +123,6 @@ if ( isset( $_GET['action'] ) ) {
 		$submenu_file = 'plugin-install.php';
 		require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
-		/* translators: %s: Plugin name and version. */
 		$title = sprintf( __( 'Installing Plugin: %s' ), $api->name . ' ' . $api->version );
 		$nonce = 'install-plugin_' . $plugin;
 		$url   = 'update.php?action=install-plugin&plugin=' . urlencode( $plugin );
@@ -154,7 +152,6 @@ if ( isset( $_GET['action'] ) ) {
 		$submenu_file = 'plugin-install.php';
 		require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
-		/* translators: %s: File name. */
 		$title = sprintf( __( 'Installing Plugin from uploaded file: %s' ), esc_html( basename( $file_upload->filename ) ) );
 		$nonce = 'plugin-upload';
 		$url   = add_query_arg( array( 'package' => $file_upload->id ), 'update.php?action=upload-plugin' );
@@ -228,8 +225,7 @@ if ( isset( $_GET['action'] ) ) {
 
 		check_admin_referer( 'install-theme_' . $theme );
 		$api = themes_api(
-			'theme_information',
-			array(
+			'theme_information', array(
 				'slug'   => $theme,
 				'fields' => array(
 					'sections' => false,
@@ -247,7 +243,6 @@ if ( isset( $_GET['action'] ) ) {
 		$submenu_file = 'themes.php';
 		require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
-		/* translators: %s: Theme name and version. */
 		$title = sprintf( __( 'Installing Theme: %s' ), $api->name . ' ' . $api->version );
 		$nonce = 'install-theme_' . $theme;
 		$url   = 'update.php?action=install-theme&theme=' . urlencode( $theme );
@@ -274,7 +269,6 @@ if ( isset( $_GET['action'] ) ) {
 
 		require_once( ABSPATH . 'wp-admin/admin-header.php' );
 
-		/* translators: %s: File name. */
 		$title = sprintf( __( 'Installing Theme from uploaded file: %s' ), esc_html( basename( $file_upload->filename ) ) );
 		$nonce = 'theme-upload';
 		$url   = add_query_arg( array( 'package' => $file_upload->id ), 'update.php?action=upload-theme' );
@@ -299,6 +293,6 @@ if ( isset( $_GET['action'] ) ) {
 		 *
 		 * @since 2.8.0
 		 */
-		do_action( "update-custom_{$action}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		do_action( "update-custom_{$action}" );
 	}
 }

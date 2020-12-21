@@ -73,7 +73,6 @@
  *                                       FAQ, screenshots, other notes, and changelog. Default false.
  *         @type bool $tested            Whether to return the 'Compatible up to' value. Default true.
  *         @type bool $requires          Whether to return the required WordPress version. Default true.
- *         @type bool $requires_php      Whether to return the required PHP version. Default true.
  *         @type bool $rating            Whether to return the rating in percent and total number of ratings.
  *                                       Default true.
  *         @type bool $ratings           Whether to return the number of rating for each star (1-5). Default true.
@@ -161,8 +160,7 @@ function plugins_api( $action, $args = array() ) {
 		);
 
 		$http_url = $url;
-		$ssl      = wp_http_supports( array( 'ssl' ) );
-		if ( $ssl ) {
+		if ( $ssl = wp_http_supports( array( 'ssl' ) ) ) {
 			$url = set_url_scheme( $url, 'https' );
 		}
 
@@ -175,9 +173,9 @@ function plugins_api( $action, $args = array() ) {
 		if ( $ssl && is_wp_error( $request ) ) {
 			trigger_error(
 				sprintf(
-					/* translators: %s: Support forums URL. */
+					/* translators: %s: support forums URL */
 					__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.' ),
-					__( 'https://wordpress.org/support/forums/' )
+					__( 'https://wordpress.org/support/' )
 				) . ' ' . __( '(WordPress could not establish a secure connection to WordPress.org. Please contact your server administrator.)' ),
 				headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
 			);
@@ -188,9 +186,9 @@ function plugins_api( $action, $args = array() ) {
 			$res = new WP_Error(
 				'plugins_api_failed',
 				sprintf(
-					/* translators: %s: Support forums URL. */
+					/* translators: %s: support forums URL */
 					__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.' ),
-					__( 'https://wordpress.org/support/forums/' )
+					__( 'https://wordpress.org/support/' )
 				),
 				$request->get_error_message()
 			);
@@ -203,9 +201,9 @@ function plugins_api( $action, $args = array() ) {
 				$res = new WP_Error(
 					'plugins_api_failed',
 					sprintf(
-						/* translators: %s: Support forums URL. */
+						/* translators: %s: support forums URL */
 						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.' ),
-						__( 'https://wordpress.org/support/forums/' )
+						__( 'https://wordpress.org/support/' )
 					),
 					wp_remote_retrieve_body( $request )
 				);
@@ -240,9 +238,8 @@ function plugins_api( $action, $args = array() ) {
  * @return array
  */
 function install_popular_tags( $args = array() ) {
-	$key  = md5( serialize( $args ) );
-	$tags = get_site_transient( 'poptags_' . $key );
-	if ( false !== $tags ) {
+	$key = md5( serialize( $args ) );
+	if ( false !== ( $tags = get_site_transient( 'poptags_' . $key ) ) ) {
 		return $tags;
 	}
 
@@ -262,15 +259,7 @@ function install_popular_tags( $args = array() ) {
  */
 function install_dashboard() {
 	?>
-	<p>
-		<?php
-		printf(
-			/* translators: %s: https://wordpress.org/plugins/ */
-			__( 'Plugins extend and expand the functionality of WordPress. You may automatically install plugins from the <a href="%s">WordPress Plugin Directory</a> or upload a plugin in .zip format by clicking the button at the top of this page.' ),
-			__( 'https://wordpress.org/plugins/' )
-		);
-		?>
-	</p>
+	<p><?php printf( __( 'Plugins extend and expand the functionality of WordPress. You may automatically install plugins from the <a href="%1$s">WordPress Plugin Directory</a> or upload a plugin in .zip format by clicking the button at the top of this page.' ), __( 'https://wordpress.org/plugins/' ) ); ?></p>
 
 	<?php display_plugins_table(); ?>
 
@@ -299,11 +288,8 @@ function install_dashboard() {
 			$tags[ $tag['name'] ] = (object) $data;
 		}
 		echo wp_generate_tag_cloud(
-			$tags,
-			array(
-				/* translators: %s: Number of plugins. */
+			$tags, array(
 				'single_text'   => __( '%s plugin' ),
-				/* translators: %s: Number of plugins. */
 				'multiple_text' => __( '%s plugins' ),
 			)
 		);
@@ -345,7 +331,7 @@ function install_search_form( $deprecated = true ) {
  * @since 2.8.0
  */
 function install_plugins_upload() {
-	?>
+?>
 <div class="upload-plugin">
 	<p class="install-help"><?php _e( 'If you have a plugin in a .zip format, you may install it by uploading it here.' ); ?></p>
 	<form method="post" enctype="multipart/form-data" class="wp-upload-form" action="<?php echo self_admin_url( 'update.php?action=upload-plugin' ); ?>">
@@ -355,7 +341,7 @@ function install_plugins_upload() {
 		<?php submit_button( __( 'Install Now' ), '', 'install-plugin-submit', false ); ?>
 	</form>
 </div>
-	<?php
+<?php
 }
 
 /**
@@ -401,7 +387,6 @@ function display_plugins_table() {
 			break;
 		case 'install_plugins_beta':
 			printf(
-				/* translators: %s: URL to "Features as Plugins" page. */
 				'<p>' . __( 'You are using a development version of WordPress. These feature plugins are also under development. <a href="%s">Learn more</a>.' ) . '</p>',
 				'https://make.wordpress.org/core/handbook/about/release-cycle/features-as-plugins/'
 			);
@@ -441,7 +426,6 @@ function install_plugin_install_status( $api, $loop = false ) {
 	$status      = 'install';
 	$url         = false;
 	$update_file = false;
-	$version     = '';
 
 	/*
 	 * Check to see if this plugin is known to be installed,
@@ -517,9 +501,8 @@ function install_plugin_information() {
 	}
 
 	$api = plugins_api(
-		'plugin_information',
-		array(
-			'slug' => wp_unslash( $_REQUEST['plugin'] ),
+		'plugin_information', array(
+			'slug'   => wp_unslash( $_REQUEST['plugin'] ),
 		)
 	);
 
@@ -651,7 +634,7 @@ function install_plugin_information() {
 			<?php } if ( ! empty( $api->last_updated ) ) { ?>
 				<li><strong><?php _e( 'Last Updated:' ); ?></strong>
 					<?php
-					/* translators: %s: Human-readable time difference. */
+					/* translators: %s: Time since the last update */
 					printf( __( '%s ago' ), human_time_diff( strtotime( $api->last_updated ) ) );
 					?>
 				</li>
@@ -659,7 +642,7 @@ function install_plugin_information() {
 				<li>
 					<strong><?php _e( 'Requires WordPress Version:' ); ?></strong>
 					<?php
-					/* translators: %s: Version number. */
+					/* translators: %s: version number */
 					printf( __( '%s or higher' ), $api->requires );
 					?>
 				</li>
@@ -669,27 +652,26 @@ function install_plugin_information() {
 				<li>
 					<strong><?php _e( 'Requires PHP Version:' ); ?></strong>
 					<?php
-					/* translators: %s: Version number. */
+					/* translators: %s: version number */
 					printf( __( '%s or higher' ), $api->requires_php );
 					?>
 				</li>
 			<?php } if ( isset( $api->active_installs ) ) { ?>
 				<li><strong><?php _e( 'Active Installations:' ); ?></strong>
-				<?php
-				if ( $api->active_installs >= 1000000 ) {
-					$active_installs_millions = floor( $api->active_installs / 1000000 );
-					printf(
-						/* translators: %s: Number of millions. */
-						_nx( '%s+ Million', '%s+ Million', $active_installs_millions, 'Active plugin installations' ),
-						number_format_i18n( $active_installs_millions )
-					);
-				} elseif ( 0 == $api->active_installs ) {
-					_ex( 'Less Than 10', 'Active plugin installations' );
-				} else {
-					echo number_format_i18n( $api->active_installs ) . '+';
-				}
-				?>
-				</li>
+										<?php
+										if ( $api->active_installs >= 1000000 ) {
+											$active_installs_millions = floor( $api->active_installs / 1000000 );
+											printf(
+												_nx( '%s+ Million', '%s+ Million', $active_installs_millions, 'Active plugin installations' ),
+												number_format_i18n( $active_installs_millions )
+											);
+										} elseif ( 0 == $api->active_installs ) {
+											_ex( 'Less Than 10', 'Active plugin installations' );
+										} else {
+											echo number_format_i18n( $api->active_installs ) . '+';
+										}
+					?>
+					</li>
 			<?php } if ( ! empty( $api->slug ) && empty( $api->external ) ) { ?>
 				<li><a target="_blank" href="<?php echo __( 'https://wordpress.org/plugins/' ) . $api->slug; ?>/"><?php _e( 'WordPress.org Plugin Page &#187;' ); ?></a></li>
 			<?php } if ( ! empty( $api->homepage ) ) { ?>
@@ -708,35 +690,23 @@ function install_plugin_information() {
 					'number' => $api->num_ratings,
 				)
 			);
-			?>
-			<p aria-hidden="true" class="fyi-description">
-				<?php
-				printf(
-					/* translators: %s: Number of ratings. */
-					_n( '(based on %s rating)', '(based on %s ratings)', $api->num_ratings ),
-					number_format_i18n( $api->num_ratings )
-				);
-				?>
-			</p>
-			<?php
-		}
+?>
+			<p aria-hidden="true" class="fyi-description"><?php printf( _n( '(based on %s rating)', '(based on %s ratings)', $api->num_ratings ), number_format_i18n( $api->num_ratings ) ); ?></p>
+		<?php
+}
 
-		if ( ! empty( $api->ratings ) && array_sum( (array) $api->ratings ) > 0 ) {
-			?>
+if ( ! empty( $api->ratings ) && array_sum( (array) $api->ratings ) > 0 ) {
+		?>
 			<h3><?php _e( 'Reviews' ); ?></h3>
 			<p class="fyi-description"><?php _e( 'Read all reviews on WordPress.org or write your own!' ); ?></p>
 			<?php
 			foreach ( $api->ratings as $key => $ratecount ) {
 				// Avoid div-by-zero.
-				$_rating    = $api->num_ratings ? ( $ratecount / $api->num_ratings ) : 0;
+				$_rating = $api->num_ratings ? ( $ratecount / $api->num_ratings ) : 0;
+				/* translators: 1: number of stars (used to determine singular/plural), 2: number of reviews */
 				$aria_label = esc_attr(
 					sprintf(
-						/* translators: 1: Number of stars (used to determine singular/plural), 2: Number of reviews. */
-						_n(
-							'Reviews with %1$d star: %2$s. Opens in a new tab.',
-							'Reviews with %1$d stars: %2$s. Opens in a new tab.',
-							$key
-						),
+						_n( 'Reviews with %1$d star: %2$s. Opens in a new tab.', 'Reviews with %1$d stars: %2$s. Opens in a new tab.', $key ),
 						$key,
 						number_format_i18n( $ratecount )
 					)
@@ -744,15 +714,8 @@ function install_plugin_information() {
 				?>
 				<div class="counter-container">
 						<span class="counter-label">
-							<?php
-							printf(
-								'<a href="%s" target="_blank" aria-label="%s">%s</a>',
-								"https://wordpress.org/support/plugin/{$api->slug}/reviews/?filter={$key}",
-								$aria_label,
-								/* translators: %s: Number of stars. */
-								sprintf( _n( '%d star', '%d stars', $key ), $key )
-							);
-							?>
+							<a href="https://wordpress.org/support/plugin/<?php echo $api->slug; ?>/reviews/?filter=<?php echo $key; ?>"
+								target="_blank" aria-label="<?php echo $aria_label; ?>"><?php printf( _n( '%d star', '%d stars', $key ), $key ); ?></a>
 						</span>
 						<span class="counter-back">
 							<span class="counter-bar" style="width: <?php echo 92 * $_rating; ?>px;"></span>
@@ -761,9 +724,9 @@ function install_plugin_information() {
 				</div>
 				<?php
 			}
-		}
-		if ( ! empty( $api->contributors ) ) {
-			?>
+}
+if ( ! empty( $api->contributors ) ) {
+		?>
 			<h3><?php _e( 'Contributors' ); ?></h3>
 			<ul class="contributors">
 				<?php
@@ -775,58 +738,25 @@ function install_plugin_information() {
 					$contrib_name = esc_html( $contrib_name );
 
 					$contrib_profile = esc_url( $contrib_details['profile'] );
-					$contrib_avatar  = esc_url( add_query_arg( 's', '36', $contrib_details['avatar'] ) );
+					$contrib_avatar = esc_url( add_query_arg( 's', '36', $contrib_details['avatar'] ) );
 
 					echo "<li><a href='{$contrib_profile}' target='_blank'><img src='{$contrib_avatar}' width='18' height='18' alt='' />{$contrib_name}</a></li>";
 				}
 				?>
 			</ul>
-					<?php if ( ! empty( $api->donate_link ) ) { ?>
+			<?php if ( ! empty( $api->donate_link ) ) { ?>
 				<a target="_blank" href="<?php echo esc_url( $api->donate_link ); ?>"><?php _e( 'Donate to this plugin &#187;' ); ?></a>
 			<?php } ?>
-				<?php } ?>
+		<?php } ?>
 	</div>
-	<div id="section-holder">
+	<div id="section-holder" class="wrap">
 	<?php
-	$requires_php = isset( $api->requires_php ) ? $api->requires_php : null;
-	$requires_wp  = isset( $api->requires ) ? $api->requires : null;
+	$wp_version = get_bloginfo( 'version' );
 
-	$compatible_php = is_php_version_compatible( $requires_php );
-	$compatible_wp  = is_wp_version_compatible( $requires_wp );
-	$tested_wp      = ( empty( $api->tested ) || version_compare( get_bloginfo( 'version' ), $api->tested, '<=' ) );
-
-	if ( ! $compatible_php ) {
-		echo '<div class="notice notice-error notice-alt"><p>';
-		_e( '<strong>Error:</strong> This plugin <strong>requires a newer version of PHP</strong>.' );
-		if ( current_user_can( 'update_php' ) ) {
-			printf(
-				/* translators: %s: URL to Update PHP page. */
-				' ' . __( '<a href="%s" target="_blank">Click here to learn more about updating PHP</a>.' ),
-				esc_url( wp_get_update_php_url() )
-			);
-
-			wp_update_php_annotation( '</p><p><em>', '</em>' );
-		} else {
-			echo '</p>';
-		}
-		echo '</div>';
-	}
-
-	if ( ! $tested_wp ) {
-		echo '<div class="notice notice-warning notice-alt"><p>';
-		_e( '<strong>Warning:</strong> This plugin <strong>has not been tested</strong> with your current version of WordPress.' );
-		echo '</p></div>';
-	} elseif ( ! $compatible_wp ) {
-		echo '<div class="notice notice-error notice-alt"><p>';
-		_e( '<strong>Error:</strong> This plugin <strong>requires a newer version of WordPress</strong>.' );
-		if ( current_user_can( 'update_core' ) ) {
-			printf(
-				/* translators: %s: URL to WordPress Updates screen. */
-				' ' . __( '<a href="%s" target="_parent">Click here to update WordPress</a>.' ),
-				self_admin_url( 'update-core.php' )
-			);
-		}
-		echo '</p></div>';
+	if ( ! empty( $api->tested ) && version_compare( substr( $wp_version, 0, strlen( $api->tested ) ), $api->tested, '>' ) ) {
+		echo '<div class="notice notice-warning notice-alt"><p>' . __( '<strong>Warning:</strong> This plugin has <strong>not been tested</strong> with your current version of WordPress.' ) . '</p></div>';
+	} elseif ( ! empty( $api->requires ) && version_compare( substr( $wp_version, 0, strlen( $api->requires ) ), $api->requires, '<' ) ) {
+		echo '<div class="notice notice-warning notice-alt"><p>' . __( '<strong>Warning:</strong> This plugin has <strong>not been marked as compatible</strong> with your version of WordPress.' ) . '</p></div>';
 	}
 
 	foreach ( (array) $api->sections as $section_name => $content ) {
@@ -850,30 +780,16 @@ function install_plugin_information() {
 		switch ( $status['status'] ) {
 			case 'install':
 				if ( $status['url'] ) {
-					if ( $compatible_php && $compatible_wp ) {
-						echo '<a data-slug="' . esc_attr( $api->slug ) . '" id="plugin_install_from_iframe" class="button button-primary right" href="' . $status['url'] . '" target="_parent">' . __( 'Install Now' ) . '</a>';
-					} else {
-						printf(
-							'<button type="button" class="button button-primary button-disabled right" disabled="disabled">%s</button>',
-							_x( 'Cannot Install', 'plugin' )
-						);
-					}
+					echo '<a data-slug="' . esc_attr( $api->slug ) . '" id="plugin_install_from_iframe" class="button button-primary right" href="' . $status['url'] . '" target="_parent">' . __( 'Install Now' ) . '</a>';
 				}
 				break;
 			case 'update_available':
 				if ( $status['url'] ) {
-					if ( $compatible_php ) {
-						echo '<a data-slug="' . esc_attr( $api->slug ) . '" data-plugin="' . esc_attr( $status['file'] ) . '" id="plugin_update_from_iframe" class="button button-primary right" href="' . $status['url'] . '" target="_parent">' . __( 'Install Update Now' ) . '</a>';
-					} else {
-						printf(
-							'<button type="button" class="button button-primary button-disabled right" disabled="disabled">%s</button>',
-							_x( 'Cannot Update', 'plugin' )
-						);
-					}
+					echo '<a data-slug="' . esc_attr( $api->slug ) . '" data-plugin="' . esc_attr( $status['file'] ) . '" id="plugin_update_from_iframe" class="button button-primary right" href="' . $status['url'] . '" target="_parent">' . __( 'Install Update Now' ) . '</a>';
 				}
 				break;
 			case 'newer_installed':
-				/* translators: %s: Plugin version. */
+				/* translators: %s: Plugin version */
 				echo '<a class="button button-primary right disabled">' . sprintf( __( 'Newer Version (%s) Installed' ), $status['version'] ) . '</a>';
 				break;
 			case 'latest_installed':

@@ -52,30 +52,29 @@ class WP_Widget_Meta extends WP_Widget {
 		if ( $title ) {
 			echo $args['before_title'] . $title . $args['after_title'];
 		}
-		?>
+			?>
 			<ul>
 			<?php wp_register(); ?>
 			<li><?php wp_loginout(); ?></li>
-			<li><a href="<?php echo esc_url( get_bloginfo( 'rss2_url' ) ); ?>"><?php _e( 'Entries feed' ); ?></a></li>
-			<li><a href="<?php echo esc_url( get_bloginfo( 'comments_rss2_url' ) ); ?>"><?php _e( 'Comments feed' ); ?></a></li>
+			<li><a href="<?php echo esc_url( get_bloginfo( 'rss2_url' ) ); ?>"><?php _e( 'Entries <abbr title="Really Simple Syndication">RSS</abbr>' ); ?></a></li>
+			<li><a href="<?php echo esc_url( get_bloginfo( 'comments_rss2_url' ) ); ?>"><?php _e( 'Comments <abbr title="Really Simple Syndication">RSS</abbr>' ); ?></a></li>
 			<?php
 			/**
-			 * Filters the "WordPress.org" list item HTML in the Meta widget.
+			 * Filters the "Powered by WordPress" text in the Meta widget.
 			 *
 			 * @since 3.6.0
 			 * @since 4.9.0 Added the `$instance` parameter.
 			 *
-			 * @param string $html     Default HTML for the WordPress.org list item.
-			 * @param array  $instance Array of settings for the current widget.
+			 * @param string $title_text Default title text for the WordPress.org link.
+			 * @param array  $instance   Array of settings for the current widget.
 			 */
 			echo apply_filters(
-				'widget_meta_poweredby',
-				sprintf(
-					'<li><a href="%1$s">%2$s</a></li>',
+				'widget_meta_poweredby', sprintf(
+					'<li><a href="%s" title="%s">%s</a></li>',
 					esc_url( __( 'https://wordpress.org/' ) ),
-					__( 'WordPress.org' )
-				),
-				$instance
+					esc_attr__( 'Powered by WordPress, state-of-the-art semantic personal publishing platform.' ),
+					_x( 'WordPress.org', 'meta widget link text' )
+				), $instance
 			);
 
 			wp_meta();
@@ -112,8 +111,9 @@ class WP_Widget_Meta extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, array( 'title' => '' ) );
-		?>
-			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $instance['title'] ); ?>" /></p>
-		<?php
+		$title    = sanitize_text_field( $instance['title'] );
+?>
+			<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></p>
+<?php
 	}
 }

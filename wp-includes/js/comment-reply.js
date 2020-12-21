@@ -8,7 +8,8 @@
  *
  * @type {Object}
  */
-window.addComment = ( function( window ) {
+var addComment;
+addComment = ( function( window ) {
 	// Avoid scope lookups on commonly used variables.
 	var document = window.document;
 
@@ -22,9 +23,6 @@ window.addComment = ( function( window ) {
 		postIdFieldId     : 'comment_post_ID'
 	};
 
-	// Cross browser MutationObserver.
-	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-
 	// Check browser cuts the mustard.
 	var cutsTheMustard = 'querySelector' in document && 'addEventListener' in window;
 
@@ -32,7 +30,7 @@ window.addComment = ( function( window ) {
 	 * Check browser supports dataset.
 	 * !! sets the variable to true if the property exists.
 	 */
-	var supportsDataset = !! document.documentElement.dataset;
+	var supportsDataset = !! document.body.dataset;
 
 	// For holding the cancel element.
 	var cancelElement;
@@ -43,27 +41,8 @@ window.addComment = ( function( window ) {
 	// The respond element.
 	var respondElement;
 
-	// The mutation observer.
-	var observer;
-
-	if ( cutsTheMustard && document.readyState !== 'loading' ) {
-		ready();
-	} else if ( cutsTheMustard ) {
-		window.addEventListener( 'DOMContentLoaded', ready, false );
-	}
-
-	/**
-	 * Sets up object variables after the DOM is ready.
-	 *
-	 * @since 5.1.1
-	 */
-	function ready() {
-		// Initialise the events.
-		init();
-
-		// Set up a MutationObserver to check for comments loaded late.
-		observeChanges();
-	}
+	// Initialise the events.
+	init();
 
 	/**
 	 * Add events to links classed .comment-reply-link.
@@ -72,14 +51,14 @@ window.addComment = ( function( window ) {
 	 * required to move the comment form. To allow for lazy loading of
 	 * comments this method is exposed as window.commentReply.init().
 	 *
-	 * @since 5.1.0
+	 * @since 5.0.0
 	 *
 	 * @memberOf addComment
 	 *
 	 * @param {HTMLElement} context The parent DOM element to search for links.
 	 */
 	function init( context ) {
-		if ( ! cutsTheMustard ) {
+		if ( true !== cutsTheMustard ) {
 			return;
 		}
 
@@ -95,21 +74,6 @@ window.addComment = ( function( window ) {
 		cancelElement.addEventListener( 'touchstart', cancelEvent );
 		cancelElement.addEventListener( 'click',      cancelEvent );
 
-		// Submit the comment form when the user types CTRL or CMD + 'Enter'.
-		var submitFormHandler = function( e ) {
-			if ( ( e.metaKey || e.ctrlKey ) && e.keyCode === 13 ) {
-				commentFormElement.removeEventListener( 'keydown', submitFormHandler );
-				e.preventDefault();
-				// The submit button ID is 'submit' so we can't call commentFormElement.submit(). Click it instead.
-				commentFormElement.submit.click();
-				return false;
-			}
-		};
-
-		if ( commentFormElement ) {
-			commentFormElement.addEventListener( 'keydown', submitFormHandler );
-		}
-
 		var links = replyLinks( context );
 		var element;
 
@@ -124,7 +88,7 @@ window.addComment = ( function( window ) {
 	/**
 	 * Return all links classed .comment-reply-link.
 	 *
-	 * @since 5.1.0
+	 * @since 5.0.0
 	 *
 	 * @param {HTMLElement} context The parent DOM element to search for links.
 	 *
@@ -154,7 +118,7 @@ window.addComment = ( function( window ) {
 	/**
 	 * Cancel event handler.
 	 *
-	 * @since 5.1.0
+	 * @since 5.0.0
 	 *
 	 * @param {Event} event The calling event.
 	 */
@@ -179,7 +143,7 @@ window.addComment = ( function( window ) {
 	/**
 	 * Click event handler.
 	 *
-	 * @since 5.1.0
+	 * @since 5.0.0
 	 *
 	 * @param {Event} event The calling event.
 	 */
@@ -190,14 +154,6 @@ window.addComment = ( function( window ) {
 			respondId = getDataAttribute( replyLink, 'respondelement'),
 			postId    = getDataAttribute( replyLink, 'postid'),
 			follow;
-
-		if ( ! commId || ! parentId || ! respondId || ! postId ) {
-			/*
-			 * Theme or plugin defines own link via custom `wp_list_comments()` callback
-			 * and calls `moveForm()` either directly or via a custom event hook.
-			 */
-			return;
-		}
 
 		/*
 		 * Third party comments systems can hook into this function via the global scope,
@@ -210,49 +166,11 @@ window.addComment = ( function( window ) {
 	}
 
 	/**
-	 * Creates a mutation observer to check for newly inserted comments.
-	 *
-	 * @since 5.1.0
-	 */
-	function observeChanges() {
-		if ( ! MutationObserver ) {
-			return;
-		}
-
-		var observerOptions = {
-			childList: true,
-			subtree: true
-		};
-
-		observer = new MutationObserver( handleChanges );
-		observer.observe( document.body, observerOptions );
-	}
-
-	/**
-	 * Handles DOM changes, calling init() if any new nodes are added.
-	 *
-	 * @since 5.1.0
-	 *
-	 * @param {Array} mutationRecords Array of MutationRecord objects.
-	 */
-	function handleChanges( mutationRecords ) {
-		var i = mutationRecords.length;
-
-		while ( i-- ) {
-			// Call init() once if any record in this set adds nodes.
-			if ( mutationRecords[ i ].addedNodes.length ) {
-				init();
-				return;
-			}
-		}
-	}
-
-	/**
 	 * Backward compatible getter of data-* attribute.
 	 *
 	 * Uses element.dataset if it exists, otherwise uses getAttribute.
 	 *
-	 * @since 5.1.0
+	 * @since 5.0.0
 	 *
 	 * @param {HTMLElement} Element DOM element with the attribute.
 	 * @param {String}      Attribute the attribute to get.
@@ -273,7 +191,7 @@ window.addComment = ( function( window ) {
 	 *
 	 * Local alias for document.getElementById.
 	 *
-	 * @since 5.1.0
+	 * @since 5.0.0
 	 *
 	 * @param {HTMLElement} The requested element.
 	 */
@@ -324,7 +242,7 @@ window.addComment = ( function( window ) {
 		 * This is for backward compatibility with third party commenting systems
 		 * hooking into the event using older techniques.
 		 */
-		cancelElement.onclick = function() {
+		cancelElement.onclick = function(){
 			return false;
 		};
 

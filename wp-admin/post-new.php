@@ -12,7 +12,7 @@ require_once( dirname( __FILE__ ) . '/admin.php' );
 /**
  * @global string  $post_type
  * @global object  $post_type_object
- * @global WP_Post $post             Global post object.
+ * @global WP_Post $post
  */
 global $post_type, $post_type_object, $post;
 
@@ -68,16 +68,8 @@ $post_ID = $post->ID;
 
 /** This filter is documented in wp-admin/post.php */
 if ( apply_filters( 'replace_editor', false, $post ) !== true ) {
-	if ( use_block_editor_for_post( $post ) ) {
-		include( ABSPATH . 'wp-admin/edit-form-blocks.php' );
-	} else {
-		wp_enqueue_script( 'autosave' );
-		include( ABSPATH . 'wp-admin/edit-form-advanced.php' );
-	}
-} else {
-	// Flag that we're not loading the block editor.
-	$current_screen = get_current_screen();
-	$current_screen->is_block_editor( false );
+	wp_enqueue_script( 'autosave' );
+	include( ABSPATH . 'wp-admin/edit-form-advanced.php' );
 }
 
 include( ABSPATH . 'wp-admin/admin-footer.php' );

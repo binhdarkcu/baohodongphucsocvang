@@ -112,10 +112,10 @@ wp.customHtmlWidgets = ( function( $ ) {
 			 * to prevent the editor's contents from getting sanitized as soon as a user removes focus from
 			 * the editor. This is particularly important for users who cannot unfiltered_html.
 			 */
-			control.contentUpdateBypassed = control.fields.content.is( document.activeElement ) || control.editor && control.editor.codemirror.state.focused || 0 !== control.currentErrorAnnotations.length;
+			control.contentUpdateBypassed = control.fields.content.is( document.activeElement ) || control.editor && control.editor.codemirror.state.focused || 0 !== control.currentErrorAnnotations;
 			if ( ! control.contentUpdateBypassed ) {
 				syncInput = control.syncContainer.find( '.sync-input.content' );
-				control.fields.content.val( syncInput.val() );
+				control.fields.content.val( syncInput.val() ).trigger( 'change' );
 			}
 		},
 

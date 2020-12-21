@@ -142,8 +142,7 @@ class WP_Dependencies {
 	 * @return bool True on success, false on failure.
 	 */
 	public function all_deps( $handles, $recursion = false, $group = false ) {
-		$handles = (array) $handles;
-		if ( ! $handles ) {
+		if ( ! $handles = (array) $handles ) {
 			return false;
 		}
 
@@ -203,8 +202,7 @@ class WP_Dependencies {
 	 * @since 2.6.0 Moved from `WP_Scripts`.
 	 *
 	 * @param string           $handle Name of the item. Should be unique.
-	 * @param string|bool      $src    Full URL of the item, or path of the item relative to the WordPress root directory.
-	 *                                 If source is set to false, item is an alias of other items it depends on.
+	 * @param string           $src    Full URL of the item, or path of the item relative to the WordPress root directory.
 	 * @param string[]         $deps   Optional. An array of registered item handles this item depends on. Default empty array.
 	 * @param string|bool|null $ver    Optional. String specifying item version number, if it has one, which is added to the URL
 	 *                                 as a query string for cache busting purposes. If version is set to false, a version

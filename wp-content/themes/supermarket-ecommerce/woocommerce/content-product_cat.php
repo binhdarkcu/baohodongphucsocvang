@@ -71,7 +71,8 @@ if($parent_slug === 'danh-muc') {?>
 	</div>
 	<!--section-->
 	<?php
-			$amountProduct = get_field('amount_product_categories', 'option');
+			$eto_options = get_option('eto_settings');
+			$amountProduct = $eto_options['amount_product_categories'];
 			$args = array(
 	            'posts_per_page' => $amountProduct,
 							'paged' => get_query_var( 'paged' ),

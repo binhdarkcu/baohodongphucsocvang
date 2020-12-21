@@ -265,10 +265,7 @@ class WP_REST_Server {
 		 * @param bool $rest_enabled Whether the REST API is enabled. Default true.
 		 */
 		apply_filters_deprecated(
-			'rest_enabled',
-			array( true ),
-			'4.7.0',
-			'rest_authentication_errors',
+			'rest_enabled', array( true ), '4.7.0', 'rest_authentication_errors',
 			__( 'The REST API can no longer be completely disabled, the rest_authentication_errors filter can be used to restrict access to the API, instead.' )
 		);
 
@@ -310,7 +307,7 @@ class WP_REST_Server {
 		$request->set_body_params( wp_unslash( $_POST ) );
 		$request->set_file_params( $_FILES );
 		$request->set_headers( $this->get_headers( wp_unslash( $_SERVER ) ) );
-		$request->set_body( self::get_raw_data() );
+		$request->set_body( $this->get_raw_data() );
 
 		/*
 		 * HTTP method override for clients that can't use PUT/PATCH/DELETE. First, we check
@@ -401,11 +398,6 @@ class WP_REST_Server {
 			 */
 			$result = apply_filters( 'rest_pre_echo_response', $result, $this, $request );
 
-			// The 204 response shouldn't have a body.
-			if ( 204 === $code || null === $result ) {
-				return null;
-			}
-
 			$result = wp_json_encode( $result );
 
 			$json_error_message = $this->get_json_last_error();
@@ -442,7 +434,7 @@ class WP_REST_Server {
 	 */
 	public function response_to_data( $response, $embed ) {
 		$data  = $response->get_data();
-		$links = self::get_compact_response_links( $response );
+		$links = $this->get_compact_response_links( $response );
 
 		if ( ! empty( $links ) ) {
 			// Convert links to part of the data.
@@ -564,6 +556,11 @@ class WP_REST_Server {
 		$embedded = array();
 
 		foreach ( $data['_links'] as $rel => $links ) {
+			// Ignore links to self, for obvious reasons.
+			if ( 'self' === $rel ) {
+				continue;
+			}
+
 			$embeds = array();
 
 			foreach ( $links as $item ) {
@@ -659,9 +656,7 @@ class WP_REST_Server {
 			$this->namespaces[ $namespace ] = array();
 
 			$this->register_route(
-				$namespace,
-				'/' . $namespace,
-				array(
+				$namespace, '/' . $namespace, array(
 					array(
 						'methods'  => self::READABLE,
 						'callback' => array( $this, 'get_namespace_index' ),
@@ -904,9 +899,9 @@ class WP_REST_Server {
 				 *
 				 * @since 4.7.0
 				 *
-				 * @param WP_HTTP_Response|WP_Error $response Result to send to the client. Usually a WP_REST_Response or WP_Error.
-				 * @param array                     $handler  Route handler used for the request.
-				 * @param WP_REST_Request           $request  Request used to generate the response.
+				 * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
+				 * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
+				 * @param WP_REST_Request  $request  Request used to generate the response.
 				 */
 				$response = apply_filters( 'rest_request_before_callbacks', $response, $handler, $request );
 
@@ -932,7 +927,7 @@ class WP_REST_Server {
 					 * @since 4.4.0
 					 * @since 4.5.0 Added `$route` and `$handler` parameters.
 					 *
-					 * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
+					 * @param bool            $dispatch_result Dispatch result, will be used if not empty.
 					 * @param WP_REST_Request $request         Request used to generate the response.
 					 * @param string          $route           Route matched for the request.
 					 * @param array           $handler         Route handler used for the request.
@@ -963,9 +958,9 @@ class WP_REST_Server {
 				 *
 				 * @since 4.7.0
 				 *
-				 * @param WP_HTTP_Response|WP_Error $response Result to send to the client. Usually a WP_REST_Response or WP_Error.
-				 * @param array                     $handler  Route handler used for the request.
-				 * @param WP_REST_Request           $request  Request used to generate the response.
+				 * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
+				 * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
+				 * @param WP_REST_Request  $request  Request used to generate the response.
 				 */
 				$response = apply_filters( 'rest_request_after_callbacks', $response, $handler, $request );
 
@@ -996,9 +991,14 @@ class WP_REST_Server {
 	 * @return bool|string Boolean false or string error message.
 	 */
 	protected function get_json_last_error() {
+		// See https://core.trac.wordpress.org/ticket/27799.
+		if ( ! function_exists( 'json_last_error' ) ) {
+			return false;
+		}
+
 		$last_error_code = json_last_error();
 
-		if ( JSON_ERROR_NONE === $last_error_code || empty( $last_error_code ) ) {
+		if ( ( defined( 'JSON_ERROR_NONE' ) && JSON_ERROR_NONE === $last_error_code ) || empty( $last_error_code ) ) {
 			return false;
 		}
 
@@ -1274,7 +1274,19 @@ class WP_REST_Server {
 	 * @param string $key Header key.
 	 */
 	public function remove_header( $key ) {
-		header_remove( $key );
+		if ( function_exists( 'header_remove' ) ) {
+			// In PHP 5.3+ there is a way to remove an already set header.
+			header_remove( $key );
+		} else {
+			// In PHP 5.2, send an empty header, but only as a last resort to
+			// override a header already sent.
+			foreach ( headers_list() as $header ) {
+				if ( 0 === stripos( $header, "$key:" ) ) {
+					$this->send_header( $key, '' );
+					break;
+				}
+			}
+		}
 	}
 
 	/**

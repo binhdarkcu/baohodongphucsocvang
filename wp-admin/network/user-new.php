@@ -66,8 +66,7 @@ if ( isset( $_REQUEST['action'] ) && 'add-user' == $_REQUEST['action'] ) {
 					array(
 						'update'  => 'added',
 						'user_id' => $user_id,
-					),
-					'user-new.php'
+					), 'user-new.php'
 				)
 			);
 			exit;
@@ -86,13 +85,12 @@ if ( isset( $_GET['update'] ) ) {
 			}
 		}
 
-		$message = __( 'User added.' );
-
-		if ( $edit_link ) {
-			$message .= sprintf( ' <a href="%s">%s</a>', $edit_link, __( 'Edit user' ) );
+		if ( empty( $edit_link ) ) {
+			$messages[] = __( 'User added.' );
+		} else {
+			/* translators: %s: edit page url */
+			$messages[] = sprintf( __( 'User added. <a href="%s">Edit user</a>' ), $edit_link );
 		}
-
-		$messages[] = $message;
 	}
 }
 
@@ -111,7 +109,7 @@ if ( ! empty( $messages ) ) {
 }
 
 if ( isset( $add_user_errors ) && is_wp_error( $add_user_errors ) ) {
-	?>
+?>
 	<div class="error">
 		<?php
 		foreach ( $add_user_errors->get_error_messages() as $message ) {
@@ -121,7 +119,7 @@ if ( isset( $add_user_errors ) && is_wp_error( $add_user_errors ) ) {
 	</div>
 <?php } ?>
 	<form action="<?php echo network_admin_url( 'user-new.php?action=add-user' ); ?>" id="adduser" method="post" novalidate="novalidate">
-	<table class="form-table" role="presentation">
+	<table class="form-table">
 		<tr class="form-field form-required">
 			<th scope="row"><label for="username"><?php _e( 'Username' ); ?></label></th>
 			<td><input type="text" class="regular-text" name="user[username]" id="username" autocapitalize="none" autocorrect="off" maxlength="60" /></td>
@@ -131,7 +129,7 @@ if ( isset( $add_user_errors ) && is_wp_error( $add_user_errors ) ) {
 			<td><input type="email" class="regular-text" name="user[email]" id="email"/></td>
 		</tr>
 		<tr class="form-field">
-			<td colspan="2" class="td-full"><?php _e( 'A password reset link will be sent to the user via email.' ); ?></td>
+			<td colspan="2"><?php _e( 'A password reset link will be sent to the user via email.' ); ?></td>
 		</tr>
 	</table>
 	<?php

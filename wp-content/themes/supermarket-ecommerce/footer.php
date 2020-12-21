@@ -6,8 +6,14 @@
  * @since 1.0
  * @version 0.1
  */
-$sub_header_top_color = get_field('sub_header_top_color', 'option');
-
+ $eto_options = get_option('eto_settings');
+ $sub_header_top_color = '#'.$eto_options['sub_header_top_color'];
+	$first_col_title = $eto_options['first_col_title'];
+	$first_col_detail = $eto_options['first_col_detail'];
+	$sec_col_title = $eto_options['sec_col_title'];
+	$sec_col_detail = $eto_options['sec_col_detail'];
+	$third_col_title = $eto_options['third_col_title'];
+	$third_col_detail = $eto_options['third_col_detail'];
 ?>
 		</div>
 		<?php get_template_part('tpl', 'support');?>
@@ -21,8 +27,8 @@ $sub_header_top_color = get_field('sub_header_top_color', 'option');
               </svg>
             </div>
             <div class="content tappable">
-              <div class="title"><?php echo esc_html_e(get_field('first_col_title', 'option')); ?></div>
-              <div class="detail"><?php echo esc_html_e(get_field('first_col_detail', 'option')); ?></div>
+              <div class="title"><?php echo esc_html_e($first_col_title); ?></div>
+              <div class="detail"><?php echo esc_html_e($first_col_detail); ?></div>
             </div>
           </div>
           <div class="block-wrapper top-xs">
@@ -32,8 +38,8 @@ $sub_header_top_color = get_field('sub_header_top_color', 'option');
               </svg>
             </div>
             <div class="content">
-              <div class="title"><?php echo esc_html_e(get_field('sec_col_title', 'option')); ?></div>
-              <div class="detail"><?php echo esc_html_e(get_field('sec_col_detail', 'option')); ?></div>
+              <div class="title"><?php echo esc_html_e($sec_col_title); ?></div>
+              <div class="detail"><?php echo esc_html_e($sec_col_detail); ?></div>
             </div>
           </div>
           <div class="block-wrapper top-xs">
@@ -43,8 +49,8 @@ $sub_header_top_color = get_field('sub_header_top_color', 'option');
               </svg>
             </div>
             <div class="content">
-              <div class="title"><?php echo esc_html_e(get_field('third_col_title', 'option')); ?></div>
-              <div class="detail"><?php echo esc_html_e(get_field('third_col_detail', 'option')); ?></div>
+              <div class="title"><?php echo esc_html_e($third_col_title); ?></div>
+              <div class="detail"><?php echo esc_html_e($third_col_detail); ?></div>
             </div>
           </div>
         </div>

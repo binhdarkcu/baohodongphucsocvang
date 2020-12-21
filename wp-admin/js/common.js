@@ -3,7 +3,7 @@
  */
 
 /* global setUserSetting, ajaxurl, commonL10n, alert, confirm, pagenow */
-/* global columns, screenMeta */
+var showNotice, adminMenu, columns, validateForm, screenMeta;
 
 /**
  *  Adds common WordPress functionality to the window.
@@ -23,7 +23,7 @@
  * @since 2.7.0
  * @deprecated 3.3.0
  */
-window.adminMenu = {
+adminMenu = {
 	init : function() {},
 	fold : function() {},
 	restoreMenuState : function() {},
@@ -32,7 +32,7 @@ window.adminMenu = {
 };
 
 // Show/hide/save table columns.
-window.columns = {
+columns = {
 
 	/**
 	 * Initializes the column toggles in the screen options.
@@ -110,7 +110,7 @@ window.columns = {
 	 * @returns {string} The hidden column names separated by a comma.
 	 */
 	hidden : function() {
-		return $( '.manage-column[id]' ).filter( '.hidden' ).map(function() {
+		return $( '.manage-column[id]' ).filter( ':hidden' ).map(function() {
 			return this.id;
 		}).get().join( ',' );
 	},
@@ -158,7 +158,7 @@ $document.ready(function(){columns.init();});
  *
  * @returns {boolean} Returns true if all required fields are not an empty string.
  */
-window.validateForm = function( form ) {
+validateForm = function( form ) {
 	return !$( form )
 		.find( '.form-required' )
 		.filter( function() { return $( ':input:visible', this ).val() === ''; } )
@@ -178,7 +178,7 @@ window.validateForm = function( form ) {
  *
  * @returns {void}
  */
-window.showNotice = {
+showNotice = {
 
 	/**
 	 * Shows a delete confirmation pop-up message.
@@ -219,7 +219,7 @@ window.showNotice = {
  *
  * @returns {void}
  */
-window.screenMeta = {
+screenMeta = {
 	element: null, // #screen-meta
 	toggles: null, // .screen-meta-toggle
 	page:    null, // #wpcontent
@@ -1274,8 +1274,6 @@ $document.ready( function() {
 		init: function() {
 			var self = this;
 
-			this.maybeDisableSortables = this.maybeDisableSortables.bind( this );
-
 			// Modify functionality based on custom activate/deactivate event
 			$document.on( 'wp-responsive-activate.wp-responsive', function() {
 				self.activate();
@@ -1315,31 +1313,13 @@ $document.ready( function() {
 			$document.on( 'wp-window-resized.wp-responsive', $.proxy( this.trigger, this ) );
 
 			// This needs to run later as UI Sortable may be initialized later on $(document).ready().
-			$window.on( 'load.wp-responsive', this.maybeDisableSortables );
-			$document.on( 'postbox-toggled', this.maybeDisableSortables );
+			$window.on( 'load.wp-responsive', function() {
+				var width = navigator.userAgent.indexOf('AppleWebKit/') > -1 ? $window.width() : window.innerWidth;
 
-			// When the screen columns are changed, potentially disable sortables.
-			$( '#screen-options-wrap input' ).on( 'click', this.maybeDisableSortables );
-		},
-
-		/**
-		 * Disable sortables if there is only one metabox, or the screen is in one column mode. Otherwise, enable sortables.
-		 *
-		 * @since 5.3.0
-		 *
-		 * @returns {void}
-		 */
-		maybeDisableSortables: function() {
-			var width = navigator.userAgent.indexOf('AppleWebKit/') > -1 ? $window.width() : window.innerWidth;
-
-			if (
-				( width <= 782 ) ||
-				( 1 >= $sortables.find( '.ui-sortable-handle:visible' ).length && jQuery( '.columns-prefs-1 input' ).prop( 'checked' ) )
-			) {
-				this.disableSortables();
-			} else {
-				this.enableSortables();
-			}
+				if ( width <= 782 ) {
+					self.disableSortables();
+				}
+			});
 		},
 
 		/**
@@ -1376,8 +1356,7 @@ $document.ready( function() {
 		deactivate: function() {
 			setPinMenu();
 			$adminmenu.removeData('wp-responsive');
-
-			this.maybeDisableSortables();
+			this.enableSortables();
 		},
 
 		/**
@@ -1412,8 +1391,6 @@ $document.ready( function() {
 			} else {
 				this.disableOverlay();
 			}
-
-			this.maybeDisableSortables();
 		},
 
 		/**
@@ -1462,7 +1439,6 @@ $document.ready( function() {
 			if ( $sortables.length ) {
 				try {
 					$sortables.sortable( 'disable' );
-					$sortables.find( '.ui-sortable-handle' ).addClass( 'is-non-sortable' );
 				} catch ( e ) {}
 			}
 		},
@@ -1478,7 +1454,6 @@ $document.ready( function() {
 			if ( $sortables.length ) {
 				try {
 					$sortables.sortable( 'enable' );
-					$sortables.find( '.ui-sortable-handle' ).removeClass( 'is-non-sortable' );
 				} catch ( e ) {}
 			}
 		}

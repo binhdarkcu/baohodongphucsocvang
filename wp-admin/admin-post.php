@@ -31,10 +31,10 @@ do_action( 'admin_init' );
 
 $action = empty( $_REQUEST['action'] ) ? '' : $_REQUEST['action'];
 
-if ( ! is_user_logged_in() ) {
+if ( ! wp_validate_auth_cookie() ) {
 	if ( empty( $action ) ) {
 		/**
-		 * Fires on a non-authenticated admin post request where no action is supplied.
+		 * Fires on a non-authenticated admin post request where no action was supplied.
 		 *
 		 * @since 2.6.0
 		 */
@@ -53,7 +53,7 @@ if ( ! is_user_logged_in() ) {
 } else {
 	if ( empty( $action ) ) {
 		/**
-		 * Fires on an authenticated admin post request where no action is supplied.
+		 * Fires on an authenticated admin post request where no action was supplied.
 		 *
 		 * @since 2.6.0
 		 */
